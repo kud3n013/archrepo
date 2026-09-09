@@ -20,10 +20,7 @@ jobs:
       # ── 0. Install runtime deps inside the container ──────────────────
       - name: Install dependencies
         run: |
-          pacman -Syu --noconfirm git sudo jq nodejs pacman-contrib cmake \
-            vulkan-headers vulkan-icd-loader wayland libxcb libxrandr libx11 \
-            libdrm dconf dbus imagemagick chafa zlib hwdata opencl-headers \
-            ocl-icd libnm libpulse ddcutil directx-headers libelf
+          pacman -Syu --noconfirm git sudo jq pacman-contrib
 
       # ── 1. Checkout both branches ────────────────────────────────────
       - name: Checkout main
@@ -51,22 +48,26 @@ jobs:
       - name: Check for new upstream release
         id: version
         run: |
-          UPSTREAM_REPO="fastfetch-cli/fastfetch"
-          LATEST=$(curl -s "https://api.github.com/repos/${UPSTREAM_REPO}/releases/latest" \
-                   | jq -r '.tag_name')
+          # Proton Mail publishes versions via their download URL redirect
+          # We scrape the latest version from the .deb download headers
+          LATEST=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" \
+                   | grep -i '^location:' \
+                   | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)')
 
-          # Strip leading 'v' if present
-          LATEST="${LATEST#v}"
+          if [ -z "$LATEST" ]; then
+            echo "::warning::Could not determine latest version from redirect, falling back to PKGBUILD version"
+            LATEST=$(grep -oP '^pkgver=\K.*' src/proton-mail-bin/PKGBUILD)
+          fi
 
-          CURRENT=$(grep -oP '^pkgver=\K.*' src/my-app/PKGBUILD)
+          CURRENT=$(grep -oP '^pkgver=\K.*' src/proton-mail-bin/PKGBUILD)
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
           echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
 
           if [ "$LATEST" != "$CURRENT" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            sed -i "s/^pkgver=.*/pkgver=${LATEST}/" src/my-app/PKGBUILD
-            sed -i "s/^pkgrel=.*/pkgrel=1/"          src/my-app/PKGBUILD
+            sed -i "s/^pkgver=.*/pkgver=${LATEST}/" src/proton-mail-bin/PKGBUILD
+            sed -i "s/^pkgrel=.*/pkgrel=1/"          src/proton-mail-bin/PKGBUILD
             echo "📦 Updated pkgver: ${CURRENT} → ${LATEST}"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -77,14 +78,14 @@ jobs:
       - name: Update checksums & .SRCINFO
         if: steps.version.outputs.changed == 'true'
         run: |
-          cd src/my-app
+          cd src/proton-mail-bin
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
       # ── 5. Build the package ─────────────────────────────────────────
       - name: Build package
         run: |
-          cd src/my-app
+          cd src/proton-mail-bin
           sudo -u builder makepkg -s --noconfirm
 
       # ── 6. Update repo database ─────────────────────────────────────
@@ -93,21 +94,22 @@ jobs:
           mkdir -p repo/x86_64
 
           # Copy newly built package(s) into the repo directory
-          cp src/my-app/*.pkg.tar.zst repo/x86_64/
+          cp src/proton-mail-bin/*.pkg.tar.zst repo/x86_64/
 
           # Identify the package we just built (resolve before cd)
-          NEW_PKG=$(ls -t src/my-app/*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
+          NEW_PKG=$(ls -t src/proton-mail-bin/*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
 
           cd repo/x86_64
 
           # Remove older versions of the same package (keep only the new one)
-          for f in fastfetch-*.pkg.tar.zst; do
+          for f in proton-mail-bin-*.pkg.tar.zst; do
             [ "$f" = "$NEW_PKG" ] && continue
+            [ "$f" = 'proton-mail-bin-*.pkg.tar.zst' ] && continue  # glob didn't match
             echo "Removing old package: $f"
             rm -f "$f"
           done
 
-          # Rebuild the database from scratch with whatever .pkg.tar.zst files remain
+          # Rebuild the database from scratch
           rm -f archrepo.db* archrepo.files*
           repo-add archrepo.db.tar.gz *.pkg.tar.zst
 
@@ -118,8 +120,8 @@ jobs:
           cd src
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add my-app/PKGBUILD my-app/.SRCINFO
-          git commit -m "bump: fastfetch ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
+          git add proton-mail-bin/PKGBUILD proton-mail-bin/.SRCINFO
+          git commit -m "bump: proton-mail-bin ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
           git push origin main
 
       # ── 8. Push binaries + DB → gh-pages ─────────────────────────────
@@ -129,5 +131,5 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "repo: update fastfetch to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
+          git commit -m "repo: update proton-mail-bin to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
           git push origin gh-pages
