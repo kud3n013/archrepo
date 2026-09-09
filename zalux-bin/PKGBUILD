@@ -45,7 +45,7 @@ optdepends=(
 source=(
     "zalo.AppImage::https://github.com/doandat943/zalo-for-linux/releases/download/${pkgver}/Zalo-${pkgver}+ZaDark-${_zadarkver}-${_commithash}-ZaDark.AppImage"
     "zalo.desktop"
-    "Zalo.png::https://raw.githubusercontent.com/AUR-repo-packages/zalo-for-linux-bin/main/Zalo.png"
+    "Zalo.png"
 )
 options=(!strip !debug)
 sha256sums=('SKIP'
