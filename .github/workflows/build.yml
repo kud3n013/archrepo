@@ -46,6 +46,8 @@ jobs:
           useradd -m builder
           echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown -R builder:builder src repo
+          git config --global --add safe.directory "$(pwd)/src"
+          git config --global --add safe.directory "$(pwd)/repo"
 
       # ── 3. Auto-update PKGBUILD version from upstream ────────────────
       - name: Check for new upstream release
