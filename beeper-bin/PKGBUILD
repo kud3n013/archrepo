@@ -1,0 +1,113 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://www.beeper.com/changelog
+
+_pkgname=beeper
+pkgname=beeper-bin
+pkgver=4.3.104
+pkgrel=1
+pkgdesc="The ultimate messaging app (formerly Beeper v4)"
+arch=('x86_64')
+url="https://www.beeper.com/changelog"
+license=('LicenseRef-beeper')
+provides=('beeper' 'beeper-v4-bin')
+conflicts=('beeper' 'beeper-v4-bin')
+depends=(
+    'libappindicator-gtk3'
+    'libnotify'
+    'libsecret'
+    'hicolor-icon-theme'
+)
+makedepends=(
+    'asar'
+)
+options=(!strip !debug)
+source=(
+    "Beeper-${pkgver}-x86_64.AppImage::https://beeper-desktop.download.beeper.com/builds/Beeper-${pkgver}-x86_64.AppImage"
+    "beeper.sh"
+    "beeper.desktop"
+)
+sha256sums=('6b42072150559ba8f529fdec800f800fd51fa6e1241ae4cb60e4454247b2c3e9'
+            '6f9be57974047d54a2567c3600e083ec159330c7382cf88b8dd9e564b90aecd1'
+            '87909f61383ecc5a962f6d10a713ff53503537f4c876eb8bc478ad5fd80c3182')
+
+prepare() {
+    chmod +x "Beeper-${pkgver}-x86_64.AppImage"
+
+    # Some filesystems (e.g. NTFS mounts) reject direct execution of AppImages.
+    # Fall back to copying to /tmp for extraction if needed.
+    local _appimage="Beeper-${pkgver}-x86_64.AppImage"
+    local _extract_bin="${_appimage}"
+    if ! "./${_appimage}" --appimage-help &>/dev/null; then
+        _extract_bin="$(mktemp -u /tmp/beeper-XXXXXX.AppImage)"
+        cp -f "${_appimage}" "${_extract_bin}"
+        chmod +x "${_extract_bin}"
+    fi
+
+    "${_extract_bin}" --appimage-extract >/dev/null
+    [ "${_extract_bin}" != "${_appimage}" ] && rm -f "${_extract_bin}"
+
+    # Explicitly set APPDIR in AppRun
+    sed -Ei 's@^(if \[ -z "\$APPDIR" ] ; then)$@APPDIR="/opt/beeper"\n\1@' "${srcdir}/squashfs-root/AppRun"
+
+    local _app_dir="${srcdir}/squashfs-root/resources"
+    local _asar_file="${_app_dir}/app.asar"
+    local _extract_dir="${srcdir}/app.asar.extracted"
+
+    # Extract asar archive
+    asar extract "${_asar_file}" "${_extract_dir}"
+
+    # Determine unpacked files glob for repacking
+    local _unpacked_files_glob
+    _unpacked_files_glob="{$(cd "${_asar_file}.unpacked" && find . -type f | sed -E 's,^\./,,' | paste -s -d, -)}"
+
+    # Disable registerLinuxConfig to prevent duplicate/unmanaged desktop files in ~/.local/share/applications
+    local _main_dir="${_extract_dir}/build/main"
+    local _linux_config_file
+    _linux_config_file=$(grep -lE 'export\{[a-zA-Z0-9_]+ as registerLinuxConfig\};' "${_main_dir}"/*.mjs | head -n1)
+    if [ -n "${_linux_config_file}" ]; then
+        sed -i 's/export{[a-zA-Z0-9_]* as registerLinuxConfig};/const noopFunc=function(){};export{noopFunc as registerLinuxConfig};/' "${_linux_config_file}"
+    fi
+
+    # Repack asar preserving unpacked native binaries
+    asar pack --unpack "${_extract_dir}/${_unpacked_files_glob}" "${_extract_dir}" "${srcdir}/app.asar"
+
+    # Sanity-check unpacked files
+    local _fp
+    while IFS= read -r -d '' _fp; do
+        cmp "${_app_dir}/app.asar.unpacked/${_fp}" "${srcdir}/app.asar.unpacked/${_fp}" || return 1
+    done < <(cd "${_app_dir}/app.asar.unpacked" && find . -type f -print0)
+
+    mv -Tf "${srcdir}/app.asar" "${_asar_file}"
+    rm -rf "${_extract_dir}" "${srcdir}/app.asar.unpacked"
+
+    # Remove default desktop file from squashfs-root to prevent duplicate install
+    rm -f "${srcdir}/squashfs-root/beepertexts.desktop"
+}
+
+package() {
+    # Install application files to /opt/beeper
+    install -dm755 "${pkgdir}/opt/beeper"
+    cp -a "${srcdir}/squashfs-root/." "${pkgdir}/opt/beeper/"
+
+    # Fix AppRun permissions
+    chmod 755 "${pkgdir}/opt/beeper/AppRun"
+
+    # Install wrapper script
+    install -Dm755 "${srcdir}/beeper.sh" "${pkgdir}/usr/bin/beeper"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/beeper.desktop" "${pkgdir}/usr/share/applications/beeper.desktop"
+
+    # Install icons
+    install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/beepertexts.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/beepertexts.png"
+    install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/beepertexts.png" \
+        "${pkgdir}/usr/share/pixmaps/beepertexts.png"
+
+    # Install licenses
+    install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    install -Dm644 "${srcdir}/squashfs-root/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+    # Fix permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

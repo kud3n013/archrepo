@@ -35,6 +35,7 @@ Now you can install any package using standard `pacman`:
 ```bash
 sudo pacman -S zalo-for-linux-bin
 sudo pacman -S proton-mail-bin
+sudo pacman -S beeper-bin
 ```
 
 ---
@@ -45,6 +46,7 @@ sudo pacman -S proton-mail-bin
 |---|---|---|---|
 | **`zalo-for-linux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux-bin` |
 | **`proton-mail-bin`** | [Proton Mail Linux Beta](https://proton.me/mail) | Official desktop application for Proton Mail and Proton Calendar, integrated with system Electron. | `sudo pacman -S proton-mail-bin` |
+| **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
 
 ---
 

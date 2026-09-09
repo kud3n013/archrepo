@@ -39,6 +39,9 @@ jobs:
           - name: zalo-for-linux-bin
             upstream_repo: doandat943/zalo-for-linux
             upstream_check: github-release
+          - name: beeper-bin
+            upstream_repo: ""
+            upstream_check: beeper-redirect
 
     steps:
       # ── 0. Check if this package should run ───────────────────────────
@@ -115,6 +118,10 @@ jobs:
             HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
             VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
             [ -n "$VER" ] && LATEST="$VER"
+          elif [ "$CHECK" = "beeper-redirect" ]; then
+            HEADERS=$(curl -sI "https://api.beeper.com/desktop/download/linux/x64/stable/com.automattic.beeper.desktop" || true)
+            VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'Beeper-\K[0-9.]+(?=-x86_64\.AppImage)' || true)
+            [ -n "$VER" ] && LATEST="$VER"
           fi
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
@@ -177,8 +184,7 @@ jobs:
           # Check if this exact package exists in the GitHub Release
           ASSETS=$(gh release view packages --repo ${{ github.repository }} --json assets --jq '.assets[].name' 2>/dev/null || true)
           if echo "$ASSETS" | grep -qxF "$PKG_FILE"; then
-            echo "⚡ Package ${PKG_FILE} is already published in release 'packages'. Downloading to reuse..."
-            gh release download packages --pattern "$PKG_FILE" --dir "." --repo ${{ github.repository }}
+            echo "⚡ Package ${PKG_FILE} is already published in release 'packages'. Skipping build..."
             echo "skip_build=true" >> "$GITHUB_OUTPUT"
           else
             echo "Package ${PKG_FILE} not found in release. Building with makepkg..."
@@ -194,7 +200,7 @@ jobs:
 
       # ── 9. Upload package artifact for publish job ───────────────────
       - name: Upload package artifact
-        if: steps.filter.outputs.skip != 'true'
+        if: steps.filter.outputs.skip != 'true' && steps.cache_check.outputs.skip_build != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package.name }}-pkg
@@ -224,16 +230,27 @@ jobs:
 
       - name: Download all package artifacts
         uses: actions/download-artifact@v4
+        continue-on-error: true
         with:
           path: all-pkgs
           merge-multiple: true
 
       - name: Update repository database
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p repo/x86_64
-          cp all-pkgs/*.pkg.tar.zst repo/x86_64/
-
           cd repo/x86_64
+
+          # 1. Download existing packages from GitHub Releases so we never lose already published packages
+          echo "Fetching existing packages from release 'packages'..."
+          gh release download packages --pattern "*.pkg.tar.zst" --repo ${{ github.repository }} || true
+
+          # 2. Copy newly built packages from workflow artifacts
+          if [ -d ../../all-pkgs ] && compgen -G "../../all-pkgs/*.pkg.tar.zst" > /dev/null; then
+            echo "Copying newly built package artifacts..."
+            cp -f ../../all-pkgs/*.pkg.tar.zst .
+          fi
 
           # Keep newest package version for each package name
           PKGS=$(ls *.pkg.tar.zst 2>/dev/null | sed -E 's/-[0-9]+.*//' | sort -u || true)
@@ -310,6 +327,7 @@ jobs:
             <ul>
               <li><code>proton-mail-bin</code> - Proton Mail official desktop client</li>
               <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
+              <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
             </ul>
           </body>
           </html>

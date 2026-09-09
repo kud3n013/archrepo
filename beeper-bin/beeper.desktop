@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Beeper
+GenericName=Unified Messenger
+Comment=The ultimate messaging app
+Exec=/usr/bin/beeper %U
+Icon=beepertexts
+Terminal=false
+StartupWMClass=Beeper
+Categories=Network;InstantMessaging;
+MimeType=x-scheme-handler/beeper;x-scheme-handler/matrix;x-scheme-handler/element;
