@@ -265,6 +265,15 @@ jobs:
           cd repo/x86_64
           gh release upload packages --clobber --repo ${{ github.repository }} *.pkg.tar.zst archrepo.db* archrepo.files*
 
+          # Remove superseded package assets from the GitHub Release
+          RELEASE_ASSETS=$(gh release view packages --repo ${{ github.repository }} --json assets --jq '.assets[].name' || true)
+          for asset in $RELEASE_ASSETS; do
+            if [[ "$asset" == *.pkg.tar.zst ]] && [ ! -f "$asset" ]; then
+              echo "Removing outdated release asset: $asset"
+              gh release delete-asset packages "$asset" --yes --repo ${{ github.repository }} || true
+            fi
+          done
+
       - name: Prepare gh-pages branch
         run: |
           cd repo/x86_64
