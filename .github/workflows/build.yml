@@ -19,6 +19,17 @@ jobs:
       run:
         shell: bash
 
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - name: proton-mail-bin
+            upstream_repo: ""
+            upstream_check: proton-redirect
+          - name: zalux-bin
+            upstream_repo: doandat943/zalo-for-linux
+            upstream_check: github-release
+
     steps:
       # ── 0. Install runtime deps inside the container ──────────────────
       - name: Install dependencies
@@ -43,8 +54,8 @@ jobs:
       # ── 2. Create unprivileged builder user ──────────────────────────
       - name: Create builder user
         run: |
-          useradd -m builder
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          id builder &>/dev/null || useradd -m builder
+          grep -q '^builder' /etc/sudoers || echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown -R builder:builder src repo
           git config --global --add safe.directory "$(pwd)/src"
           git config --global --add safe.directory "$(pwd)/repo"
@@ -53,61 +64,81 @@ jobs:
       - name: Check for new upstream release
         id: version
         run: |
-          # Fetch the redirect headers and extract the version from the URL
-          HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
-          LATEST=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
+          PKG="${{ matrix.package.name }}"
+          CHECK="${{ matrix.package.upstream_check }}"
+          UPSTREAM="${{ matrix.package.upstream_repo }}"
 
-          if [ -z "$LATEST" ]; then
-            echo "::warning::Could not determine latest version from redirect, falling back to PKGBUILD version"
-            LATEST=$(grep -oP '^pkgver=\K.*' src/proton-mail-bin/PKGBUILD)
+          CURRENT=$(grep -oP '^pkgver=\K.*' "src/${PKG}/PKGBUILD")
+          LATEST="$CURRENT"
+
+          if [ "$CHECK" = "github-release" ] && [ -n "$UPSTREAM" ]; then
+            TAG=$(curl -s "https://api.github.com/repos/${UPSTREAM}/releases/latest" | jq -r '.tag_name' || true)
+            TAG="${TAG#v}"
+            [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
+          elif [ "$CHECK" = "proton-redirect" ]; then
+            HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
+            VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
+            [ -n "$VER" ] && LATEST="$VER"
           fi
-
-          CURRENT=$(grep -oP '^pkgver=\K.*' src/proton-mail-bin/PKGBUILD)
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
           echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
 
           if [ "$LATEST" != "$CURRENT" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            sed -i "s/^pkgver=.*/pkgver=${LATEST}/" src/proton-mail-bin/PKGBUILD
-            sed -i "s/^pkgrel=.*/pkgrel=1/"          src/proton-mail-bin/PKGBUILD
-            echo "📦 Updated pkgver: ${CURRENT} → ${LATEST}"
+            sed -i "s/^pkgver=.*/pkgver=${LATEST}/" "src/${PKG}/PKGBUILD"
+            sed -i "s/^pkgrel=.*/pkgrel=1/"          "src/${PKG}/PKGBUILD"
+
+            # For zalux-bin, also update _zadarkver and _commithash from the release asset name
+            if [ "$PKG" = "zalux-bin" ] && [ "$CHECK" = "github-release" ]; then
+              ASSET=$(curl -s "https://api.github.com/repos/${UPSTREAM}/releases/latest" \
+                      | jq -r '.assets[].name' | grep 'ZaDark.AppImage$' | head -1 || true)
+              if [ -n "$ASSET" ]; then
+                ZADARK_VER=$(echo "$ASSET" | grep -oP 'ZaDark-\K[0-9]+\.[0-9]+\.[0-9]+' || true)
+                COMMIT=$(echo "$ASSET" | grep -oP '\-\K[a-f0-9]{7}(?=-ZaDark)' || true)
+                [ -n "$ZADARK_VER" ] && sed -i "s/^_zadarkver=.*/_zadarkver=${ZADARK_VER}/" "src/${PKG}/PKGBUILD"
+                [ -n "$COMMIT" ] && sed -i "s/^_commithash=.*/_commithash=${COMMIT}/" "src/${PKG}/PKGBUILD"
+              fi
+            fi
+
+            echo "📦 Updated ${PKG} pkgver: ${CURRENT} → ${LATEST}"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "✅ Already at latest version ${CURRENT}"
+            echo "✅ ${PKG} already at latest version ${CURRENT}"
           fi
 
       # ── 4. Refresh checksums & .SRCINFO ──────────────────────────────
       - name: Update checksums & .SRCINFO
         if: steps.version.outputs.changed == 'true'
         run: |
-          cd src/proton-mail-bin
+          cd "src/${{ matrix.package.name }}"
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
       # ── 5. Build the package ─────────────────────────────────────────
       - name: Build package
         run: |
-          cd src/proton-mail-bin
+          cd "src/${{ matrix.package.name }}"
           sudo -u builder makepkg -s --noconfirm
 
       # ── 6. Update repo database ─────────────────────────────────────
       - name: Update repository database
         run: |
+          PKG="${{ matrix.package.name }}"
           mkdir -p repo/x86_64
 
           # Copy newly built package(s) into the repo directory
-          cp src/proton-mail-bin/*.pkg.tar.zst repo/x86_64/
+          cp "src/${PKG}/"*.pkg.tar.zst repo/x86_64/
 
           # Identify the package we just built (resolve before cd)
-          NEW_PKG=$(ls -t src/proton-mail-bin/*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
+          NEW_PKG=$(ls -t "src/${PKG}/"*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
 
           cd repo/x86_64
 
           # Remove older versions of the same package (keep only the new one)
-          for f in proton-mail-bin-*.pkg.tar.zst; do
+          for f in ${PKG}-*.pkg.tar.zst; do
             [ "$f" = "$NEW_PKG" ] && continue
-            [ "$f" = 'proton-mail-bin-*.pkg.tar.zst' ] && continue  # glob didn't match
+            [[ "$f" == *'*'* ]] && continue  # glob didn't match anything
             echo "Removing old package: $f"
             rm -f "$f"
           done
@@ -120,19 +151,22 @@ jobs:
       - name: Commit PKGBUILD changes to main
         if: steps.version.outputs.changed == 'true'
         run: |
+          PKG="${{ matrix.package.name }}"
           cd src
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add proton-mail-bin/PKGBUILD proton-mail-bin/.SRCINFO
-          git commit -m "bump: proton-mail-bin ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
+          git add "${PKG}/PKGBUILD" "${PKG}/.SRCINFO"
+          git commit -m "bump: ${PKG} ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
           git push origin main
 
       # ── 8. Push binaries + DB → gh-pages ─────────────────────────────
       - name: Commit & push to gh-pages
         run: |
+          PKG="${{ matrix.package.name }}"
           cd repo
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin gh-pages || true
           git add -A
-          git commit -m "repo: update proton-mail-bin to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
+          git commit -m "repo: update ${PKG} to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
           git push origin gh-pages

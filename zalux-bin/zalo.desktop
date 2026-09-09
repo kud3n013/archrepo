@@ -1,0 +1,10 @@
+[Desktop Entry]
+Comment=Zalo Messaging for Linux
+Name=Zalo
+Exec=/usr/bin/zalo --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto --enable-wayland-ime %U
+Icon=zalo
+Terminal=false
+Type=Application
+Categories=Network;Chat;InstantMessaging;
+StartupWMClass=zalo-for-linux
+MimeType=x-scheme-handler/zalo;
