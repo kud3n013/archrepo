@@ -51,11 +51,9 @@ jobs:
       - name: Check for new upstream release
         id: version
         run: |
-          # Proton Mail publishes versions via their download URL redirect
-          # We scrape the latest version from the .deb download headers
-          LATEST=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" \
-                   | grep -i '^location:' \
-                   | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)')
+          # Fetch the redirect headers and extract the version from the URL
+          HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
+          LATEST=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
 
           if [ -z "$LATEST" ]; then
             echo "::warning::Could not determine latest version from redirect, falling back to PKGBUILD version"
