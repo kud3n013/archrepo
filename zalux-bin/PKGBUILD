@@ -1,49 +1,44 @@
 # Maintainer: archrepo CI <ci@archrepo>
-# Contributor: Nguyen Hoang Ky <nhktmdzhg at gmail dot com>
 # Upstream: https://github.com/doandat943/zalo-for-linux
 
 _pkgname=zalo
 pkgname=zalux-bin
 pkgver=26.8.20
-_zadarkver=26.2.1
 _commithash=87b0696
 pkgrel=1
-pkgdesc="Zalo for Linux (ZaDark edition) — repackaged with Wayland/Hyprland scaling fixes"
+pkgdesc="Zalo for Linux — repackaged with Wayland/Hyprland scaling fixes"
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
 license=('MIT')
-provides=('zalo')
-conflicts=('zalo' 'zalo-for-linux-bin')
+provides=('zalo' 'zalux' 'zalo-for-linux')
+conflicts=('zalo' 'zalux' 'zalo-for-linux' 'zalo-for-linux-bin')
 depends=(
-    'sqlite'
     'glibc'
     'zlib'
+    'fuse2'
 )
 optdepends=(
     # Clipboard & Screenshots
     'wl-clipboard: paste images from clipboard on Wayland'
     'xclip: paste images from clipboard on X11'
-    'deepin-screen-recorder: Screenshot without/with Zalo window button'
-    'spectacle: Screenshot without/with Zalo window button'
-    'flameshot: Screenshot without/with Zalo window button'
-    'gnome-screenshot: Screenshot without/with Zalo window button'
-    'xfce4-screenshooter: Screenshot without/with Zalo window button'
-    'mate-screenshot: Screenshot without/with Zalo window button'
-    'scrot: Screenshot without/with Zalo window button'
+    'grim: screenshot tool on Wayland'
+    'slurp: screenshot region selection on Wayland'
+    'flameshot: screenshot tool'
+    'spectacle: screenshot tool'
 
     # Audio/Video Calling (ZCall Bridge)
     'wine: Voice/Video call engine support (or download portable wine in-app)'
-    'v4l-utils: control camera formats (fix inverted/green camera)'
+    'v4l-utils: control camera formats'
     'v4l2loopback-dkms: loopback camera support'
 
     # Wayland Screen Sharing Bridge
     'xorg-server-xvfb: headless X server for Wayland screen-sharing bridge'
     'xdotool: window resizing for screen bridge display'
-    'gst-plugins-base: 64-bit GStreamer plugins (ximagesink) for screen bridge'
-    'gst-plugins-bad: 64-bit GStreamer plugins (pipewiresrc) for screen bridge'
+    'gst-plugins-base: 64-bit GStreamer plugins for screen bridge'
+    'gst-plugins-bad: 64-bit GStreamer plugins for screen bridge'
 )
 source=(
-    "zalo.AppImage::https://github.com/doandat943/zalo-for-linux/releases/download/${pkgver}/Zalo-${pkgver}+ZaDark-${_zadarkver}-${_commithash}-ZaDark.AppImage"
+    "zalo.AppImage::https://github.com/doandat943/zalo-for-linux/releases/download/${pkgver}/Zalo-${pkgver}-${_commithash}.AppImage"
     "zalo.desktop"
     "Zalo.png"
 )
@@ -52,8 +47,26 @@ sha256sums=('SKIP'
             'SKIP'
             'SKIP')
 
+prepare() {
+    chmod +x "zalo.AppImage"
+    ./zalo.AppImage --appimage-extract "zalo.png" 2>/dev/null || ./zalo.AppImage --appimage-extract ".DirIcon" 2>/dev/null || true
+}
+
 package() {
+    # Install executable and zalux alias
     install -Dm755 "${srcdir}/zalo.AppImage" "${pkgdir}/usr/bin/zalo"
-    install -Dm644 "${srcdir}/zalo.desktop"  "${pkgdir}/usr/share/applications/zalo.desktop"
-    install -Dm644 "${srcdir}/Zalo.png"      "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
+    ln -sf /usr/bin/zalo "${pkgdir}/usr/bin/zalux"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
+    ln -sf /usr/share/applications/zalo.desktop "${pkgdir}/usr/share/applications/zalux.desktop"
+
+    # Install icon (prefer 512x512 extracted from AppImage, fallback to bundled)
+    if [ -f "${srcdir}/squashfs-root/zalo.png" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/zalo.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
+    elif [ -f "${srcdir}/squashfs-root/.DirIcon" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/.DirIcon" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
+    elif [ -f "${srcdir}/Zalo.png" ]; then
+        install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
+    fi
 }

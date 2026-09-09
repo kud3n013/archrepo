@@ -6,5 +6,5 @@ Icon=zalo
 Terminal=false
 Type=Application
 Categories=Network;Chat;InstantMessaging;
-StartupWMClass=zalo-for-linux
+StartupWMClass=zalo
 MimeType=x-scheme-handler/zalo;

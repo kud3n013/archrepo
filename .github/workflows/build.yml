@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write                 # push commits to main + gh-pages
+  contents: write                 # push commits to main + gh-pages, manage releases
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
         run: |
           pacman -Syu --noconfirm git sudo jq curl pacman-contrib
 
-      # ── 1. Checkout both branches ────────────────────────────────────
+      # ── 1. Checkout main branch ───────────────────────────────────────
       - name: Checkout main
         uses: actions/checkout@v4
         with:
@@ -44,21 +44,13 @@ jobs:
           path: src
           fetch-depth: 0
 
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: repo
-          fetch-depth: 0
-
       # ── 2. Create unprivileged builder user ──────────────────────────
       - name: Create builder user
         run: |
           id builder &>/dev/null || useradd -m builder
           grep -q '^builder' /etc/sudoers || echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          chown -R builder:builder src repo
+          chown -R builder:builder src
           git config --global --add safe.directory "$(pwd)/src"
-          git config --global --add safe.directory "$(pwd)/repo"
 
       # ── 3. Auto-update PKGBUILD version from upstream ────────────────
       - name: Check for new upstream release
@@ -70,11 +62,28 @@ jobs:
 
           CURRENT=$(grep -oP '^pkgver=\K.*' "src/${PKG}/PKGBUILD")
           LATEST="$CURRENT"
+          UPDATE_NEEDED=false
 
           if [ "$CHECK" = "github-release" ] && [ -n "$UPSTREAM" ]; then
-            TAG=$(curl -s "https://api.github.com/repos/${UPSTREAM}/releases/latest" | jq -r '.tag_name' || true)
+            RELEASE_JSON=$(curl -s "https://api.github.com/repos/${UPSTREAM}/releases/latest" || true)
+            TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name' 2>/dev/null || true)
             TAG="${TAG#v}"
             [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
+
+            # For zalux-bin: match clean upstream asset Zalo-<ver>-<commit>.AppImage
+            if [ "$PKG" = "zalux-bin" ]; then
+              ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' | grep -E '^Zalo-[0-9.]+-([0-9a-fA-F]+)\.AppImage$' | head -1 || true)
+              if [ -n "$ASSET" ]; then
+                COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=\.AppImage)' || true)
+                CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "src/${PKG}/PKGBUILD" || true)
+                if [ -n "$COMMIT" ] && [ "$COMMIT" != "$CURRENT_COMMIT" ]; then
+                  sed -i "s/^_commithash=.*/_commithash=${COMMIT}/" "src/${PKG}/PKGBUILD"
+                  UPDATE_NEEDED=true
+                  echo "Updated commit hash: ${CURRENT_COMMIT} → ${COMMIT}"
+                fi
+              fi
+            fi
+
           elif [ "$CHECK" = "proton-redirect" ]; then
             HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
             VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
@@ -84,23 +93,10 @@ jobs:
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
           echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
 
-          if [ "$LATEST" != "$CURRENT" ]; then
+          if [ "$LATEST" != "$CURRENT" ] || [ "$UPDATE_NEEDED" = "true" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             sed -i "s/^pkgver=.*/pkgver=${LATEST}/" "src/${PKG}/PKGBUILD"
             sed -i "s/^pkgrel=.*/pkgrel=1/"          "src/${PKG}/PKGBUILD"
-
-            # For zalux-bin, also update _zadarkver and _commithash from the release asset name
-            if [ "$PKG" = "zalux-bin" ] && [ "$CHECK" = "github-release" ]; then
-              ASSET=$(curl -s "https://api.github.com/repos/${UPSTREAM}/releases/latest" \
-                      | jq -r '.assets[].name' | grep 'ZaDark.AppImage$' | head -1 || true)
-              if [ -n "$ASSET" ]; then
-                ZADARK_VER=$(echo "$ASSET" | grep -oP 'ZaDark-\K[0-9]+\.[0-9]+\.[0-9]+' || true)
-                COMMIT=$(echo "$ASSET" | grep -oP '\-\K[a-f0-9]{7}(?=-ZaDark)' || true)
-                [ -n "$ZADARK_VER" ] && sed -i "s/^_zadarkver=.*/_zadarkver=${ZADARK_VER}/" "src/${PKG}/PKGBUILD"
-                [ -n "$COMMIT" ] && sed -i "s/^_commithash=.*/_commithash=${COMMIT}/" "src/${PKG}/PKGBUILD"
-              fi
-            fi
-
             echo "📦 Updated ${PKG} pkgver: ${CURRENT} → ${LATEST}"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -115,39 +111,7 @@ jobs:
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
-      # ── 5. Build the package ─────────────────────────────────────────
-      - name: Build package
-        run: |
-          cd "src/${{ matrix.package.name }}"
-          sudo -u builder makepkg -s --noconfirm
-
-      # ── 6. Update repo database ─────────────────────────────────────
-      - name: Update repository database
-        run: |
-          PKG="${{ matrix.package.name }}"
-          mkdir -p repo/x86_64
-
-          # Copy newly built package(s) into the repo directory
-          cp "src/${PKG}/"*.pkg.tar.zst repo/x86_64/
-
-          # Identify the package we just built (resolve before cd)
-          NEW_PKG=$(ls -t "src/${PKG}/"*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
-
-          cd repo/x86_64
-
-          # Remove older versions of the same package (keep only the new one)
-          for f in ${PKG}-*.pkg.tar.zst; do
-            [ "$f" = "$NEW_PKG" ] && continue
-            [[ "$f" == *'*'* ]] && continue  # glob didn't match anything
-            echo "Removing old package: $f"
-            rm -f "$f"
-          done
-
-          # Rebuild the database from scratch
-          rm -f archrepo.db* archrepo.files*
-          repo-add archrepo.db.tar.gz *.pkg.tar.zst
-
-      # ── 7. Push updated PKGBUILD → main ─────────────────────────────
+      # ── 5. Push updated PKGBUILD → main ─────────────────────────────
       - name: Commit PKGBUILD changes to main
         if: steps.version.outputs.changed == 'true'
         run: |
@@ -157,16 +121,137 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "${PKG}/PKGBUILD" "${PKG}/.SRCINFO"
           git commit -m "bump: ${PKG} ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
-          git push origin main
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin main && git push origin main && break
+            sleep 3
+          done
 
-      # ── 8. Push binaries + DB → gh-pages ─────────────────────────────
-      - name: Commit & push to gh-pages
+      # ── 6. Build the package ─────────────────────────────────────────
+      - name: Build package
         run: |
-          PKG="${{ matrix.package.name }}"
+          cd "src/${{ matrix.package.name }}"
+          sudo -u builder makepkg -s --noconfirm
+
+      # ── 7. Upload package artifact ──────────────────────────────────
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package.name }}-pkg
+          path: src/${{ matrix.package.name }}/*.pkg.tar.zst
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm git pacman-contrib github-cli jq
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: repo
+          fetch-depth: 0
+
+      - name: Download all package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-pkgs
+          merge-multiple: true
+
+      - name: Update repository database
+        run: |
+          mkdir -p repo/x86_64
+          cp all-pkgs/*.pkg.tar.zst repo/x86_64/
+
+          cd repo/x86_64
+
+          # Clean old package versions (keep newest for each package)
+          for pkg in proton-mail-bin zalux-bin; do
+            LATEST_PKG=$(ls -t ${pkg}-*.pkg.tar.zst 2>/dev/null | head -1 || true)
+            for f in ${pkg}-*.pkg.tar.zst; do
+              [ "$f" != "$LATEST_PKG" ] && [ -f "$f" ] && rm -f "$f"
+            done
+          done
+
+          # Rebuild pacman repository database
+          rm -f archrepo.db* archrepo.files*
+          repo-add archrepo.db.tar.gz *.pkg.tar.zst
+
+          # Provide uncompressed symlink copies for direct HTTP downloads
+          cp -L archrepo.db.tar.gz archrepo.db
+          cp -L archrepo.files.tar.gz archrepo.files
+
+      - name: Publish all packages to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Ensure 'packages' release exists
+          gh release view packages --repo ${{ github.repository }} || \
+            gh release create packages --title "Arch Repository Packages" --notes "Automated repository packages" --prerelease=false --repo ${{ github.repository }}
+
+          # Upload packages and database files (bypasses 100MB limit)
+          cd repo/x86_64
+          gh release upload packages --clobber --repo ${{ github.repository }} *.pkg.tar.zst archrepo.db* archrepo.files*
+
+      - name: Prepare gh-pages branch
+        run: |
+          cd repo/x86_64
+          # Remove files >= 95 MB from git working tree so git push doesn't fail
+          # (These files are hosted safely on GitHub Releases)
+          find . -maxdepth 1 -name "*.pkg.tar.zst" -size +95M -exec rm -f {} +
+
+          # Create landing page for GitHub Pages
+          cat << 'EOF' > ../index.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>archrepo - Arch Linux Repository</title>
+            <style>
+              body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #24292f; }
+              pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; border: 1px solid #d0d7de; }
+              code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+              h1 { color: #0969da; }
+            </style>
+          </head>
+          <body>
+            <h1>📦 archrepo</h1>
+            <p>Automated Arch Linux package repository hosted on GitHub.</p>
+            <h2>Installation</h2>
+            <p>Add the repository to <code>/etc/pacman.conf</code>:</p>
+            <pre><code>[archrepo]
+          SigLevel = Optional TrustAll
+          Server = https://github.com/kud3n013/archrepo/releases/download/packages</code></pre>
+            <p>Then synchronize package databases:</p>
+            <pre><code>sudo pacman -Syy</code></pre>
+            <h2>Available Packages</h2>
+            <ul>
+              <li><code>proton-mail-bin</code> - Proton Mail official desktop client</li>
+              <li><code>zalux-bin</code> - Zalo for Linux (with Wayland &amp; Hyprland scaling fixes)</li>
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Push updates to gh-pages
+        run: |
           cd repo
-          git config user.name  "github-actions[bot]"
+          git config --global --add safe.directory "$(pwd)"
+          git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin gh-pages || true
           git add -A
-          git commit -m "repo: update ${PKG} to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
-          git push origin gh-pages
+          git commit -m "repo: update repository database and packages" || echo "Nothing to commit"
+          for i in 1 2 3 4 5; do
+            git pull --rebase origin gh-pages && git push origin gh-pages && break
+            sleep 3
+          done
