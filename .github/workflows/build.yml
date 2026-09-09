@@ -1,0 +1,125 @@
+name: Build & Publish Arch Packages
+
+on:
+  schedule:
+    - cron: "0 4 * * *"          # every day at 04:00 UTC
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write                 # push commits to main + gh-pages
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+
+    steps:
+      # ── 0. Install runtime deps inside the container ──────────────────
+      - name: Install dependencies
+        run: |
+          pacman -Syu --noconfirm git sudo jq nodejs pacman-contrib cmake \
+            vulkan-headers vulkan-icd-loader wayland libxcb libxrandr libx11 \
+            libdrm dconf dbus imagemagick chafa zlib hwdata opencl-headers \
+            ocl-icd libnm libpulse ddcutil directx-headers libelf
+
+      # ── 1. Checkout both branches ────────────────────────────────────
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: src
+          fetch-depth: 0
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: repo
+          fetch-depth: 0
+
+      # ── 2. Create unprivileged builder user ──────────────────────────
+      - name: Create builder user
+        run: |
+          useradd -m builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown -R builder:builder src repo
+
+      # ── 3. Auto-update PKGBUILD version from upstream ────────────────
+      - name: Check for new upstream release
+        id: version
+        run: |
+          UPSTREAM_REPO="fastfetch-cli/fastfetch"
+          LATEST=$(curl -s "https://api.github.com/repos/${UPSTREAM_REPO}/releases/latest" \
+                   | jq -r '.tag_name')
+
+          # Strip leading 'v' if present
+          LATEST="${LATEST#v}"
+
+          CURRENT=$(grep -oP '^pkgver=\K.*' src/my-app/PKGBUILD)
+
+          echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
+          echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
+
+          if [ "$LATEST" != "$CURRENT" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            sed -i "s/^pkgver=.*/pkgver=${LATEST}/" src/my-app/PKGBUILD
+            sed -i "s/^pkgrel=.*/pkgrel=1/"          src/my-app/PKGBUILD
+            echo "📦 Updated pkgver: ${CURRENT} → ${LATEST}"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "✅ Already at latest version ${CURRENT}"
+          fi
+
+      # ── 4. Refresh checksums & .SRCINFO ──────────────────────────────
+      - name: Update checksums & .SRCINFO
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          cd src/my-app
+          sudo -u builder updpkgsums
+          sudo -u builder makepkg --printsrcinfo > .SRCINFO
+
+      # ── 5. Build the package ─────────────────────────────────────────
+      - name: Build package
+        run: |
+          cd src/my-app
+          sudo -u builder makepkg -s --noconfirm
+
+      # ── 6. Update repo database ─────────────────────────────────────
+      - name: Update repository database
+        run: |
+          mkdir -p repo/x86_64
+          cp src/my-app/*.pkg.tar.zst repo/x86_64/
+
+          cd repo/x86_64
+          # repo-add -R removes the old entry for the same package
+          repo-add -R archrepo.db.tar.gz *.pkg.tar.zst
+
+          # Remove stale packages (keep only the latest version)
+          LATEST_PKG=$(ls -t fastfetch-*.pkg.tar.zst | head -1)
+          for f in fastfetch-*.pkg.tar.zst; do
+            [ "$f" != "$LATEST_PKG" ] && rm -f "$f"
+          done
+
+      # ── 7. Push updated PKGBUILD → main ─────────────────────────────
+      - name: Commit PKGBUILD changes to main
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          cd src
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add my-app/PKGBUILD my-app/.SRCINFO
+          git commit -m "bump: fastfetch ${{ steps.version.outputs.current }} → ${{ steps.version.outputs.latest }}"
+          git push origin main
+
+      # ── 8. Push binaries + DB → gh-pages ─────────────────────────────
+      - name: Commit & push to gh-pages
+        run: |
+          cd repo
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "repo: update fastfetch to ${{ steps.version.outputs.latest }}" || echo "Nothing to commit"
+          git push origin gh-pages
