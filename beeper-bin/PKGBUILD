@@ -36,15 +36,15 @@ prepare() {
     # Some filesystems (e.g. NTFS mounts) reject direct execution of AppImages.
     # Fall back to copying to /tmp for extraction if needed.
     local _appimage="Beeper-${pkgver}-x86_64.AppImage"
-    local _extract_bin="${_appimage}"
-    if ! "./${_appimage}" --appimage-help &>/dev/null; then
+    local _extract_bin="./${_appimage}"
+    if ! "${_extract_bin}" --appimage-help &>/dev/null; then
         _extract_bin="$(mktemp -u /tmp/beeper-XXXXXX.AppImage)"
         cp -f "${_appimage}" "${_extract_bin}"
         chmod +x "${_extract_bin}"
     fi
 
     "${_extract_bin}" --appimage-extract >/dev/null
-    [ "${_extract_bin}" != "${_appimage}" ] && rm -f "${_extract_bin}"
+    [ "${_extract_bin}" != "./${_appimage}" ] && rm -f "${_extract_bin}"
 
     # Explicitly set APPDIR in AppRun
     sed -Ei 's@^(if \[ -z "\$APPDIR" ] ; then)$@APPDIR="/opt/beeper"\n\1@' "${srcdir}/squashfs-root/AppRun"
