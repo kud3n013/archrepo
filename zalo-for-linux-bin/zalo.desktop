@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Zalo
+Comment=Zalo Messaging for Linux
+Exec=env OZONE_PLATFORM=wayland /usr/bin/zalo %U
+Icon=zalo
+Terminal=false
+Type=Application
+Categories=Network;Chat;InstantMessaging;
+StartupWMClass=zalo
+MimeType=x-scheme-handler/zalo;

@@ -36,7 +36,7 @@ jobs:
           - name: proton-mail-bin
             upstream_repo: ""
             upstream_check: proton-redirect
-          - name: zalux-bin
+          - name: zalo-for-linux-bin
             upstream_repo: doandat943/zalo-for-linux
             upstream_check: github-release
 
@@ -97,8 +97,8 @@ jobs:
             TAG="${TAG#v}"
             [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
 
-            # For zalux-bin: match clean upstream asset Zalo-<ver>-<commit>.AppImage
-            if [ "$PKG" = "zalux-bin" ]; then
+            # For zalo-for-linux-bin: match clean upstream asset Zalo-<ver>-<commit>.AppImage
+            if [ "$PKG" = "zalo-for-linux-bin" ]; then
               ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' | grep -E '^Zalo-[0-9.]+-([0-9a-fA-F]+)\.AppImage$' | head -1 || true)
               if [ -n "$ASSET" ]; then
                 COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=\.AppImage)' || true)
@@ -309,7 +309,7 @@ jobs:
             <h2>Available Packages</h2>
             <ul>
               <li><code>proton-mail-bin</code> - Proton Mail official desktop client</li>
-              <li><code>zalux-bin</code> - Zalo for Linux (with Wayland &amp; Hyprland scaling fixes)</li>
+              <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
             </ul>
           </body>
           </html>

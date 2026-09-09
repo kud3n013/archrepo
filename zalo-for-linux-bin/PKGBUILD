@@ -2,17 +2,18 @@
 # Upstream: https://github.com/doandat943/zalo-for-linux
 
 _pkgname=zalo
-pkgname=zalux-bin
+pkgname=zalo-for-linux-bin
 pkgver=26.8.20
 _commithash=87b0696
-pkgrel=2
-pkgdesc="Zalo for Linux — repackaged with Wayland/Hyprland scaling fixes"
+pkgrel=1
+pkgdesc="Zalo for Linux — unofficial port for Linux systems"
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
 license=('MIT')
-provides=('zalo' 'zalux' 'zalo-for-linux')
-conflicts=('zalo' 'zalux' 'zalo-for-linux' 'zalo-for-linux-bin')
+provides=('zalo' 'zalo-for-linux')
+conflicts=('zalo' 'zalo-for-linux' 'zalux-bin')
 depends=(
+    'bash'
     'glibc'
     'zlib'
     'fuse2'
@@ -41,24 +42,26 @@ source=(
     "zalo.AppImage::https://github.com/doandat943/zalo-for-linux/releases/download/${pkgver}/Zalo-${pkgver}-${_commithash}.AppImage"
     "zalo.desktop"
     "Zalo.png"
+    "zalo.sh"
 )
 options=(!strip !debug)
 sha256sums=('SKIP'
             'SKIP'
-            '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445')
+            '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445'
+            'SKIP')
 
 package() {
-    # Install executable and zalux alias
-    install -Dm755 "${srcdir}/zalo.AppImage" "${pkgdir}/usr/bin/zalo"
-    ln -sf /usr/bin/zalo "${pkgdir}/usr/bin/zalux"
+    # Install AppImage binary
+    install -Dm755 "${srcdir}/zalo.AppImage" "${pkgdir}/opt/zalo-for-linux/zalo.AppImage"
 
-    # Install desktop entry and zalux alias
+    # Install launcher script
+    install -Dm755 "${srcdir}/zalo.sh" "${pkgdir}/usr/bin/zalo"
+    ln -sf /usr/bin/zalo "${pkgdir}/usr/bin/zalo-for-linux"
+
+    # Install SINGLE desktop entry
     install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
-    ln -sf /usr/share/applications/zalo.desktop "${pkgdir}/usr/share/applications/zalux.desktop"
 
-    # Install bundled AUR logo for both zalux and zalo
-    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalux.png"
+    # Install bundled AUR logo
     install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
-    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/pixmaps/zalux.png"
     install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/pixmaps/zalo.png"
 }

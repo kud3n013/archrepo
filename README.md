@@ -33,7 +33,7 @@ sudo pacman -Syy
 Now you can install any package using standard `pacman`:
 
 ```bash
-sudo pacman -S zalux-bin
+sudo pacman -S zalo-for-linux-bin
 sudo pacman -S proton-mail-bin
 ```
 
@@ -43,7 +43,7 @@ sudo pacman -S proton-mail-bin
 
 | Package | Upstream | Description | Installation |
 |---|---|---|---|
-| **`zalux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalux-bin` |
+| **`zalo-for-linux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux-bin` |
 | **`proton-mail-bin`** | [Proton Mail Linux Beta](https://proton.me/mail) | Official desktop application for Proton Mail and Proton Calendar, integrated with system Electron. | `sudo pacman -S proton-mail-bin` |
 
 ---
@@ -51,7 +51,7 @@ sudo pacman -S proton-mail-bin
 ## ⚙️ Architecture & Features
 
 ### 1. Dual-Tier Storage Architecture
-- **GitHub Releases (`packages` tag):** Stores binary packages (`.pkg.tar.zst`) and pacman databases (`archrepo.db`, `archrepo.files`). This bypasses GitHub's 100 MB repository limit and supports packages up to 2 GB (such as `zalux-bin` at ~260 MB).
+- **GitHub Releases (`packages` tag):** Stores binary packages (`.pkg.tar.zst`) and pacman databases (`archrepo.db`, `archrepo.files`). This bypasses GitHub's 100 MB repository limit and supports packages up to 2 GB (such as `zalo-for-linux-bin` at ~260 MB).
 - **GitHub Pages:** Hosts the repository landing page and documentation at [kud3n013.github.io/archrepo](https://kud3n013.github.io/archrepo/).
 
 ### 2. Smart Build Caching & Skip Logic
@@ -112,10 +112,10 @@ You can trigger builds manually with fine-grained control via **GitHub Actions**
 
 ```bash
 # Build only a single package without touching others
-gh workflow run build.yml -f package=zalux-bin
+gh workflow run build.yml -f package=zalo-for-linux-bin
 
 # Force a clean rebuild even if the binary already exists
-gh workflow run build.yml -f package=zalux-bin -f force_rebuild=true
+gh workflow run build.yml -f package=zalo-for-linux-bin -f force_rebuild=true
 ```
 
 ---
