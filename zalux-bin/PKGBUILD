@@ -5,7 +5,7 @@ _pkgname=zalo
 pkgname=zalux-bin
 pkgver=26.8.20
 _commithash=87b0696
-pkgrel=1
+pkgrel=2
 pkgdesc="Zalo for Linux — repackaged with Wayland/Hyprland scaling fixes"
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
@@ -45,28 +45,20 @@ source=(
 options=(!strip !debug)
 sha256sums=('SKIP'
             'SKIP'
-            'SKIP')
-
-prepare() {
-    chmod +x "zalo.AppImage"
-    ./zalo.AppImage --appimage-extract "zalo.png" 2>/dev/null || ./zalo.AppImage --appimage-extract ".DirIcon" 2>/dev/null || true
-}
+            '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445')
 
 package() {
     # Install executable and zalux alias
     install -Dm755 "${srcdir}/zalo.AppImage" "${pkgdir}/usr/bin/zalo"
     ln -sf /usr/bin/zalo "${pkgdir}/usr/bin/zalux"
 
-    # Install desktop entry
+    # Install desktop entry and zalux alias
     install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
     ln -sf /usr/share/applications/zalo.desktop "${pkgdir}/usr/share/applications/zalux.desktop"
 
-    # Install icon (prefer 512x512 extracted from AppImage, fallback to bundled)
-    if [ -f "${srcdir}/squashfs-root/zalo.png" ]; then
-        install -Dm644 "${srcdir}/squashfs-root/zalo.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
-    elif [ -f "${srcdir}/squashfs-root/.DirIcon" ]; then
-        install -Dm644 "${srcdir}/squashfs-root/.DirIcon" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
-    elif [ -f "${srcdir}/Zalo.png" ]; then
-        install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
-    fi
+    # Install bundled AUR logo for both zalux and zalo
+    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalux.png"
+    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
+    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/pixmaps/zalux.png"
+    install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/pixmaps/zalo.png"
 }
