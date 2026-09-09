@@ -186,9 +186,10 @@ jobs:
           rm -f archrepo.db* archrepo.files*
           repo-add archrepo.db.tar.gz *.pkg.tar.zst
 
-          # Provide uncompressed symlink copies for direct HTTP downloads
-          cp -L archrepo.db.tar.gz archrepo.db
-          cp -L archrepo.files.tar.gz archrepo.files
+          # Replace symlinks with real files so GitHub Releases uploads real archives
+          rm -f archrepo.db archrepo.files
+          cp archrepo.db.tar.gz archrepo.db
+          cp archrepo.files.tar.gz archrepo.files
 
       - name: Publish all packages to GitHub Releases
         env:
