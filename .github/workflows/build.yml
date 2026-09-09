@@ -91,17 +91,25 @@ jobs:
       - name: Update repository database
         run: |
           mkdir -p repo/x86_64
+
+          # Copy newly built package(s) into the repo directory
           cp src/my-app/*.pkg.tar.zst repo/x86_64/
 
-          cd repo/x86_64
-          # repo-add -R removes the old entry for the same package
-          repo-add -R archrepo.db.tar.gz *.pkg.tar.zst
+          # Identify the package we just built (resolve before cd)
+          NEW_PKG=$(ls -t src/my-app/*.pkg.tar.zst 2>/dev/null | head -1 | xargs basename)
 
-          # Remove stale packages (keep only the latest version)
-          LATEST_PKG=$(ls -t fastfetch-*.pkg.tar.zst | head -1)
+          cd repo/x86_64
+
+          # Remove older versions of the same package (keep only the new one)
           for f in fastfetch-*.pkg.tar.zst; do
-            [ "$f" != "$LATEST_PKG" ] && rm -f "$f"
+            [ "$f" = "$NEW_PKG" ] && continue
+            echo "Removing old package: $f"
+            rm -f "$f"
           done
+
+          # Rebuild the database from scratch with whatever .pkg.tar.zst files remain
+          rm -f archrepo.db* archrepo.files*
+          repo-add archrepo.db.tar.gz *.pkg.tar.zst
 
       # ── 7. Push updated PKGBUILD → main ─────────────────────────────
       - name: Commit PKGBUILD changes to main
