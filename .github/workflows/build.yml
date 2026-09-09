@@ -6,6 +6,16 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      package:
+        description: 'Specific package to build (or "all")'
+        required: false
+        default: 'all'
+      force_rebuild:
+        description: 'Force rebuild even if binary already exists in release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write                 # push commits to main + gh-pages, manage releases
@@ -31,29 +41,46 @@ jobs:
             upstream_check: github-release
 
     steps:
-      # ── 0. Install runtime deps inside the container ──────────────────
-      - name: Install dependencies
+      # ── 0. Check if this package should run ───────────────────────────
+      - name: Check package filter
+        id: filter
         run: |
-          pacman -Syu --noconfirm git sudo jq curl pacman-contrib
+          TARGET="${{ github.event.inputs.package || 'all' }}"
+          CURRENT="${{ matrix.package.name }}"
+          if [ "$TARGET" != "all" ] && [ "$TARGET" != "$CURRENT" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping ${CURRENT} (target: ${TARGET})"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      # ── 1. Checkout main branch ───────────────────────────────────────
+      # ── 1. Install dependencies inside container ──────────────────────
+      - name: Install dependencies
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          pacman -Syu --noconfirm git sudo jq curl pacman-contrib github-cli
+
+      # ── 2. Checkout main branch ───────────────────────────────────────
       - name: Checkout main
+        if: steps.filter.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
           ref: main
           path: src
           fetch-depth: 0
 
-      # ── 2. Create unprivileged builder user ──────────────────────────
+      # ── 3. Create unprivileged builder user ──────────────────────────
       - name: Create builder user
+        if: steps.filter.outputs.skip != 'true'
         run: |
           id builder &>/dev/null || useradd -m builder
           grep -q '^builder' /etc/sudoers || echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown -R builder:builder src
           git config --global --add safe.directory "$(pwd)/src"
 
-      # ── 3. Auto-update PKGBUILD version from upstream ────────────────
+      # ── 4. Auto-update PKGBUILD version from upstream ────────────────
       - name: Check for new upstream release
+        if: steps.filter.outputs.skip != 'true'
         id: version
         run: |
           PKG="${{ matrix.package.name }}"
@@ -103,17 +130,17 @@ jobs:
             echo "✅ ${PKG} already at latest version ${CURRENT}"
           fi
 
-      # ── 4. Refresh checksums & .SRCINFO ──────────────────────────────
+      # ── 5. Refresh checksums & .SRCINFO if version changed ───────────
       - name: Update checksums & .SRCINFO
-        if: steps.version.outputs.changed == 'true'
+        if: steps.filter.outputs.skip != 'true' && steps.version.outputs.changed == 'true'
         run: |
           cd "src/${{ matrix.package.name }}"
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
-      # ── 5. Push updated PKGBUILD → main ─────────────────────────────
+      # ── 6. Push updated PKGBUILD → main ─────────────────────────────
       - name: Commit PKGBUILD changes to main
-        if: steps.version.outputs.changed == 'true'
+        if: steps.filter.outputs.skip != 'true' && steps.version.outputs.changed == 'true'
         run: |
           PKG="${{ matrix.package.name }}"
           cd src
@@ -126,14 +153,48 @@ jobs:
             sleep 3
           done
 
-      # ── 6. Build the package ─────────────────────────────────────────
+      # ── 7. Check if binary is already published in release ───────────
+      - name: Check existing release binary
+        if: steps.filter.outputs.skip != 'true'
+        id: cache_check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PKG="${{ matrix.package.name }}"
+          cd "src/${PKG}"
+
+          # Compute the exact filename makepkg will produce
+          PKG_FILE=$(sudo -u builder makepkg --packagelist | head -1 | xargs basename)
+          echo "target_pkg=${PKG_FILE}" >> "$GITHUB_OUTPUT"
+
+          FORCE="${{ github.event.inputs.force_rebuild || 'false' }}"
+          if [ "$FORCE" = "true" ]; then
+            echo "Force rebuild requested."
+            echo "skip_build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Check if this exact package exists in the GitHub Release
+          ASSETS=$(gh release view packages --repo ${{ github.repository }} --json assets --jq '.assets[].name' 2>/dev/null || true)
+          if echo "$ASSETS" | grep -qxF "$PKG_FILE"; then
+            echo "⚡ Package ${PKG_FILE} is already published in release 'packages'. Downloading to reuse..."
+            gh release download packages --pattern "$PKG_FILE" --dir "." --repo ${{ github.repository }}
+            echo "skip_build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Package ${PKG_FILE} not found in release. Building with makepkg..."
+            echo "skip_build=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 8. Build package with makepkg if not cached ──────────────────
       - name: Build package
+        if: steps.filter.outputs.skip != 'true' && steps.cache_check.outputs.skip_build != 'true'
         run: |
           cd "src/${{ matrix.package.name }}"
           sudo -u builder makepkg -s --noconfirm
 
-      # ── 7. Upload package artifact ──────────────────────────────────
+      # ── 9. Upload package artifact for publish job ───────────────────
       - name: Upload package artifact
+        if: steps.filter.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package.name }}-pkg
@@ -174,8 +235,9 @@ jobs:
 
           cd repo/x86_64
 
-          # Clean old package versions (keep newest for each package)
-          for pkg in proton-mail-bin zalux-bin; do
+          # Keep newest package version for each package name
+          PKGS=$(ls *.pkg.tar.zst 2>/dev/null | sed -E 's/-[0-9]+.*//' | sort -u || true)
+          for pkg in $PKGS; do
             LATEST_PKG=$(ls -t ${pkg}-*.pkg.tar.zst 2>/dev/null | head -1 || true)
             for f in ${pkg}-*.pkg.tar.zst; do
               [ "$f" != "$LATEST_PKG" ] && [ -f "$f" ] && rm -f "$f"
@@ -186,7 +248,7 @@ jobs:
           rm -f archrepo.db* archrepo.files*
           repo-add archrepo.db.tar.gz *.pkg.tar.zst
 
-          # Replace symlinks with real files so GitHub Releases uploads real archives
+          # Replace symlinks with real files for GitHub Releases
           rm -f archrepo.db archrepo.files
           cp archrepo.db.tar.gz archrepo.db
           cp archrepo.files.tar.gz archrepo.files
