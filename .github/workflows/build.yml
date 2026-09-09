@@ -15,12 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
+    defaults:
+      run:
+        shell: bash
 
     steps:
       # ── 0. Install runtime deps inside the container ──────────────────
       - name: Install dependencies
         run: |
-          pacman -Syu --noconfirm git sudo jq pacman-contrib
+          pacman -Syu --noconfirm git sudo jq curl pacman-contrib
 
       # ── 1. Checkout both branches ────────────────────────────────────
       - name: Checkout main
