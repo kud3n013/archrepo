@@ -1,8 +1,9 @@
 pkgbase = zalo-for-linux-bin
 	pkgdesc = Zalo for Linux — unofficial port for Linux systems with Wayland & flags support
 	pkgver = 26.8.20
-	pkgrel = 2
+	pkgrel = 3
 	url = https://github.com/doandat943/zalo-for-linux
+	install = zalo-for-linux-bin.install
 	arch = x86_64
 	license = MIT
 	depends = bash
