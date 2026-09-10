@@ -2,9 +2,32 @@
 # Prevent AppImage from writing unmanaged desktop files to ~/.local/share/applications
 export DESKTOPINTEGRATION=0
 
-# Default to Wayland Ozone platform if not explicitly set
-if [ -z "$OZONE_PLATFORM" ]; then
-    export OZONE_PLATFORM=wayland
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+USER_FLAGS_FILE="$XDG_CONFIG_HOME/zalo-flags.conf"
+SYSTEM_FLAGS_FILE="/etc/zalo-flags.conf"
+
+FLAGS=()
+
+# Prefer user configuration in ~/.config/zalo-flags.conf, fallback to system config /etc/zalo-flags.conf
+if [[ -f "$USER_FLAGS_FILE" ]]; then
+    CONFIG_FILE="$USER_FLAGS_FILE"
+elif [[ -f "$SYSTEM_FLAGS_FILE" ]]; then
+    CONFIG_FILE="$SYSTEM_FLAGS_FILE"
+else
+    CONFIG_FILE=""
 fi
 
-exec /opt/zalo-for-linux/zalo.AppImage "$@"
+if [[ -n "$CONFIG_FILE" ]]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line="$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+        [[ -z "$line" || "$line" =~ ^# ]] && continue
+        FLAGS+=("$line")
+    done < "$CONFIG_FILE"
+else
+    # Default Wayland flags if no config file exists
+    if [[ -n "$WAYLAND_DISPLAY" ]]; then
+        FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
+    fi
+fi
+
+exec /opt/zalo-for-linux/zalo.AppImage "${FLAGS[@]}" "$@"

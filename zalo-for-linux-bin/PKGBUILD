@@ -5,13 +5,14 @@ _pkgname=zalo
 pkgname=zalo-for-linux-bin
 pkgver=26.8.20
 _commithash=87b0696
-pkgrel=1
-pkgdesc="Zalo for Linux — unofficial port for Linux systems"
+pkgrel=2
+pkgdesc="Zalo for Linux — unofficial port for Linux systems with Wayland & flags support"
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
 license=('MIT')
 provides=('zalo' 'zalo-for-linux')
 conflicts=('zalo' 'zalo-for-linux' 'zalux-bin')
+backup=('etc/zalo-flags.conf')
 depends=(
     'bash'
     'glibc'
@@ -43,11 +44,13 @@ source=(
     "zalo.desktop"
     "Zalo.png"
     "zalo.sh"
+    "zalo-flags.conf"
 )
 options=(!strip !debug)
 sha256sums=('SKIP'
             'SKIP'
             '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445'
+            'SKIP'
             'SKIP')
 
 package() {
@@ -58,7 +61,10 @@ package() {
     install -Dm755 "${srcdir}/zalo.sh" "${pkgdir}/usr/bin/zalo"
     ln -sf /usr/bin/zalo "${pkgdir}/usr/bin/zalo-for-linux"
 
-    # Install SINGLE desktop entry
+    # Install system-wide default flags file
+    install -Dm644 "${srcdir}/zalo-flags.conf" "${pkgdir}/etc/zalo-flags.conf"
+
+    # Install desktop entry
     install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
 
     # Install bundled AUR logo
