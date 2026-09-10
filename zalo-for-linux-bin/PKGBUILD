@@ -5,7 +5,7 @@ _pkgname=zalo
 pkgname=zalo-for-linux-bin
 pkgver=26.8.20
 _commithash=87b0696
-pkgrel=3
+pkgrel=4
 pkgdesc="Zalo for Linux — unofficial port for Linux systems with Wayland & flags support"
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
@@ -18,7 +18,14 @@ depends=(
     'bash'
     'glibc'
     'zlib'
-    'fuse2'
+    'gtk3'
+    'nss'
+    'alsa-lib'
+    'libxss'
+    'libxtst'
+)
+makedepends=(
+    'asar'
 )
 optdepends=(
     # Clipboard & Screenshots
@@ -42,6 +49,7 @@ optdepends=(
 )
 source=(
     "zalo.AppImage::https://github.com/doandat943/zalo-for-linux/releases/download/${pkgver}/Zalo-${pkgver}-${_commithash}.AppImage"
+    "fix-zcall-async.patch"
     "zalo.desktop"
     "Zalo.png"
     "zalo.sh"
@@ -49,14 +57,53 @@ source=(
 )
 options=(!strip !debug)
 sha256sums=('SKIP'
+            '16b9e68906e4823eecc12b812f1bb8e9806bc08cc42c8372a6f192ff831b1b8c'
             'SKIP'
             '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445'
             'SKIP'
             'SKIP')
 
+prepare() {
+    chmod +x "zalo.AppImage"
+
+    # Some filesystems (e.g. NTFS mounts) reject direct execution of AppImages.
+    local _appimage="zalo.AppImage"
+    local _extract_bin="./${_appimage}"
+    if ! "${_extract_bin}" --appimage-help &>/dev/null; then
+        _extract_bin="$(mktemp -u /tmp/zalo-XXXXXX.AppImage)"
+        cp -f "${_appimage}" "${_extract_bin}"
+        chmod +x "${_extract_bin}"
+    fi
+
+    "${_extract_bin}" --appimage-extract >/dev/null
+    [ "${_extract_bin}" != "./${_appimage}" ] && rm -f "${_extract_bin}"
+
+    local _app_dir="${srcdir}/squashfs-root/resources"
+    local _asar_file="${_app_dir}/app.asar"
+    local _extract_dir="${srcdir}/app.asar.extracted"
+
+    # Extract asar archive
+    asar extract "${_asar_file}" "${_extract_dir}"
+
+    # Patch zcall-bridge to initialize Wine asynchronously and non-blocking
+    patch -Np1 -d "${_extract_dir}" -i "${srcdir}/fix-zcall-async.patch"
+
+    # Repack asar archive
+    asar pack "${_extract_dir}" "${srcdir}/app.asar"
+    mv -Tf "${srcdir}/app.asar" "${_asar_file}"
+    rm -rf "${_extract_dir}"
+
+    # Remove root-level desktop file to avoid accidental clashes
+    rm -f "${srcdir}/squashfs-root/zalo.desktop"
+}
+
 package() {
-    # Install AppImage binary
-    install -Dm755 "${srcdir}/zalo.AppImage" "${pkgdir}/opt/zalo-for-linux/zalo.AppImage"
+    # Install extracted application files to /opt/zalo-for-linux
+    install -dm755 "${pkgdir}/opt/zalo-for-linux"
+    cp -a "${srcdir}/squashfs-root/." "${pkgdir}/opt/zalo-for-linux/"
+
+    # Fix binary permissions
+    chmod 755 "${pkgdir}/opt/zalo-for-linux/zalo"
 
     # Install launcher script
     install -Dm755 "${srcdir}/zalo.sh" "${pkgdir}/usr/bin/zalo"
@@ -71,4 +118,15 @@ package() {
     # Install bundled AUR logo
     install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/zalo.png"
     install -Dm644 "${srcdir}/Zalo.png" "${pkgdir}/usr/share/pixmaps/zalo.png"
+
+    # Install licenses if available
+    if [ -f "${srcdir}/squashfs-root/LICENSE.electron.txt" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    fi
+    if [ -f "${srcdir}/squashfs-root/LICENSES.chromium.html" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    fi
+
+    # Fix overall permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
 }

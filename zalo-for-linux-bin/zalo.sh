@@ -21,6 +21,10 @@ if [[ -n "$CONFIG_FILE" ]]; then
     while IFS= read -r line || [[ -n "$line" ]]; do
         line="$(echo "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
         [[ -z "$line" || "$line" =~ ^# ]] && continue
+        if [[ "$line" =~ ^(export[[:space:]]+)?ZCALL_DISABLE=1 ]]; then
+            export ZCALL_DISABLE=1
+            continue
+        fi
         FLAGS+=("$line")
     done < "$CONFIG_FILE"
 else
@@ -30,4 +34,7 @@ else
     fi
 fi
 
-exec /opt/zalo-for-linux/zalo.AppImage "${FLAGS[@]}" "$@"
+export LD_LIBRARY_PATH="/opt/zalo-for-linux/usr/lib:${LD_LIBRARY_PATH}"
+export GSETTINGS_SCHEMA_DIR="/opt/zalo-for-linux/usr/share/glib-2.0/schemas:${GSETTINGS_SCHEMA_DIR}"
+
+exec /opt/zalo-for-linux/zalo "${FLAGS[@]}" "$@"

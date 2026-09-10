@@ -1,0 +1,129 @@
+--- a/plugins/zcall-bridge/index.js
++++ b/plugins/zcall-bridge/index.js
+@@ -178,10 +178,8 @@
+     debugLog('validate: pipebridge.exe not found (resourcesPath=' + (process.resourcesPath || '') + ')');
+     return false;
+   }
+-  // Use a dedicated throwaway prefix: validating against the real prefix can
+-  // trigger slow version upgrade/downgrade passes (10-30s+) or corrupt state,
+-  // and a cold first run needs a generous timeout.
+-  const valPrefix = prefix + '-validate';
++  // Validate directly against the booted prefix without spawning redundant validate prefixes
++  const valPrefix = prefix;
+   try {
+     const res = spawnSync(winePath, [pipebridgePath, '--version'], {
+       env: Object.assign({}, process.env, { WINEPREFIX: valPrefix, WINEDEBUG: '-all' }),
+@@ -204,6 +202,47 @@
+   }
+ }
+ 
++function validateWineAsync(winePath, prefix) {
++  return new Promise((resolve) => {
++    const pipebridgePath = findPipebridgePath();
++    if (!pipebridgePath) {
++      debugLog('validate: pipebridge.exe not found (resourcesPath=' + (process.resourcesPath || '') + ')');
++      return resolve(false);
++    }
++    try {
++      const child = spawn(winePath, [pipebridgePath, '--version'], {
++        env: Object.assign({}, process.env, { WINEPREFIX: prefix, WINEDEBUG: '-all' })
++      });
++      let stdout = '';
++      let stderr = '';
++      if (child.stdout) child.stdout.on('data', d => { stdout += d.toString(); });
++      if (child.stderr) child.stderr.on('data', d => { stderr += d.toString(); });
++      const timer = setTimeout(() => {
++        try { child.kill(); } catch (_) {}
++        resolve(false);
++      }, 30000);
++      child.on('close', (code) => {
++        clearTimeout(timer);
++        if (code === 0 && /pipebridge/.test(stdout)) {
++          resolve(true);
++        } else {
++          debugLog('validate FAILED wine=' + winePath + ' code=' + code + ' stdout=' + stdout + ' stderr=' + stderr);
++          resolve(false);
++        }
++      });
++      child.on('error', (err) => {
++        clearTimeout(timer);
++        debugLog('validate error: ' + err.message);
++        resolve(false);
++      });
++    } catch (e) {
++      debugLog('validate exception: ' + e.message);
++      resolve(false);
++    }
++  });
++}
++
++
+ /**
+  * Kill leftover wine processes of OUR prefix (e.g. winedevice orphans left
+  * by an unclean kill -9 of a previous session). Safe to run at launch: no
+@@ -545,6 +584,21 @@
+ // ---------------------------------------------------------------------------
+ 
+ function launch({ userDataDir }) {
++  if (process.env.ZCALL_DISABLE) {
++    console.log('[zcall-bridge] ZCALL_DISABLE is set, skipping wine initialization');
++    return false;
++  }
++
++  // Defer initialization to background so Electron main thread and Wayland event loop never freeze
++  setTimeout(() => {
++    initWineAsync(userDataDir).catch((e) => {
++      console.error('[zcall-bridge] background wine init failed:', e);
++    });
++  }, 1500);
++  return true;
++}
++
++async function initWineAsync(userDataDir) {
+   if (process.env.ZCALL_DISABLE) return false;
+ 
+   const prefix = process.env.ZCALL_WINEPREFIX || path.join(userDataDir, 'zcall-wine');
+@@ -576,22 +630,35 @@
+   let wine = null;
+   let failedWine = null;
+   for (const candidate of candidates) {
+-    // Ensure the prefix exists before validating (validation needs a booted prefix)
++    // Ensure the prefix exists before validating asynchronously
+     if (!fs.existsSync(path.join(prefix, 'drive_c'))) {
+-      console.log('[zcall-bridge] initializing wine prefix:', prefix);
++      console.log('[zcall-bridge] initializing wine prefix in background:', prefix);
+       try {
+-        spawnSync(candidate, ['wineboot', '-u'], {
+-          env: Object.assign({}, process.env, { WINEPREFIX: prefix, WINEDEBUG: '-all' }),
+-          stdio: 'ignore',
+-          timeout: 180000
++        await new Promise((resolve) => {
++          const child = spawn(candidate, ['wineboot', '-u'], {
++            env: Object.assign({}, process.env, { WINEPREFIX: prefix, WINEDEBUG: '-all' }),
++            stdio: 'ignore'
++          });
++          const timer = setTimeout(() => {
++            try { child.kill(); } catch (_) {}
++            resolve();
++          }, 180000);
++          child.on('close', () => {
++            clearTimeout(timer);
++            resolve();
++          });
++          child.on('error', () => {
++            clearTimeout(timer);
++            resolve();
++          });
+         });
+       } catch (e) {
+         console.error('[zcall-bridge] wineboot failed:', e.message);
+       }
+     }
+ 
+-    // A wine is only usable if it can run 32-bit executables.
+-    if (validateWine(candidate, prefix)) {
++    // Validate using async spawn against the booted prefix
++    if (await validateWineAsync(candidate, prefix)) {
+       wine = candidate;
+       break;
+     }
