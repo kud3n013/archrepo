@@ -1,16 +1,15 @@
 # Maintainer: archrepo CI <ci@archrepo>
 # Contributor: meowcateatrat <https://github.com/meowcateatrat>
 
-_pkgname=freedownloadmanager-elephant
-pkgname=freedownloadmanager-elephant-bin
+pkgname=freedownloadmanager-elephant
 pkgver=1.3.8
 pkgrel=1
 pkgdesc="Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp)"
 arch=('any')
 url="https://github.com/meowcateatrat/elephant"
 license=('MIT')
-provides=("${_pkgname}")
-conflicts=("${_pkgname}")
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin")
 install="${pkgname}.install"
 options=(!strip !debug)
 
@@ -21,17 +20,17 @@ depends=(
 )
 
 source=(
-    "${_pkgname}-${pkgver}.fda::https://github.com/meowcateatrat/elephant/releases/download/${pkgver}/elephant.fda"
+    "${pkgname}-${pkgver}.fda::https://github.com/meowcateatrat/elephant/releases/download/${pkgver}/elephant.fda"
     "LICENSE-${pkgver}::https://raw.githubusercontent.com/meowcateatrat/elephant/${pkgver}/LICENSE"
 )
-noextract=("${_pkgname}-${pkgver}.fda")
+noextract=("${pkgname}-${pkgver}.fda")
 sha512sums=('3083a023ac222731c85a0141bbccbbe4398da4fedcba15db36d3edfe414f3caa686d2d6619febe23b5593be529ee65512f921dcfba8f5a5fe54c77a5333de0f4'
             '912e814f244d8016b8b476e9d9aa88efc6c0829383c3d6e7447ab5a597624debf55ae18925399228c8b5dfa3183914f605485748ce1cadf61a5c07c946bddec1')
 
 prepare() {
     rm -rf "${srcdir}/plugin"
     mkdir -p "${srcdir}/plugin"
-    bsdtar -xf "${srcdir}/${_pkgname}-${pkgver}.fda" -C "${srcdir}/plugin"
+    bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.fda" -C "${srcdir}/plugin"
 }
 
 package() {

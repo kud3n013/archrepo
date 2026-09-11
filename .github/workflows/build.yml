@@ -33,22 +33,13 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - name: proton-mail-bin
-            upstream_repo: ""
-            upstream_check: proton-redirect
           - name: zalo-for-linux-bin
             upstream_repo: doandat943/zalo-for-linux
             upstream_check: github-release
           - name: beeper-bin
             upstream_repo: ""
             upstream_check: beeper-redirect
-          - name: proton-pass-bin
-            upstream_repo: ""
-            upstream_check: proton-pass-api
-          - name: freedownloadmanager-bin
-            upstream_repo: ""
-            upstream_check: fdm-debrepo
-          - name: freedownloadmanager-elephant-bin
+          - name: freedownloadmanager-elephant
             upstream_repo: meowcateatrat/elephant
             upstream_check: github-release
           - name: howdy-next-bin
@@ -253,6 +244,12 @@ jobs:
           path: repo
           fetch-depth: 0
 
+      - name: Checkout main (for archive detection)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main_src
+
       - name: Download all package artifacts
         uses: actions/download-artifact@v4
         continue-on-error: true
@@ -275,6 +272,17 @@ jobs:
           if [ -d ../../all-pkgs ] && compgen -G "../../all-pkgs/*.pkg.tar.zst" > /dev/null; then
             echo "Copying newly built package artifacts..."
             cp -f ../../all-pkgs/*.pkg.tar.zst .
+          fi
+
+          # 3. Purge archived packages so they are never indexed in archrepo.db or kept in releases
+          if [ -d ../../main_src/archive ]; then
+            for arch_dir in ../../main_src/archive/*; do
+              if [ -d "$arch_dir" ]; then
+                arch_pkg=$(basename "$arch_dir")
+                echo "Archived package detected: ${arch_pkg}. Purging from repository..."
+                rm -f ${arch_pkg}-*.pkg.tar.zst
+              fi
+            done
           fi
 
           # Keep newest package version for each package name
@@ -349,12 +357,9 @@ jobs:
             <pre><code>sudo pacman -Syy</code></pre>
             <h2>Available Packages</h2>
             <ul>
-              <li><code>proton-mail-bin</code> - Proton Mail official desktop client</li>
-              <li><code>proton-pass-bin</code> - Proton Pass official desktop application</li>
               <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
               <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
-              <li><code>freedownloadmanager-bin</code> - Free Download Manager (Qt6 with Wayland/X11 support)</li>
-              <li><code>freedownloadmanager-elephant-bin</code> - Free Download Manager Elephant add-on (powered by yt-dlp)</li>
+              <li><code>freedownloadmanager-elephant</code> - Free Download Manager Elephant add-on (powered by yt-dlp)</li>
               <li><code>howdy-next-bin</code> - Howdy Next: facial-recognition authentication for Linux (patched, no OpenCV WARN spam)</li>
             </ul>
           </body>

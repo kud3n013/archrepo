@@ -34,11 +34,8 @@ Now you can install any package using standard `pacman`:
 
 ```bash
 sudo pacman -S zalo-for-linux-bin
-sudo pacman -S proton-mail-bin
-sudo pacman -S proton-pass-bin
 sudo pacman -S beeper-bin
-sudo pacman -S freedownloadmanager-bin
-sudo pacman -S freedownloadmanager-elephant-bin
+sudo pacman -S freedownloadmanager-elephant
 sudo pacman -S howdy-next-bin
 ```
 
@@ -49,12 +46,21 @@ sudo pacman -S howdy-next-bin
 | Package | Upstream | Description | Installation |
 |---|---|---|---|
 | **`zalo-for-linux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux-bin` |
-| **`proton-mail-bin`** | [Proton Mail Linux Beta](https://proton.me/mail) | Official desktop application for Proton Mail and Proton Calendar, integrated with system Electron. | `sudo pacman -S proton-mail-bin` |
-| **`proton-pass-bin`** | [Proton Pass Linux](https://proton.me/pass) | Official desktop application for Proton Pass: end-to-end encrypted password and identity manager. | `sudo pacman -S proton-pass-bin` |
 | **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
-| **`freedownloadmanager-bin`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with Qt6 Wayland/X11 support and BitTorrent integration. | `sudo pacman -S freedownloadmanager-bin` |
-| **`freedownloadmanager-elephant-bin`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant-bin` |
+| **`freedownloadmanager-elephant`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant` |
 | **`howdy-next-bin`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next-bin` |
+
+---
+
+## 🗄️ Archived Packages
+
+The following packages have been retired from the active repository and are no longer installable via `pacman`. Their packaging recipes and configurations are preserved in [`archive/`](archive/):
+
+| Package | Upstream | Location | Status |
+|---|---|---|---|
+| **`freedownloadmanager-bin`** | [Free Download Manager](https://www.freedownloadmanager.org/) | [`archive/freedownloadmanager-bin`](archive/freedownloadmanager-bin/) | Archived |
+| **`proton-mail-bin`** | [Proton Mail Linux Beta](https://proton.me/mail) | [`archive/proton-mail-bin`](archive/proton-mail-bin/) | Archived |
+| **`proton-pass-bin`** | [Proton Pass Linux](https://proton.me/pass) | [`archive/proton-pass-bin`](archive/proton-pass-bin/) | Archived |
 
 ---
 
