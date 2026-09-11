@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=GDLauncher Carbon
+GenericName=Minecraft Launcher
+Comment=A simple yet powerful Minecraft custom launcher
+Exec=/usr/bin/gdlauncher-carbon %U
+Icon=gdlauncher-carbon
+Terminal=false
+StartupWMClass=GDLauncher
+Categories=Game;
+MimeType=x-scheme-handler/gdlauncher;

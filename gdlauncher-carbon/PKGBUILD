@@ -1,0 +1,103 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://gdlauncher.com
+# AUR Reference: https://aur.archlinux.org/packages/gdlauncher-carbon-bin
+
+_pkgname=gdlauncher-carbon
+pkgname=gdlauncher-carbon-bin
+pkgver=2.0.40
+pkgrel=1
+pkgdesc="GDLauncher Carbon — a simple yet powerful Minecraft custom launcher with a strong focus on user experience"
+arch=('x86_64')
+url="https://gdlauncher.com"
+license=('LicenseRef-gdlauncher')
+provides=('gdlauncher-carbon')
+conflicts=('gdlauncher-carbon' 'gdlauncher' 'gdlauncher-bin' 'gdlauncher-beta' 'gdlauncher-beta-bin' 'gdlauncher-appimage' 'gdlauncher-git')
+install=gdlauncher-carbon.install
+backup=('etc/gdlauncher-carbon-flags.conf')
+depends=(
+    'gtk3'
+    'nss'
+    'alsa-lib'
+    'libxss'
+    'libxtst'
+    'hicolor-icon-theme'
+)
+optdepends=(
+    'libnotify: desktop notifications'
+    'wl-clipboard: clipboard support on Wayland'
+    'xdg-utils: default browser and URL handling'
+)
+options=(!strip !debug)
+source=(
+    "${_pkgname}-${pkgver}.AppImage::https://cdn-raw.gdl.gg/launcher/GDLauncher__${pkgver}__linux__x64.AppImage"
+    "${_pkgname}.png"
+    "gdlauncher-carbon.sh"
+    "gdlauncher-carbon-flags.conf"
+    "gdlauncher-carbon.desktop"
+)
+sha256sums=('dd7c01f333ce5fcdf3c693e246d2e829bf8204917a6b1ef2dd67d0c845db0336'
+            'e72d839270b646c138aec74fbbf45a6aa601735801a478e48ca8f4c29d8ec021'
+            '74f17e048e6eefc7fc6a1d6e143bd940abaa4eec5ca2c5f2c3e3f161098a92c1'
+            '4ebe224b4374b41d8db20e28ca5808ca464ede265cf9d282722d3f5b4d740a95'
+            '732bd212024be3829c104654f71bc9d3976793029cbb34238e1d91a205ee800a')
+
+prepare() {
+    chmod +x "${_pkgname}-${pkgver}.AppImage"
+
+    # Some filesystems (e.g. NTFS mounts) reject direct execution of AppImages.
+    # Fall back to copying to /tmp for extraction if needed.
+    # Note: --appimage-help may segfault on some builds, so we also accept non-zero exit.
+    local _appimage="${_pkgname}-${pkgver}.AppImage"
+    local _extract_bin="./${_appimage}"
+    if ! "${_extract_bin}" --appimage-help &>/dev/null; then
+        _extract_bin="$(mktemp -u /tmp/gdlauncher-XXXXXX.AppImage)"
+        cp -f "${_appimage}" "${_extract_bin}"
+        chmod +x "${_extract_bin}"
+    fi
+
+    "${_extract_bin}" --appimage-extract >/dev/null 2>&1 || true
+    [ "${_extract_bin}" != "./${_appimage}" ] && rm -f "${_extract_bin}"
+
+    # Verify extraction succeeded
+    [ -d "${srcdir}/squashfs-root" ] || { echo "ERROR: AppImage extraction failed"; return 1; }
+
+    # Explicitly set APPDIR in AppRun so it works from /opt/gdlauncher-carbon
+    sed -Ei 's@^(if \[ -z "\$APPDIR" ] ; then)$@APPDIR="/opt/gdlauncher-carbon"\n\1@' "${srcdir}/squashfs-root/AppRun"
+
+    # Remove root-level desktop files from squashfs-root to prevent duplicate installs
+    rm -f "${srcdir}/squashfs-root/"*.desktop
+}
+
+package() {
+    # Install extracted application files to /opt/gdlauncher-carbon
+    install -dm755 "${pkgdir}/opt/${_pkgname}"
+    cp -a "${srcdir}/squashfs-root/." "${pkgdir}/opt/${_pkgname}/"
+
+    # Fix main binary permissions (upstream binary is named @gddesktop)
+    chmod 755 "${pkgdir}/opt/${_pkgname}/@gddesktop"
+    chmod 755 "${pkgdir}/opt/${_pkgname}/AppRun"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/gdlauncher-carbon.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Install system-wide default flags file
+    install -Dm644 "${srcdir}/gdlauncher-carbon-flags.conf" "${pkgdir}/etc/gdlauncher-carbon-flags.conf"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/gdlauncher-carbon.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install icons (use the downloaded upstream icon at 512x512, and bundled 2048x2048 from AppImage)
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Install licenses if available
+    if [ -f "${srcdir}/squashfs-root/LICENSE.electron.txt" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    fi
+    if [ -f "${srcdir}/squashfs-root/LICENSES.chromium.html" ]; then
+        install -Dm644 "${srcdir}/squashfs-root/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    fi
+
+    # Fix overall permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

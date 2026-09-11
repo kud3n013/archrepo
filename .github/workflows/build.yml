@@ -66,6 +66,9 @@ jobs:
           - name: zotero-mcp
             upstream_repo: 54yyyu/zotero-mcp
             upstream_check: github-release
+          - name: gdlauncher-carbon
+            upstream_repo: ""
+            upstream_check: gdlauncher-cdn
 
     steps:
       # ── 0. Check if this package should run ───────────────────────────
@@ -161,6 +164,9 @@ jobs:
                 echo "Updated build ID: ${CURRENT_BUILD} → ${BUILD}"
               fi
             fi
+          elif [ "$CHECK" = "gdlauncher-cdn" ]; then
+            VER=$(curl -s "https://cdn-raw.gdl.gg/launcher/latest-linux.yml" | grep -oP '^version:\s*\K[0-9.]+' || true)
+            [ -n "$VER" ] && LATEST="$VER"
           fi
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
@@ -402,6 +408,7 @@ jobs:
               <li><code>zotero-ocr</code> - Zotero OCR (Optical Character Recognition for PDFs via tesseract/poppler)</li>
               <li><code>zotero-pdf-translate</code> - Translate for Zotero (PDF, EPUB, and note translation with 20+ services)</li>
               <li><code>zotero-mcp</code> - Zotero Model Context Protocol (MCP) server & standalone CLI</li>
+              <li><code>gdlauncher-carbon</code> - GDLauncher Carbon: powerful Minecraft custom launcher (Electron, Wayland-ready)</li>
             </ul>
           </body>
           </html>
