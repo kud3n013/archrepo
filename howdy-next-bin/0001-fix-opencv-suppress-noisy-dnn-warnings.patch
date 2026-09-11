@@ -1,0 +1,52 @@
+--- a/howdy/src/bin/compare.cpp
++++ b/howdy/src/bin/compare.cpp
+@@ -9,6 +9,7 @@
+ #include "protocol/compare_exit.hpp"
+ #include "storage/user_models.hpp"
+ #include "vision/face_model.hpp"
++#include <opencv2/core/utils/logger.hpp>
+ 
+ #include <algorithm>
+ #include <chrono>
+@@ -268,6 +269,7 @@ namespace {
+ }  // namespace
+ 
+ auto main(int argc, char **argv) -> int {
++	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 	try {
+ 		const auto start_time   = std::chrono::steady_clock::now();
+ 		const auto parse_result = howdy::native::parse_compare_args(
+--- a/howdy/src/vision/face_model.cpp
++++ b/howdy/src/vision/face_model.cpp
+@@ -11,6 +11,7 @@
+ #include <utility>
+ 
+ #include <opencv2/imgproc.hpp>
++#include <opencv2/core/utils/logger.hpp>
+ 
+ namespace howdy::native {
+ 	namespace {
+@@ -18,6 +19,8 @@ namespace howdy::native {
+ 		// Classic-engine fallback, which cannot load Howdy's supported ONNX models.
+ 		// Remove after upstream makes New engine selection/failure behavior suitable.
+ 		auto force_opencv_new_dnn_engine() -> bool {
++			cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
++			setenv("OPENCV_LOG_LEVEL", "ERROR", 1);
+ 			return setenv("OPENCV_FORCE_DNN_ENGINE", "2", 1) == 0;
+ 		}
+ 
+@@ -35,6 +38,7 @@ namespace howdy::native {
+ 	    : metric_(config.sface_metric)
+ 	    , threshold_(config.sface_threshold)
+ 	    , backend_(std::make_shared<Backend>()) {
++		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 		backend_->check_readiness = [](const std::filesystem::path &path) -> OpenCvModelReadiness {
+ 			return check_opencv_model_readiness_with_label(path, "OpenCV face model file",
+ 			                                               static_cast<uid_t>(0));
+@@ -64,6 +68,7 @@ namespace howdy::native {
+ 	    : metric_(config.sface_metric)
+ 	    , threshold_(config.sface_threshold)
+ 	    , backend_(std::make_shared<Backend>(std::move(backend))) {
++		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 		initialize(config);
+ 	}

@@ -48,6 +48,9 @@ jobs:
           - name: freedownloadmanager-bin
             upstream_repo: ""
             upstream_check: fdm-debrepo
+          - name: howdy-next-bin
+            upstream_repo: ""
+            upstream_check: codeberg-release
 
     steps:
       # ── 0. Check if this package should run ───────────────────────────
@@ -136,6 +139,10 @@ jobs:
             PKG_INDEX=$(curl -sL "https://debrepo.freedownloadmanager.org/dists/jammy/main/binary-amd64/Packages" || true)
             VER=$(echo "$PKG_INDEX" | grep -oP '^Version:\s*\K[0-9.]+' | head -1 || true)
             [ -n "$VER" ] && LATEST="$VER"
+          elif [ "$CHECK" = "codeberg-release" ]; then
+            TAG=$(curl -s "https://codeberg.org/api/v1/repos/nathawat/howdy-next/releases/latest" | jq -r '.tag_name' 2>/dev/null || true)
+            TAG="${TAG#v}"
+            [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
           fi
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
@@ -343,6 +350,7 @@ jobs:
               <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
               <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
               <li><code>freedownloadmanager-bin</code> - Free Download Manager (Qt6 with Wayland/X11 support)</li>
+              <li><code>howdy-next-bin</code> - Howdy Next: facial-recognition authentication for Linux (patched, no OpenCV WARN spam)</li>
             </ul>
           </body>
           </html>

@@ -1,0 +1,37 @@
+pre_install() {
+	echo '[CAUTION] Keep a root shell open while configuring PAM: sudo -i'
+}
+
+post_install() {
+	echo ''
+	echo '┌──────────────────────────────────────────────────────────────┐'
+	echo '│  howdy-next: Facial Recognition Authentication for Linux    │'
+	echo '│  Patched build: OpenCV WARN messages suppressed             │'
+	echo '├──────────────────────────────────────────────────────────────┤'
+	echo '│  Setup steps:                                               │'
+	echo '│  1. Download models:  sudo howdy download-models            │'
+	echo '│  2. Configure camera: sudo howdy config                     │'
+	echo '│     (set device_path to your IR camera, e.g. /dev/video2)   │'
+	echo '│  3. Test camera:      sudo howdy test                       │'
+	echo '│  4. Add face model:   sudo howdy add                        │'
+	echo '│  5. Enable PAM: add to /etc/pam.d/<service>                 │'
+	echo '│     auth sufficient pam_howdy.so workaround=native          │'
+	echo '│     (services: sudo, system-auth, sddm, gdm-password, etc) │'
+	echo '└──────────────────────────────────────────────────────────────┘'
+	echo ''
+}
+
+post_upgrade() {
+	echo '[INFO] howdy-next upgraded. Your face models and config are preserved.'
+	echo '[INFO] Run "sudo howdy test" to verify facial recognition still works.'
+}
+
+pre_remove() {
+	echo '[WARNING] Remove pam_howdy.so from /etc/pam.d/* BEFORE removing this package!'
+	echo '[WARNING] Failure to do so may lock you out of authentication.'
+}
+
+post_remove() {
+	echo '[INFO] howdy-next removed. Face models may remain in /usr/share/howdy/models/'
+	echo '[INFO] Config may remain in /etc/howdy/ (backed up by pacman if modified).'
+}

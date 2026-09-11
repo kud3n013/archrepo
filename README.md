@@ -38,6 +38,7 @@ sudo pacman -S proton-mail-bin
 sudo pacman -S proton-pass-bin
 sudo pacman -S beeper-bin
 sudo pacman -S freedownloadmanager-bin
+sudo pacman -S howdy-next-bin
 ```
 
 ---
@@ -51,6 +52,7 @@ sudo pacman -S freedownloadmanager-bin
 | **`proton-pass-bin`** | [Proton Pass Linux](https://proton.me/pass) | Official desktop application for Proton Pass: end-to-end encrypted password and identity manager. | `sudo pacman -S proton-pass-bin` |
 | **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
 | **`freedownloadmanager-bin`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with Qt6 Wayland/X11 support and BitTorrent integration. | `sudo pacman -S freedownloadmanager-bin` |
+| **`howdy-next-bin`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next-bin` |
 
 ---
 
@@ -68,6 +70,7 @@ sudo pacman -S freedownloadmanager-bin
 ### 3. Automatic Upstream Tracking
 - A daily cron job (`0 4 * * *`) checks upstream release channels:
   - GitHub releases (via GitHub API)
+  - Codeberg releases (via Gitea API)
   - HTTP redirects (via redirect headers)
 - When a new version is detected, the workflow automatically:
   1. Updates `pkgver` and commit hashes in `PKGBUILD`.

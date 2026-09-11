@@ -1,0 +1,36 @@
+pkgbase = howdy-next-bin
+	pkgdesc = C++ rewrite of Howdy facial-recognition authentication on Linux (patched: no OpenCV WARN spam)
+	pkgver = 3.4.0
+	pkgrel = 1
+	url = https://codeberg.org/nathawat/howdy-next
+	install = howdy-next.install
+	arch = x86_64
+	license = GPL-3.0-or-later
+	makedepends = cmake>=3.31
+	makedepends = gettext
+	depends = acl
+	depends = curl>=7.85.0
+	depends = glibc>=2.34
+	depends = libevdev
+	depends = libinih>=59
+	depends = openssl
+	depends = opencv>=5.0.0
+	depends = pam
+	depends = qt6-base
+	depends = yyjson>=0.12.0
+	optdepends = linux-enable-ir-emitter: Enables infrared cameras that are not directly enabled out-of-the-box
+	provides = howdy-next
+	provides = howdy
+	conflicts = howdy
+	conflicts = howdy-next
+	conflicts = howdy-next-git
+	options = !debug
+	backup = etc/howdy/config.ini
+	source = howdy-next-3.4.0.tar.gz::https://codeberg.org/nathawat/howdy-next/archive/v3.4.0.tar.gz
+	source = polkit-agent-helper-howdy.conf
+	source = 0001-fix-opencv-suppress-noisy-dnn-warnings.patch
+	sha512sums = SKIP
+	sha512sums = SKIP
+	sha512sums = SKIP
+
+pkgname = howdy-next-bin
