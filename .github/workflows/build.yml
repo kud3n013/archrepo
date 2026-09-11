@@ -218,7 +218,14 @@ jobs:
         if: steps.filter.outputs.skip != 'true' && steps.cache_check.outputs.skip_build != 'true'
         run: |
           cd "src/${{ matrix.package.name }}"
-          sudo -u builder makepkg -s --noconfirm
+          if ! sudo -u builder makepkg -s --noconfirm; then
+            echo "makepkg -s failed (likely external/AUR runtime dependencies). Installing makedepends and retrying with -d..."
+            MAKEDEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /makedepends/ {print $2}')
+            if [ -n "$MAKEDEPS" ]; then
+              pacman -S --needed --noconfirm $MAKEDEPS
+            fi
+            sudo -u builder makepkg -d --noconfirm
+          fi
 
       # ── 9. Upload package artifact for publish job ───────────────────
       - name: Upload package artifact
