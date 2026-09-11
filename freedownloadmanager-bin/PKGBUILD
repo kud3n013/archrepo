@@ -1,0 +1,108 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Contributor: Freedownloadmanager Team <support@freedownloadmanager.org>
+# Contributor: Rizwan Hasan <rizwan.hasan486@gmail.com>
+
+_pkgname=freedownloadmanager
+pkgname=freedownloadmanager-bin
+pkgver=6.34.4.6974
+pkgrel=1
+pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
+arch=('x86_64')
+url="https://www.freedownloadmanager.org/"
+license=('Freeware')
+provides=("${_pkgname}" 'fdm')
+conflicts=("${_pkgname}" 'fdm')
+install="${pkgname}.install"
+backup=("etc/${_pkgname}-flags.conf")
+options=(!strip !debug)
+
+depends=(
+    'alsa-lib'
+    'bubblewrap'
+    'dbus'
+    'ffmpeg'
+    'fontconfig'
+    'freetype2'
+    'gcc-libs'
+    'glibc'
+    'hicolor-icon-theme'
+    'libglvnd'
+    'libpulse'
+    'libx11'
+    'libxcb'
+    'libxkbcommon'
+    'libxkbcommon-x11'
+    'openssl'
+    'wayland'
+    'xcb-util'
+    'xcb-util-cursor'
+    'xcb-util-image'
+    'xcb-util-keysyms'
+    'xcb-util-renderutil'
+    'xcb-util-wm'
+    'xdg-utils'
+    'zlib'
+    'zstd'
+)
+
+optdepends=(
+    'gst-plugins-base: multimedia playback support'
+    'qt6-wayland: native Wayland display server support'
+)
+
+source=(
+    "${pkgname}-${pkgver}-amd64.deb::https://files2.freedownloadmanager.org/6/latest/freedownloadmanager.deb"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.desktop"
+    "${_pkgname}.png"
+)
+sha512sums=('cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fefc3bde80ff81cc34464ed2c1f6ee7bfb798b32737412a9eccbd92d358c8d6c'
+            '80d012b621371dd38669dd20e13145d56988bc102dfc75a2b5cebc6d30f0a867d69487368a18fc9c0316d254b801090212ee07a211eeb96aa33492a037e69d65'
+            '167fe8381024433b71f091d9050e2bb0488b9a71f7b771b94d390014443b02f235bf9abe5d2a892d90e7aee50134ed348fbf8967b90cd94d1bb6435ab8333004'
+            '49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b'
+            '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d')
+
+prepare() {
+    # Extract deb archive data payload
+    tar -xf data.tar.xz
+}
+
+package() {
+    # Install application files into /opt/freedownloadmanager
+    install -dm755 "${pkgdir}/opt"
+    cp -a "opt/${_pkgname}" "${pkgdir}/opt/${_pkgname}"
+
+    # Ensure binary permissions
+    chmod 755 "${pkgdir}/opt/${_pkgname}/fdm"
+    chmod 755 "${pkgdir}/opt/${_pkgname}/wenativehost"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Provide convenient fdm symlink pointing to wrapper
+    ln -sf "${_pkgname}" "${pkgdir}/usr/bin/fdm"
+
+    # Install system-wide flags configuration
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install FreeDesktop desktop entry
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install high-resolution application icon
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Install AppStream metadata if present
+    if [ -f "usr/share/appdata/${_pkgname}.appdata.xml" ]; then
+        install -Dm644 "usr/share/appdata/${_pkgname}.appdata.xml" "${pkgdir}/usr/share/metainfo/${_pkgname}.appdata.xml"
+    fi
+
+    # Install AppArmor profile if present
+    if [ -f "etc/apparmor.d/${_pkgname}" ]; then
+        install -Dm644 "etc/apparmor.d/${_pkgname}" "${pkgdir}/etc/apparmor.d/${_pkgname}"
+    fi
+
+    # Fix directory and file permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Free Download Manager
+Comment=Fast and powerful modern download accelerator and organizer
+GenericName=Download Manager
+Keywords=download;manager;free;fdm;bittorrent;torrent;magnet;
+Exec=/usr/bin/freedownloadmanager %U
+Terminal=false
+Type=Application
+Icon=freedownloadmanager
+Categories=Network;FileTransfer;P2P;Qt;
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+StartupNotify=true
+StartupWMClass=fdm

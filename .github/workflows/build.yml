@@ -45,6 +45,9 @@ jobs:
           - name: proton-pass-bin
             upstream_repo: ""
             upstream_check: proton-pass-api
+          - name: freedownloadmanager-bin
+            upstream_repo: ""
+            upstream_check: fdm-debrepo
 
     steps:
       # ── 0. Check if this package should run ───────────────────────────
@@ -129,6 +132,10 @@ jobs:
             PASS_JSON=$(curl -sL "https://proton.me/download/pass/linux/version.json" || true)
             VER=$(echo "$PASS_JSON" | jq -r '.Releases[] | select(.CategoryName=="Stable") | .Version' 2>/dev/null | head -1 || true)
             [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
+          elif [ "$CHECK" = "fdm-debrepo" ]; then
+            PKG_INDEX=$(curl -sL "https://debrepo.freedownloadmanager.org/dists/jammy/main/binary-amd64/Packages" || true)
+            VER=$(echo "$PKG_INDEX" | grep -oP '^Version:\s*\K[0-9.]+' | head -1 || true)
+            [ -n "$VER" ] && LATEST="$VER"
           fi
 
           echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
@@ -335,6 +342,7 @@ jobs:
               <li><code>proton-pass-bin</code> - Proton Pass official desktop application</li>
               <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
               <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
+              <li><code>freedownloadmanager-bin</code> - Free Download Manager (Qt6 with Wayland/X11 support)</li>
             </ul>
           </body>
           </html>
