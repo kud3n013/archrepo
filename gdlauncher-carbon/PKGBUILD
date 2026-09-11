@@ -3,15 +3,16 @@
 # AUR Reference: https://aur.archlinux.org/packages/gdlauncher-carbon-bin
 
 _pkgname=gdlauncher-carbon
-pkgname=gdlauncher-carbon-bin
+pkgname=gdlauncher-carbon
 pkgver=2.0.40
 pkgrel=1
 pkgdesc="GDLauncher Carbon — a simple yet powerful Minecraft custom launcher with a strong focus on user experience"
 arch=('x86_64')
 url="https://gdlauncher.com"
 license=('LicenseRef-gdlauncher')
-provides=('gdlauncher-carbon')
-conflicts=('gdlauncher-carbon' 'gdlauncher' 'gdlauncher-bin' 'gdlauncher-beta' 'gdlauncher-beta-bin' 'gdlauncher-appimage' 'gdlauncher-git')
+provides=('gdlauncher-carbon-bin')
+conflicts=('gdlauncher-carbon-bin' 'gdlauncher' 'gdlauncher-bin' 'gdlauncher-beta' 'gdlauncher-beta-bin' 'gdlauncher-appimage' 'gdlauncher-git')
+replaces=('gdlauncher-carbon-bin')
 install=gdlauncher-carbon.install
 backup=('etc/gdlauncher-carbon-flags.conf')
 depends=(

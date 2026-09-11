@@ -323,7 +323,7 @@ jobs:
 
           # 4. Purge legacy -bin packages that have been renamed
           echo "Purging legacy -bin packages from repository index..."
-          rm -f antigravity-bin-*.pkg.tar.zst beeper-bin-*.pkg.tar.zst howdy-next-bin-*.pkg.tar.zst zalo-for-linux-bin-*.pkg.tar.zst
+          rm -f antigravity-bin-*.pkg.tar.zst beeper-bin-*.pkg.tar.zst howdy-next-bin-*.pkg.tar.zst zalo-for-linux-bin-*.pkg.tar.zst gdlauncher-carbon-bin-*.pkg.tar.zst
 
           # Keep newest package version for each package name
           PKGS=$(ls *.pkg.tar.zst 2>/dev/null | sed -E 's/-[0-9]+.*//' | sort -u || true)
