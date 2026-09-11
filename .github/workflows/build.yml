@@ -294,9 +294,8 @@ jobs:
       - name: Prepare gh-pages branch
         run: |
           cd repo/x86_64
-          # Remove files >= 95 MB from git working tree so git push doesn't fail
-          # (These files are hosted safely on GitHub Releases)
-          find . -maxdepth 1 -name "*.pkg.tar.zst" -size +95M -exec rm -f {} +
+          # Packages are hosted on GitHub Releases; keep only the database files in git to save repo space
+          rm -f *.pkg.tar.zst
 
           # Create landing page for GitHub Pages
           cat << 'EOF' > ../index.html

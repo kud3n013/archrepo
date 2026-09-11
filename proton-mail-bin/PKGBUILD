@@ -5,11 +5,12 @@
 pkgname=proton-mail-bin
 _name=${pkgname%-bin}
 pkgver=1.13.4
-pkgrel=1
+pkgrel=2
 pkgdesc='Proton official desktop application for Proton Mail and Proton Calendar'
 arch=('x86_64')
 url='https://proton.me/mail'
 license=('GPL-3.0-or-later')
+install=proton-mail-bin.install
 _electron=electron40
 depends=(bash "${_electron}" hicolor-icon-theme)
 provides=("${_name}")

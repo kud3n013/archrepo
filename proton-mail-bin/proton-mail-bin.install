@@ -1,0 +1,23 @@
+_cleanup_user_desktops() {
+    # Remove rogue or duplicate user-level desktop files left behind by desktop environments or manual edits
+    for user_home in /home/*; do
+        if [ -d "$user_home/.local/share/applications" ]; then
+            rm -f "$user_home/.local/share/applications/proton-mail.desktop" \
+                  "$user_home/.local/share/applications/ProtonMail.desktop" \
+                  "$user_home/.local/share/applications/Proton Mail.desktop" 2>/dev/null || true
+        fi
+    done
+    update-desktop-database -q 2>/dev/null || true
+}
+
+post_install() {
+    _cleanup_user_desktops
+}
+
+post_upgrade() {
+    _cleanup_user_desktops
+}
+
+post_remove() {
+    _cleanup_user_desktops
+}
