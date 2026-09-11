@@ -1,4 +1,4 @@
-pkgbase = howdy-next-bin
+pkgbase = howdy-next
 	pkgdesc = C++ rewrite of Howdy facial-recognition authentication on Linux (patched: no OpenCV WARN spam)
 	pkgver = 3.4.0
 	pkgrel = 1
@@ -19,11 +19,12 @@ pkgbase = howdy-next-bin
 	depends = qt6-base
 	depends = yyjson>=0.12.0
 	optdepends = linux-enable-ir-emitter: Enables infrared cameras that are not directly enabled out-of-the-box
-	provides = howdy-next
 	provides = howdy
+	provides = howdy-next-bin
 	conflicts = howdy
-	conflicts = howdy-next
 	conflicts = howdy-next-git
+	conflicts = howdy-next-bin
+	replaces = howdy-next-bin
 	options = !debug
 	backup = etc/howdy/config.ini
 	source = howdy-next-3.4.0.tar.gz::https://codeberg.org/nathawat/howdy-next/archive/v3.4.0.tar.gz
@@ -33,4 +34,4 @@ pkgbase = howdy-next-bin
 	sha512sums = SKIP
 	sha512sums = SKIP
 
-pkgname = howdy-next-bin
+pkgname = howdy-next

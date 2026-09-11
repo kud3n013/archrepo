@@ -9,8 +9,8 @@
 You are an expert Arch Linux packaging engineer maintaining the custom pacman repository `kud3n013/archrepo`.
 
 I want to add / modify a package in this repository with the following specifications:
-- **Package Name**: [e.g. appname-bin]
-- **Existing AUR Package / Link (if known)**: [e.g. https://aur.archlinux.org/packages/appname-bin]
+- **Package Name**: [e.g. appname] (Note: do NOT use -bin suffix; archrepo is already a pre-compiled binary repository)
+- **Existing AUR Package / Link (if known)**: [e.g. https://aur.archlinux.org/packages/appname or appname-bin]
 - **Upstream Project / Download URL**: [e.g. https://github.com/org/repo or direct download link]
 - **Changelog / Release Page**: [e.g. https://github.com/org/repo/releases]
 - **Upstream Distribution Format**: [AppImage / Debian .deb / pre-compiled tarball / raw binary]
@@ -49,9 +49,9 @@ Before writing a package recipe from scratch, search and inspect the Arch User R
 1. **Check for existing Arch binary package**:
    - Verify whether upstream's release page already provides an official Arch Linux package (`.pkg.tar.zst` or `.pkg.tar.xz`).
    - If an official `.pkg.tar.zst` exists, do NOT extract and re-package it with `makepkg`; directly adopt or download the official binary into the repository index.
-   - If upstream only distributes `.AppImage`, `.deb`, `.rpm`, or `.tar.gz`, confirm that these are upstream binary installers and NOT native Arch packages. These MUST be repackaged into a native `.pkg.tar.zst` using a `-bin` PKGBUILD so `pacman` can track and manage them.
-2. **Never compile from source for `-bin` packages**:
-   - If the package ends with `-bin`, do NOT invoke `cargo build`, `cmake`, or `make`. Extract the pre-compiled binaries from the upstream archive.
+   - If upstream only distributes `.AppImage`, `.deb`, `.rpm`, or `.tar.gz`, confirm that these are upstream binary installers and NOT native Arch packages. These MUST be repackaged into a native `.pkg.tar.zst` PKGBUILD so `pacman` can track and manage them.
+2. **Never compile from source when repackaging pre-compiled binaries**:
+   - Extract the pre-compiled binaries from the upstream archive; do NOT invoke `cargo build`, `cmake`, or `make` unless compiling from source is explicitly required.
 
 ---
 
@@ -72,9 +72,9 @@ Inside the repository root, create `[PACKAGE_NAME]/` with the following standard
 
 ### Step 4: PKGBUILD Rules & Standards
 1. **Metadata**:
-   - `pkgname=[pkgname]-bin`
-   - `_pkgname=[pkgname]`
-   - `provides=("${_pkgname}")` and `conflicts=("${_pkgname}")` (along with any obsolete/conflicting variants).
+   - `pkgname=[pkgname]` (do NOT append `-bin`)
+   - `provides=("[pkgname]-bin")` and `conflicts=("[pkgname]-bin")` (along with any obsolete/conflicting variants).
+   - `replaces=("[pkgname]-bin")` if superseding a previous `-bin` package.
    - `options=(!strip !debug)` for pre-compiled binary packages.
    - `backup=("etc/[pkgname]-flags.conf")` if a system-wide flags file is installed.
    - `install=[pkgname].install` (required if desktop files or user cleanup is involved).
@@ -142,7 +142,7 @@ For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-re
 1. **Add to Build Matrix**:
    Add the new package under `strategy.matrix.package` in `build.yml`:
    ```yaml
-   - name: [pkgname]-bin
+   - name: [pkgname]
      upstream_repo: [org/repo or empty]
      upstream_check: [github-release | redirect | custom]
    ```
@@ -162,5 +162,5 @@ Before completing the task:
 - [ ] Clean up local temporary/build files (`src/`, `pkg/`, tarballs).
 - [ ] Commit and push changes to `main`.
 - [ ] Monitor GitHub Actions workflow run to verify clean build and release publication.
-- [ ] Provide user with the exact pacman install command (`sudo pacman -Sy [pkgname]-bin`).
+- [ ] Provide user with the exact pacman install command (`sudo pacman -Sy [pkgname]`).
 ```

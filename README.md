@@ -33,11 +33,11 @@ sudo pacman -Syy
 Now you can install any package using standard `pacman`:
 
 ```bash
-sudo pacman -S zalo-for-linux-bin
-sudo pacman -S beeper-bin
-sudo pacman -S antigravity-bin
+sudo pacman -S zalo-for-linux
+sudo pacman -S beeper
+sudo pacman -S antigravity
 sudo pacman -S freedownloadmanager-elephant
-sudo pacman -S howdy-next-bin
+sudo pacman -S howdy-next
 sudo pacman -S zotero-better-bibtex
 sudo pacman -S zotmoov
 sudo pacman -S zotero-better-notes
@@ -52,11 +52,11 @@ sudo pacman -S zotero-mcp
 
 | Package | Upstream | Description | Installation |
 |---|---|---|---|
-| **`zalo-for-linux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux-bin` |
-| **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
-| **`antigravity-bin`** | [Google Antigravity](https://antigravity.google) | Google Antigravity 2.0 multi-agent orchestration platform with native Wayland support and configurable flags. | `sudo pacman -S antigravity-bin` |
+| **`zalo-for-linux`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux` |
+| **`beeper`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper` |
+| **`antigravity`** | [Google Antigravity](https://antigravity.google) | Google Antigravity 2.0 multi-agent orchestration platform with native Wayland support and configurable flags. | `sudo pacman -S antigravity` |
 | **`freedownloadmanager-elephant`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant` |
-| **`howdy-next-bin`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next-bin` |
+| **`howdy-next`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next` |
 | **`zotero-better-bibtex`** | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) | Better BibTeX for Zotero - LaTeX bibliography and citation management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-bibtex` |
 | **`zotmoov`** | [wileyyugioh/zotmoov](https://github.com/wileyyugioh/zotmoov) | ZotMoov - moves attachments to directories based on collection/item rules. Auto-installed via distribution extensions. | `sudo pacman -S zotmoov` |
 | **`zotero-better-notes`** | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) | Better Notes for Zotero - comprehensive note taking and management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-notes` |
@@ -72,16 +72,16 @@ The following packages have been retired from the active repository and are no l
 
 | Package | Upstream | Location | Status |
 |---|---|---|---|
-| **`freedownloadmanager-bin`** | [Free Download Manager](https://www.freedownloadmanager.org/) | [`archive/freedownloadmanager-bin`](archive/freedownloadmanager-bin/) | Archived |
-| **`proton-mail-bin`** | [Proton Mail Linux Beta](https://proton.me/mail) | [`archive/proton-mail-bin`](archive/proton-mail-bin/) | Archived |
-| **`proton-pass-bin`** | [Proton Pass Linux](https://proton.me/pass) | [`archive/proton-pass-bin`](archive/proton-pass-bin/) | Archived |
+| **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | [`archive/freedownloadmanager`](archive/freedownloadmanager/) | Archived |
+| **`proton-mail`** | [Proton Mail Linux Beta](https://proton.me/mail) | [`archive/proton-mail`](archive/proton-mail/) | Archived |
+| **`proton-pass`** | [Proton Pass Linux](https://proton.me/pass) | [`archive/proton-pass`](archive/proton-pass/) | Archived |
 
 ---
 
 ## ⚙️ Architecture & Features
 
 ### 1. Dual-Tier Storage Architecture
-- **GitHub Releases (`packages` tag):** Stores binary packages (`.pkg.tar.zst`) and pacman databases (`archrepo.db`, `archrepo.files`). This bypasses GitHub's 100 MB repository limit and supports packages up to 2 GB (such as `zalo-for-linux-bin` at ~260 MB).
+- **GitHub Releases (`packages` tag):** Stores binary packages (`.pkg.tar.zst`) and pacman databases (`archrepo.db`, `archrepo.files`). This bypasses GitHub's 100 MB repository limit and supports packages up to 2 GB (such as `zalo-for-linux` at ~260 MB).
 - **GitHub Pages:** Hosts the repository landing page and documentation at [kud3n013.github.io/archrepo](https://kud3n013.github.io/archrepo/).
 
 ### 2. Smart Build Caching & Skip Logic
@@ -143,10 +143,10 @@ You can trigger builds manually with fine-grained control via **GitHub Actions**
 
 ```bash
 # Build only a single package without touching others
-gh workflow run build.yml -f package=zalo-for-linux-bin
+gh workflow run build.yml -f package=zalo-for-linux
 
 # Force a clean rebuild even if the binary already exists
-gh workflow run build.yml -f package=zalo-for-linux-bin -f force_rebuild=true
+gh workflow run build.yml -f package=zalo-for-linux -f force_rebuild=true
 ```
 
 ---

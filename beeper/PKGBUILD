@@ -2,16 +2,17 @@
 # Upstream: https://www.beeper.com/changelog
 
 _pkgname=beeper
-pkgname=beeper-bin
+pkgname=beeper
 pkgver=4.3.113
 pkgrel=1
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
 license=('LicenseRef-beeper')
-provides=('beeper' 'beeper-v4-bin')
-conflicts=('beeper' 'beeper-v4-bin')
-install=beeper-bin.install
+provides=('beeper-bin' 'beeper-v4-bin')
+conflicts=('beeper-bin' 'beeper-v4-bin')
+replaces=('beeper-bin')
+install=beeper.install
 depends=(
     'libappindicator-gtk3'
     'libnotify'

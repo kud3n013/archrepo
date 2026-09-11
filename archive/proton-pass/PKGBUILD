@@ -3,16 +3,17 @@
 # Contributor: Mysti
 
 _pkgname=proton-pass
-pkgname=proton-pass-bin
+pkgname=proton-pass
 pkgver=1.40.2
 pkgrel=1
 pkgdesc="Official desktop application for Proton Pass: end-to-end encrypted password and identity manager"
 arch=('x86_64')
 url="https://proton.me/pass"
 license=('GPL-3.0-or-later')
-provides=('proton-pass' 'protonpass')
-conflicts=('proton-pass' 'protonpass')
-install=proton-pass-bin.install
+provides=('protonpass' "${pkgname}-bin")
+conflicts=('protonpass' "${pkgname}-bin")
+replaces=("${pkgname}-bin")
+install=proton-pass.install
 backup=("etc/${_pkgname}-flags.conf")
 options=(!strip !debug)
 

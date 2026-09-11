@@ -15,9 +15,9 @@ Packages in this directory:
 
 | Package | Original Upstream | Reason for Archiving |
 |---|---|---|
-| [`freedownloadmanager-bin`](./freedownloadmanager-bin/) | [Free Download Manager](https://www.freedownloadmanager.org/) | Archived per maintainer request. |
-| [`proton-mail-bin`](./proton-mail-bin/) | [Proton Mail Linux Beta](https://proton.me/mail) | Archived per maintainer request. |
-| [`proton-pass-bin`](./proton-pass-bin/) | [Proton Pass Linux](https://proton.me/pass) | Archived per maintainer request. |
+| [`freedownloadmanager`](./freedownloadmanager/) | [Free Download Manager](https://www.freedownloadmanager.org/) | Archived per maintainer request. |
+| [`proton-mail`](./proton-mail/) | [Proton Mail Linux Beta](https://proton.me/mail) | Archived per maintainer request. |
+| [`proton-pass`](./proton-pass/) | [Proton Pass Linux](https://proton.me/pass) | Archived per maintainer request. |
 
 ---
 

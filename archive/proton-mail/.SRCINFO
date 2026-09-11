@@ -1,16 +1,17 @@
-pkgbase = proton-mail-bin
+pkgbase = proton-mail
 	pkgdesc = Proton official desktop application for Proton Mail and Proton Calendar
 	pkgver = 1.13.4
 	pkgrel = 2
 	url = https://proton.me/mail
-	install = proton-mail-bin.install
+	install = proton-mail.install
 	arch = x86_64
 	license = GPL-3.0-or-later
 	depends = bash
 	depends = electron40
 	depends = hicolor-icon-theme
-	provides = proton-mail
-	conflicts = proton-mail
+	provides = proton-mail-bin
+	conflicts = proton-mail-bin
+	replaces = proton-mail-bin
 	options = !debug
 	options = !strip
 	source = proton-mail-1.13.4.deb::https://proton.me/download/mail/linux/1.13.4/ProtonMail-desktop-beta.deb
@@ -18,4 +19,4 @@ pkgbase = proton-mail-bin
 	sha512sums = SKIP
 	sha512sums = SKIP
 
-pkgname = proton-mail-bin
+pkgname = proton-mail

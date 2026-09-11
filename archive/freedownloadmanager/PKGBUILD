@@ -3,15 +3,16 @@
 # Contributor: Rizwan Hasan <rizwan.hasan486@gmail.com>
 
 _pkgname=freedownloadmanager
-pkgname=freedownloadmanager-bin
+pkgname=freedownloadmanager
 pkgver=6.34.4.6974
 pkgrel=2
 pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
 arch=('x86_64')
 url="https://www.freedownloadmanager.org/"
 license=('Freeware')
-provides=("${_pkgname}" 'fdm')
-conflicts=("${_pkgname}" 'fdm')
+provides=("${pkgname}-bin" 'fdm')
+conflicts=("${pkgname}-bin" 'fdm')
+replaces=("${pkgname}-bin")
 install="${pkgname}.install"
 backup=("etc/${_pkgname}-flags.conf")
 options=(!strip !debug)

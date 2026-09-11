@@ -2,7 +2,7 @@
 # Upstream: https://antigravity.google
 
 _pkgname=antigravity
-pkgname=antigravity-bin
+pkgname=antigravity
 pkgver=2.12.2
 _build=6298742303883264
 pkgrel=1
@@ -10,8 +10,9 @@ pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
 url="https://antigravity.google"
 license=('LicenseRef-Google-Antigravity')
-provides=("${_pkgname}")
-conflicts=("${_pkgname}")
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin")
+replaces=("${pkgname}-bin")
 backup=("etc/${_pkgname}-flags.conf")
 install=${pkgname}.install
 depends=(

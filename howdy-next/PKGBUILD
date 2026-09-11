@@ -3,7 +3,7 @@
 # Patched: Suppress noisy OpenCV 5 DNN WARN messages via cv::utils::logging API
 # Ref: https://codeberg.org/nathawat/howdy-next/pulls/30 (our fix supersedes PR#30's broken setenv approach)
 
-pkgname=howdy-next-bin
+pkgname=howdy-next
 _pkgname=howdy-next
 pkgver=3.4.0
 pkgrel=1
@@ -30,12 +30,13 @@ makedepends=(
 optdepends=(
 	'linux-enable-ir-emitter: Enables infrared cameras that are not directly enabled out-of-the-box'
 )
-provides=('howdy-next' 'howdy')
+provides=('howdy' 'howdy-next-bin')
 conflicts=(
 	'howdy'
-	'howdy-next'
 	'howdy-next-git'
+	'howdy-next-bin'
 )
+replaces=('howdy-next-bin')
 backup=('etc/howdy/config.ini')
 install=howdy-next.install
 options=(!debug)

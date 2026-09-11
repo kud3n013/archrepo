@@ -2,7 +2,7 @@
 # Upstream: https://github.com/doandat943/zalo-for-linux
 
 _pkgname=zalo
-pkgname=zalo-for-linux-bin
+pkgname=zalo-for-linux
 pkgver=26.8.20
 _commithash=87b0696
 pkgrel=4
@@ -10,9 +10,10 @@ pkgdesc="Zalo for Linux — unofficial port for Linux systems with Wayland & fla
 arch=('x86_64')
 url="https://github.com/doandat943/zalo-for-linux"
 license=('MIT')
-provides=('zalo' 'zalo-for-linux')
-conflicts=('zalo' 'zalo-for-linux' 'zalux-bin')
-install=zalo-for-linux-bin.install
+provides=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+conflicts=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+replaces=('zalo-for-linux-bin')
+install=zalo-for-linux.install
 backup=('etc/zalo-flags.conf')
 depends=(
     'bash'

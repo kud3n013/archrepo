@@ -2,19 +2,20 @@
 # Contributor: AlphaLynx <alphalynx at alphalynx dot dev>
 # Contributor: Mark Wagie <mark dot wagie at proton dot me>
 
-pkgname=proton-mail-bin
-_name=${pkgname%-bin}
+pkgname=proton-mail
+_name=${pkgname}
 pkgver=1.13.4
 pkgrel=2
 pkgdesc='Proton official desktop application for Proton Mail and Proton Calendar'
 arch=('x86_64')
 url='https://proton.me/mail'
 license=('GPL-3.0-or-later')
-install=proton-mail-bin.install
+install=proton-mail.install
 _electron=electron40
 depends=(bash "${_electron}" hicolor-icon-theme)
-provides=("${_name}")
-conflicts=("${_name}")
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin")
+replaces=("${pkgname}-bin")
 options=(!debug !strip)
 source=("${_name}-${pkgver}.deb::https://proton.me/download/mail/linux/${pkgver}/ProtonMail-desktop-beta.deb"
         "${_name}.sh")
