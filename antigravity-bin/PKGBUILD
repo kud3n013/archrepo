@@ -1,0 +1,92 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://antigravity.google
+
+_pkgname=antigravity
+pkgname=antigravity-bin
+pkgver=2.12.2
+_build=6298742303883264
+pkgrel=1
+pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
+arch=('x86_64')
+url="https://antigravity.google"
+license=('LicenseRef-Google-Antigravity')
+provides=("${_pkgname}")
+conflicts=("${_pkgname}")
+backup=("etc/${_pkgname}-flags.conf")
+install=${pkgname}.install
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'cairo'
+    'dbus'
+    'expat'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libgcc'
+    'libx11'
+    'libxcb'
+    'libxcomposite'
+    'libxdamage'
+    'libxext'
+    'libxfixes'
+    'libxkbcommon'
+    'libxrandr'
+    'mesa'
+    'nspr'
+    'nss'
+    'pango'
+    'systemd-libs'
+)
+optdepends=(
+    'wl-clipboard: Wayland clipboard integration'
+    'xclip: X11 clipboard integration'
+)
+options=(!strip !debug)
+source=(
+    "Antigravity-${pkgver}-${_build}-x86_64.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-hub/${pkgver}-${_build}/linux-x64/Antigravity.tar.gz"
+    "${_pkgname}.sh"
+    "${_pkgname}.desktop"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.png"
+)
+sha256sums=('fc2e2af49a45aefee9558bce56aaa4bbde00d560d354357af1b834a9dd43cd33'
+            'a58cdf0fac31cf33c247a91849aa6d8383a9436715a356c74773c49094c4fdcd'
+            '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
+            '5659ed3c7e04af07aece4db774e656c3d92d09f83b96c0111d80c12940cab76f'
+            'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317')
+
+package() {
+    # Install main application files to /opt/antigravity
+    install -dm755 "${pkgdir}/opt/${_pkgname}"
+    cp -a "${srcdir}/Antigravity-x64/." "${pkgdir}/opt/${_pkgname}/"
+
+    # Provide /opt/Antigravity compatibility symlink
+    ln -s "${_pkgname}" "${pkgdir}/opt/Antigravity"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Install system-wide flags configuration
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install icons
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Install licenses
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    install -Dm644 "${pkgdir}/opt/${_pkgname}/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    install -Dm644 "${pkgdir}/opt/${_pkgname}/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+    # Permission hardening
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+    chmod 4755 "${pkgdir}/opt/${_pkgname}/chrome-sandbox"
+}

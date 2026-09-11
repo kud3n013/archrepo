@@ -35,6 +35,7 @@ Now you can install any package using standard `pacman`:
 ```bash
 sudo pacman -S zalo-for-linux-bin
 sudo pacman -S beeper-bin
+sudo pacman -S antigravity-bin
 sudo pacman -S freedownloadmanager-elephant
 sudo pacman -S howdy-next-bin
 sudo pacman -S zotero-better-bibtex
@@ -53,6 +54,7 @@ sudo pacman -S zotero-mcp
 |---|---|---|---|
 | **`zalo-for-linux-bin`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux-bin` |
 | **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
+| **`antigravity-bin`** | [Google Antigravity](https://antigravity.google) | Google Antigravity 2.0 multi-agent orchestration platform with native Wayland support and configurable flags. | `sudo pacman -S antigravity-bin` |
 | **`freedownloadmanager-elephant`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant` |
 | **`howdy-next-bin`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next-bin` |
 | **`zotero-better-bibtex`** | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) | Better BibTeX for Zotero - LaTeX bibliography and citation management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-bibtex` |

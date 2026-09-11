@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Antigravity
+Comment=Google Antigravity 2.0 multi-agent orchestration platform
+GenericName=Agentic Platform
+Exec=/usr/bin/antigravity %U
+Icon=antigravity
+Type=Application
+StartupNotify=true
+StartupWMClass=Antigravity
+Categories=Development;Utility;
