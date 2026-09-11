@@ -10,9 +10,10 @@ You are an expert Arch Linux packaging engineer maintaining the custom pacman re
 
 I want to add / modify a package in this repository with the following specifications:
 - **Package Name**: [e.g. appname-bin]
-- **Upstream Project / Download URL**: [e.g. https://github.com/org/repo or https://example.com/download/app.AppImage]
+- **Existing AUR Package / Link (if known)**: [e.g. https://aur.archlinux.org/packages/appname-bin]
+- **Upstream Project / Download URL**: [e.g. https://github.com/org/repo or direct download link]
 - **Changelog / Release Page**: [e.g. https://github.com/org/repo/releases]
-- **Upstream Distribution Format**: [e.g. AppImage / Debian .deb / pre-compiled tarball / raw binary]
+- **Upstream Distribution Format**: [AppImage / Debian .deb / pre-compiled tarball / raw binary]
 - **Package Description**: [Short 1-sentence description]
 - **Is it an Electron / Wayland GUI App?**: [Yes / No]
 - **Upstream Version Check Strategy**: [github-release / redirect / api-json / manual]
@@ -21,17 +22,40 @@ Please follow the mandatory repository architecture, packaging rules, and best p
 
 ---
 
-### Step 1: Upstream Pre-Flight & Binary Audit (Don't Waste Build Time & Storage)
+### Step 1: Check the AUR for Existing PKGBUILDs & Community Issues
+Before writing a package recipe from scratch, search and inspect the Arch User Repository (AUR):
+1. **Fetch the Existing AUR PKGBUILD**:
+   - Check if an existing package or related `-bin` package exists on the AUR:
+     ```bash
+     curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=[pkgname]"
+     ```
+     *(or clone it to inspect all files: `git clone https://aur.archlinux.org/[pkgname].git /tmp/[pkgname]-aur`)*
+   - Use the AUR PKGBUILD as a baseline to copy and modify upon, taking advantage of its tested dependencies, desktop entries, source URLs, and architecture configurations.
+2. **Review AUR Comments and Pinned Discussions for Known Pitfalls**:
+   - Inspect user comments on the AUR page: `https://aur.archlinux.org/packages/[pkgname]`
+   - Look for recently reported issues, recurring user complaints, and proposed workarounds:
+     - Blurry scaling, missing flags, or window decoration glitches under Wayland / Hyprland.
+     - Rogue autostart files or duplicate `.desktop` shortcuts cluttering application launchers.
+     - Missing optional dependencies (`optdepends`) needed for clipboard (e.g. `wl-clipboard`), screen sharing, audio, or camera.
+     - Electron version incompatibilities, crash loops, or startup freezes.
+     - Post-uninstallation leftovers (unremoved desktop files, cached data).
+3. **Proactively Incorporate Community Fixes into Our Build**:
+   - Do NOT just blindly copy an AUR PKGBUILD that has known flaws or unaddressed user complaints.
+   - Address the issues found in the AUR comments right in our `prepare()`, `.install` scriptlet, or launcher wrapper, ensuring `archrepo` provides a strictly superior, hardened, and hassle-free package.
+
+---
+
+### Step 2: Upstream Pre-Flight & Binary Audit (Don't Waste Build Time & Storage)
 1. **Check for existing Arch binary package**:
    - Verify whether upstream's release page already provides an official Arch Linux package (`.pkg.tar.zst` or `.pkg.tar.xz`).
-   - If an official `.pkg.tar.zst` exists, do NOT extract and re-package it with makepkg; directly adopt or download the official binary into the repository index.
+   - If an official `.pkg.tar.zst` exists, do NOT extract and re-package it with `makepkg`; directly adopt or download the official binary into the repository index.
    - If upstream only distributes `.AppImage`, `.deb`, `.rpm`, or `.tar.gz`, confirm that these are upstream binary installers and NOT native Arch packages. These MUST be repackaged into a native `.pkg.tar.zst` using a `-bin` PKGBUILD so `pacman` can track and manage them.
 2. **Never compile from source for `-bin` packages**:
    - If the package ends with `-bin`, do NOT invoke `cargo build`, `cmake`, or `make`. Extract the pre-compiled binaries from the upstream archive.
 
 ---
 
-### Step 2: Package Directory Structure
+### Step 3: Package Directory Structure
 Inside the repository root, create `[PACKAGE_NAME]/` with the following standard layout:
 ```text
 [PACKAGE_NAME]/
@@ -46,7 +70,7 @@ Inside the repository root, create `[PACKAGE_NAME]/` with the following standard
 
 ---
 
-### Step 3: PKGBUILD Rules & Standards
+### Step 4: PKGBUILD Rules & Standards
 1. **Metadata**:
    - `pkgname=[pkgname]-bin`
    - `_pkgname=[pkgname]`
@@ -64,7 +88,7 @@ Inside the repository root, create `[PACKAGE_NAME]/` with the following standard
 
 ---
 
-### Step 4: Desktop Integration & Clean Uninstallation (`.install` Scriptlet)
+### Step 5: Desktop Integration & Clean Uninstallation (`.install` Scriptlet)
 To prevent rogue, duplicate, or ghost `.desktop` shortcuts from persisting after uninstallation:
 1. **Disable AppImage runtime desktop integration**:
    In the launcher wrapper `[pkgname].sh`, export `DESKTOPINTEGRATION=0`.
@@ -87,7 +111,7 @@ To prevent rogue, duplicate, or ghost `.desktop` shortcuts from persisting after
 
 ---
 
-### Step 5: Wayland, HiDPI Scaling & Launcher Wrapper
+### Step 6: Wayland, HiDPI Scaling & Launcher Wrapper
 For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-resolution screens:
 1. **Launcher Wrapper (`[pkgname].sh`)**:
    - Look for user overrides in `~/.config/[pkgname]-flags.conf`, falling back to `/etc/[pkgname]-flags.conf`.
@@ -99,7 +123,7 @@ For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-re
    - Include clear comments documenting:
      - Wayland support (`--ozone-platform-hint=auto`, `--enable-wayland-ime`)
      - High-DPI screen scaling override (`# --force-device-scale-factor=1.5`)
-     - Any optional subsystem toggles (e.g. `# ZCALL_DISABLE=1`).
+     - Any optional subsystem toggles.
 3. **Desktop Entry (`[pkgname].desktop`)**:
    - `Exec=/usr/bin/[pkgname] %U` (pointing to the wrapper script).
    - `StartupWMClass=[correct_wm_class]` (ensures taskbars and docks track the Wayland window properly).
@@ -107,14 +131,14 @@ For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-re
 
 ---
 
-### Step 6: UI Responsiveness & Non-Blocking Startup Check
+### Step 7: UI Responsiveness & Non-Blocking Startup Check
 - Ensure that the application does NOT perform long-running synchronous calls (e.g. `spawnSync` initializing Wine prefixes, heavy downloads, or blocking IPC) on the Electron main process thread during startup.
 - In Wayland, blocking the main thread for > 5 seconds will trigger the compositor's unresponsiveness dialog (`wl_ping` timeout).
 - If upstream includes slow initialization, patch it to run asynchronously in the background (`spawn` with Promise or deferred timer).
 
 ---
 
-### Step 7: GitHub Actions CI/CD Integration (`.github/workflows/build.yml`)
+### Step 8: GitHub Actions CI/CD Integration (`.github/workflows/build.yml`)
 1. **Add to Build Matrix**:
    Add the new package under `strategy.matrix.package` in `build.yml`:
    ```yaml
@@ -130,7 +154,7 @@ For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-re
 
 ---
 
-### Step 8: Verification & Delivery Checklist
+### Step 9: Verification & Delivery Checklist
 Before completing the task:
 - [ ] Run `makepkg --printsrcinfo > .SRCINFO` to verify syntax.
 - [ ] Test package build with `makepkg` (ensure files, wrapper, flags, and desktop entry are placed in correct `${pkgdir}` paths).
