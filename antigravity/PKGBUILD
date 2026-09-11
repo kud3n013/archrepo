@@ -3,8 +3,8 @@
 
 _pkgname=antigravity
 pkgname=antigravity
-pkgver=2.12.2
-_build=6298742303883264
+pkgver=2.13.0
+_build=6362815968182272
 pkgrel=1
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
@@ -53,7 +53,7 @@ source=(
     "${_pkgname}-flags.conf"
     "${_pkgname}.png"
 )
-sha256sums=('fc2e2af49a45aefee9558bce56aaa4bbde00d560d354357af1b834a9dd43cd33'
+sha256sums=('a47a2434d920008792f3ce43ef502d486c326d2098082590831800b5b093f643'
             'a58cdf0fac31cf33c247a91849aa6d8383a9436715a356c74773c49094c4fdcd'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
             '5659ed3c7e04af07aece4db774e656c3d92d09f83b96c0111d80c12940cab76f'
