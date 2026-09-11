@@ -1,0 +1,27 @@
+_cleanup_user_desktops() {
+    # Remove rogue or duplicate user-level desktop files left behind by older versions or desktop integration
+    for user_home in /home/*; do
+        if [ -d "$user_home/.local/share/applications" ]; then
+            rm -f "$user_home/.local/share/applications/proton-pass.desktop" \
+                  "$user_home/.local/share/applications/Proton Pass.desktop" \
+                  "$user_home/.local/share/applications/ProtonPass.desktop" 2>/dev/null || true
+        fi
+        if [ -d "$user_home/.local/share/icons" ]; then
+            rm -f "$user_home/.local/share/icons/proton-pass.png" \
+                  "$user_home/.local/share/icons/Proton Pass.png" 2>/dev/null || true
+        fi
+    done
+    update-desktop-database -q 2>/dev/null || true
+}
+
+post_install() {
+    _cleanup_user_desktops
+}
+
+post_upgrade() {
+    _cleanup_user_desktops
+}
+
+post_remove() {
+    _cleanup_user_desktops
+}
