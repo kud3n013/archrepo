@@ -5,7 +5,7 @@
 _pkgname=freedownloadmanager
 pkgname=freedownloadmanager-bin
 pkgver=6.34.4.6974
-pkgrel=1
+pkgrel=2
 pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
 arch=('x86_64')
 url="https://www.freedownloadmanager.org/"
@@ -58,7 +58,7 @@ source=(
     "${_pkgname}.png"
 )
 sha512sums=('cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fefc3bde80ff81cc34464ed2c1f6ee7bfb798b32737412a9eccbd92d358c8d6c'
-            '80d012b621371dd38669dd20e13145d56988bc102dfc75a2b5cebc6d30f0a867d69487368a18fc9c0316d254b801090212ee07a211eeb96aa33492a037e69d65'
+            '3e7d2fad0b910b1fc70c0aa9bd20a4d71111f08e7babb91325fd4ea819b9f5caf11bc79d4c979b5e2aa1462072d38983521be92486babe4b8e466b795373e810'
             '167fe8381024433b71f091d9050e2bb0488b9a71f7b771b94d390014443b02f235bf9abe5d2a892d90e7aee50134ed348fbf8967b90cd94d1bb6435ab8333004'
             '49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b'
             '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d')

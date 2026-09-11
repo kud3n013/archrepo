@@ -34,4 +34,25 @@ else
     fi
 fi
 
+# Automatically link system-wide FDM plugins if present
+SYSTEM_PLUGINS_DIR="/usr/share/freedownloadmanager/plugins"
+if [[ -d "$SYSTEM_PLUGINS_DIR" ]]; then
+    USER_PLUGINS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/Softdeluxe/Free Download Manager/plugins"
+    mkdir -p "$USER_PLUGINS_DIR"
+    # Clean up broken plugin symlinks
+    for link in "$USER_PLUGINS_DIR"/*; do
+        if [[ -L "$link" && ! -e "$link" ]]; then
+            rm -f "$link"
+        fi
+    done
+    # Symlink system plugins
+    for plugin in "$SYSTEM_PLUGINS_DIR"/*; do
+        [[ -d "$plugin" ]] || continue
+        plugin_name="$(basename "$plugin")"
+        if [[ ! -e "$USER_PLUGINS_DIR/$plugin_name" ]]; then
+            ln -s "$plugin" "$USER_PLUGINS_DIR/$plugin_name"
+        fi
+    done
+fi
+
 exec /opt/freedownloadmanager/fdm "${FLAGS[@]}" "$@"

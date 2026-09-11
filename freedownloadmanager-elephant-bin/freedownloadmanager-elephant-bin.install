@@ -1,0 +1,64 @@
+_setup_elephant_plugin() {
+    local target="/usr/share/freedownloadmanager/plugins/elephant"
+
+    # Set up symlink for each user with an existing FDM directory
+    for user_home in /home/*; do
+        [ -d "$user_home" ] || continue
+        local user_fdm_dir="$user_home/.local/share/Softdeluxe/Free Download Manager"
+        local user_plugins="$user_fdm_dir/plugins"
+
+        if [ -d "$user_fdm_dir" ]; then
+            mkdir -p "$user_plugins"
+            # If an unmanaged manual directory exists, remove it so the symlink can take its place
+            if [ -d "$user_plugins/elephant" ] && [ ! -L "$user_plugins/elephant" ]; then
+                rm -rf "$user_plugins/elephant"
+            fi
+            ln -sfn "$target" "$user_plugins/elephant"
+            local user_name
+            local user_group
+            user_name=$(stat -c '%U' "$user_home")
+            user_group=$(stat -c '%G' "$user_home")
+            chown -h "$user_name:$user_group" "$user_plugins/elephant" 2>/dev/null || true
+        fi
+    done
+
+    # Also prepare in /etc/skel for newly created user profiles
+    if [ -d /etc/skel ]; then
+        mkdir -p "/etc/skel/.local/share/Softdeluxe/Free Download Manager/plugins"
+        ln -sfn "$target" "/etc/skel/.local/share/Softdeluxe/Free Download Manager/plugins/elephant"
+    fi
+
+    # Inform user about Deno runtime
+    if command -v deno &>/dev/null; then
+        echo "==> [freedownloadmanager-elephant] Deno runtime detected: $(deno --version 2>/dev/null | head -1)"
+    else
+        echo "==> [freedownloadmanager-elephant] NOTICE: Deno is required by Elephant for YouTube stream extraction."
+        echo "==> Please ensure 'deno' is installed: sudo pacman -S deno"
+    fi
+}
+
+_remove_elephant_plugin() {
+    for user_home in /home/*; do
+        [ -d "$user_home" ] || continue
+        local link="$user_home/.local/share/Softdeluxe/Free Download Manager/plugins/elephant"
+        if [ -L "$link" ]; then
+            rm -f "$link"
+        fi
+    done
+
+    if [ -L "/etc/skel/.local/share/Softdeluxe/Free Download Manager/plugins/elephant" ]; then
+        rm -f "/etc/skel/.local/share/Softdeluxe/Free Download Manager/plugins/elephant"
+    fi
+}
+
+post_install() {
+    _setup_elephant_plugin
+}
+
+post_upgrade() {
+    _setup_elephant_plugin
+}
+
+post_remove() {
+    _remove_elephant_plugin
+}

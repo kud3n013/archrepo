@@ -48,6 +48,9 @@ jobs:
           - name: freedownloadmanager-bin
             upstream_repo: ""
             upstream_check: fdm-debrepo
+          - name: freedownloadmanager-elephant-bin
+            upstream_repo: meowcateatrat/elephant
+            upstream_check: github-release
           - name: howdy-next-bin
             upstream_repo: ""
             upstream_check: codeberg-release
@@ -70,6 +73,7 @@ jobs:
       - name: Install dependencies
         if: steps.filter.outputs.skip != 'true'
         run: |
+          echo -e "\n[archrepo]\nSigLevel = Optional TrustAll\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
           pacman -Syu --noconfirm git sudo jq curl pacman-contrib github-cli
 
       # ── 2. Checkout main branch ───────────────────────────────────────
@@ -350,6 +354,7 @@ jobs:
               <li><code>zalo-for-linux-bin</code> - Zalo for Linux (with Wayland support)</li>
               <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
               <li><code>freedownloadmanager-bin</code> - Free Download Manager (Qt6 with Wayland/X11 support)</li>
+              <li><code>freedownloadmanager-elephant-bin</code> - Free Download Manager Elephant add-on (powered by yt-dlp)</li>
               <li><code>howdy-next-bin</code> - Howdy Next: facial-recognition authentication for Linux (patched, no OpenCV WARN spam)</li>
             </ul>
           </body>
