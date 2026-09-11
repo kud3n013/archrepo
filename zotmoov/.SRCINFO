@@ -1,0 +1,14 @@
+pkgbase = zotmoov
+	pkgdesc = Move Zotero attachments to directory based on collection or item rules
+	pkgver = 1.2.32
+	pkgrel = 1
+	url = https://github.com/wileyyugioh/zotmoov
+	arch = any
+	license = GPL-3.0-or-later
+	depends = zotero
+	options = !strip
+	options = !debug
+	source = zotmoov-1.2.32.xpi::https://github.com/wileyyugioh/zotmoov/releases/download/1.2.32/zotmoov-1.2.32-fx.xpi
+	sha256sums = 7770dc2c62d2aaab2662fd7402afadd058387bff69578481ac039bfc050ecc2b
+
+pkgname = zotmoov

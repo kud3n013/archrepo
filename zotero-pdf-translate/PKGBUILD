@@ -1,0 +1,32 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotero-pdf-translate
+_pkgname=zotero-pdf-translate
+_ext_id="zoteropdftranslate@euclpts.com"
+pkgver=2.4.7
+pkgrel=1
+pkgdesc="Translate PDF, EPub, webpage, metadata, annotations, notes in Zotero (Translate for Zotero)"
+arch=('any')
+url="https://github.com/windingwind/zotero-pdf-translate"
+license=('AGPL-3.0-or-later')
+depends=('zotero')
+options=('!strip' '!debug')
+source=(
+  "${pkgname}-${pkgver}.xpi::https://github.com/windingwind/${_pkgname}/releases/download/v${pkgver}/translate-for-zotero.xpi"
+)
+sha256sums=(
+  '0cb267eecff04d2ce39401e5458e31312422d77ac460f6958c9a2e2da1092dd2'
+)
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${pkgname}-${pkgver}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+}

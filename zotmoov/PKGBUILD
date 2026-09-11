@@ -1,0 +1,32 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotmoov
+_pkgname=zotmoov
+_ext_id="zotmoov@wileyy.com"
+pkgver=1.2.32
+pkgrel=1
+pkgdesc="Move Zotero attachments to directory based on collection or item rules"
+arch=('any')
+url="https://github.com/wileyyugioh/zotmoov"
+license=('GPL-3.0-or-later')
+depends=('zotero')
+options=('!strip' '!debug')
+source=(
+  "${pkgname}-${pkgver}.xpi::https://github.com/wileyyugioh/${_pkgname}/releases/download/${pkgver}/${_pkgname}-${pkgver}-fx.xpi"
+)
+sha256sums=(
+  '7770dc2c62d2aaab2662fd7402afadd058387bff69578481ac039bfc050ecc2b'
+)
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${pkgname}-${pkgver}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+}

@@ -37,6 +37,12 @@ sudo pacman -S zalo-for-linux-bin
 sudo pacman -S beeper-bin
 sudo pacman -S freedownloadmanager-elephant
 sudo pacman -S howdy-next-bin
+sudo pacman -S zotero-better-bibtex
+sudo pacman -S zotmoov
+sudo pacman -S zotero-better-notes
+sudo pacman -S zotero-ocr
+sudo pacman -S zotero-pdf-translate
+sudo pacman -S zotero-mcp
 ```
 
 ---
@@ -49,6 +55,12 @@ sudo pacman -S howdy-next-bin
 | **`beeper-bin`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper-bin` |
 | **`freedownloadmanager-elephant`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant` |
 | **`howdy-next-bin`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next-bin` |
+| **`zotero-better-bibtex`** | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) | Better BibTeX for Zotero - LaTeX bibliography and citation management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-bibtex` |
+| **`zotmoov`** | [wileyyugioh/zotmoov](https://github.com/wileyyugioh/zotmoov) | ZotMoov - moves attachments to directories based on collection/item rules. Auto-installed via distribution extensions. | `sudo pacman -S zotmoov` |
+| **`zotero-better-notes`** | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) | Better Notes for Zotero - comprehensive note taking and management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-notes` |
+| **`zotero-ocr`** | [UB-Mannheim/zotero-ocr](https://github.com/UB-Mannheim/zotero-ocr) | Optical Character Recognition for Zotero PDFs (patched with default Arch tesseract/poppler paths). | `sudo pacman -S zotero-ocr` |
+| **`zotero-pdf-translate`** | [windingwind/zotero-pdf-translate](https://github.com/windingwind/zotero-pdf-translate) | Translate for Zotero - translates PDFs, EPubs, webpages, and annotations via 20+ translation services. | `sudo pacman -S zotero-pdf-translate` |
+| **`zotero-mcp`** | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) | Model Context Protocol (MCP) server & standalone CLI (`zotero-mcp`, `zotero-cli`) for Zotero. | `sudo pacman -S zotero-mcp` |
 
 ---
 

@@ -1,0 +1,57 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotero-ocr
+_pkgname=zotero-ocr
+_ext_id="zotero-ocr@bib.uni-mannheim.de"
+pkgver=0.9.6
+pkgrel=1
+pkgdesc="Zotero Plugin for OCR (Optical Character Recognition)"
+arch=('any')
+url="https://github.com/UB-Mannheim/zotero-ocr"
+license=('AGPL-3.0-or-later')
+depends=('zotero' 'poppler' 'tesseract')
+makedepends=('python')
+provides=('zotero-extension-ocr')
+conflicts=('zotero-extension-ocr')
+options=('!strip' '!debug')
+source=(
+  "${pkgname}-${pkgver}.xpi::https://github.com/UB-Mannheim/${_pkgname}/releases/download/${pkgver}/${_pkgname}-${pkgver}.xpi"
+)
+sha256sums=(
+  '9362734df35f4d53a60c8ec63a4134a3579bbc223a5d97d8488eca6dc8c9e0bf'
+)
+
+prepare() {
+  cp -f "${pkgname}-${pkgver}.xpi" "${_ext_id}.xpi"
+
+  # Inject default Arch tesseract and pdftoppm paths into defaults.js so OCR works immediately
+  python3 -c '
+import zipfile, os
+
+xpi_path = "'"${_ext_id}.xpi"'"
+temp_path = xpi_path + ".tmp"
+
+with zipfile.ZipFile(xpi_path, "r") as zin:
+    with zipfile.ZipFile(temp_path, "w", compression=zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            content = zin.read(item.filename)
+            if item.filename == "defaults/preferences/defaults.js":
+                content += b"\npref(\"extensions.zotero.zoteroocr.ocrPath\", \"/usr/bin/tesseract\");\npref(\"extensions.zotero.zoteroocr.pdftoppmPath\", \"/usr/bin/pdftoppm\");\n"
+            zout.writestr(item, content)
+
+os.replace(temp_path, xpi_path)
+'
+}
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+}

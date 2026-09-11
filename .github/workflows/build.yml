@@ -45,6 +45,24 @@ jobs:
           - name: howdy-next-bin
             upstream_repo: ""
             upstream_check: codeberg-release
+          - name: zotero-better-bibtex
+            upstream_repo: retorquere/zotero-better-bibtex
+            upstream_check: github-release
+          - name: zotmoov
+            upstream_repo: wileyyugioh/zotmoov
+            upstream_check: github-release
+          - name: zotero-better-notes
+            upstream_repo: windingwind/zotero-better-notes
+            upstream_check: github-release
+          - name: zotero-ocr
+            upstream_repo: UB-Mannheim/zotero-ocr
+            upstream_check: github-release
+          - name: zotero-pdf-translate
+            upstream_repo: windingwind/zotero-pdf-translate
+            upstream_check: github-release
+          - name: zotero-mcp
+            upstream_repo: 54yyyu/zotero-mcp
+            upstream_check: github-release
 
     steps:
       # ── 0. Check if this package should run ───────────────────────────
@@ -349,6 +367,12 @@ jobs:
               <li><code>beeper-bin</code> - Beeper unified messenger (formerly Beeper v4)</li>
               <li><code>freedownloadmanager-elephant</code> - Free Download Manager Elephant add-on (powered by yt-dlp)</li>
               <li><code>howdy-next-bin</code> - Howdy Next: facial-recognition authentication for Linux (patched, no OpenCV WARN spam)</li>
+              <li><code>zotero-better-bibtex</code> - Better BibTeX for Zotero (LaTeX bibliography & citation management)</li>
+              <li><code>zotmoov</code> - ZotMoov (automated attachment file mover and linker for Zotero)</li>
+              <li><code>zotero-better-notes</code> - Better Notes for Zotero (comprehensive note management)</li>
+              <li><code>zotero-ocr</code> - Zotero OCR (Optical Character Recognition for PDFs via tesseract/poppler)</li>
+              <li><code>zotero-pdf-translate</code> - Translate for Zotero (PDF, EPUB, and note translation with 20+ services)</li>
+              <li><code>zotero-mcp</code> - Zotero Model Context Protocol (MCP) server & standalone CLI</li>
             </ul>
           </body>
           </html>

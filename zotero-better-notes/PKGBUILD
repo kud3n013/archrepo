@@ -1,0 +1,32 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotero-better-notes
+_pkgname=zotero-better-notes
+_ext_id="Knowledge4Zotero@windingwind.com"
+pkgver=3.3.3
+pkgrel=1
+pkgdesc="Everything about note management. All in Zotero (Better Notes for Zotero)"
+arch=('any')
+url="https://github.com/windingwind/zotero-better-notes"
+license=('AGPL-3.0-or-later')
+depends=('zotero')
+options=('!strip' '!debug')
+source=(
+  "${pkgname}-${pkgver}.xpi::https://github.com/windingwind/${_pkgname}/releases/download/v${pkgver}/better-notes-for-zotero.xpi"
+)
+sha256sums=(
+  '48d426018338becd78c71f85159c36c03bbe3f6299ab5a564099e23790b01c1e'
+)
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${pkgname}-${pkgver}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+}

@@ -1,0 +1,14 @@
+pkgbase = zotero-pdf-translate
+	pkgdesc = Translate PDF, EPub, webpage, metadata, annotations, notes in Zotero (Translate for Zotero)
+	pkgver = 2.4.7
+	pkgrel = 1
+	url = https://github.com/windingwind/zotero-pdf-translate
+	arch = any
+	license = AGPL-3.0-or-later
+	depends = zotero
+	options = !strip
+	options = !debug
+	source = zotero-pdf-translate-2.4.7.xpi::https://github.com/windingwind/zotero-pdf-translate/releases/download/v2.4.7/translate-for-zotero.xpi
+	sha256sums = 0cb267eecff04d2ce39401e5458e31312422d77ac460f6958c9a2e2da1092dd2
+
+pkgname = zotero-pdf-translate

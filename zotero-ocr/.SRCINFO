@@ -1,0 +1,19 @@
+pkgbase = zotero-ocr
+	pkgdesc = Zotero Plugin for OCR (Optical Character Recognition)
+	pkgver = 0.9.6
+	pkgrel = 1
+	url = https://github.com/UB-Mannheim/zotero-ocr
+	arch = any
+	license = AGPL-3.0-or-later
+	makedepends = python
+	depends = zotero
+	depends = poppler
+	depends = tesseract
+	provides = zotero-extension-ocr
+	conflicts = zotero-extension-ocr
+	options = !strip
+	options = !debug
+	source = zotero-ocr-0.9.6.xpi::https://github.com/UB-Mannheim/zotero-ocr/releases/download/0.9.6/zotero-ocr-0.9.6.xpi
+	sha256sums = 9362734df35f4d53a60c8ec63a4134a3579bbc223a5d97d8488eca6dc8c9e0bf
+
+pkgname = zotero-ocr

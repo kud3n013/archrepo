@@ -1,0 +1,37 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotero-better-bibtex
+_pkgname=zotero-better-bibtex
+_ext_id="better-bibtex@iris-advies.com"
+pkgver=9.0.64
+pkgrel=1
+pkgdesc="Make Zotero useful for us LaTeX holdouts (Better BibTeX for Zotero)"
+arch=('any')
+url="https://github.com/retorquere/zotero-better-bibtex"
+license=('MIT')
+depends=('zotero')
+options=('!strip' '!debug')
+source=(
+  "${pkgname}-${pkgver}.xpi::https://github.com/retorquere/${_pkgname}/releases/download/v${pkgver}/${_pkgname}-${pkgver}.xpi"
+  "LICENSE-${pkgver}::https://raw.githubusercontent.com/retorquere/${_pkgname}/v${pkgver}/LICENSE"
+)
+sha256sums=(
+  '84c4b5b05ffac9a9c7e2ff79663612486f7781690dd59b12a1e62aecdcfa7c27'
+  '829c0a6fa9ab50eadd02f0696cd3a2deb6906bdbb4b1eb78cec09fa99ce29603'
+)
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${pkgname}-${pkgver}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+
+  # License
+  install -Dm644 "LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
