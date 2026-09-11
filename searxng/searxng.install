@@ -1,0 +1,19 @@
+post_install() {
+    # Generate a random secret key if the default placeholder is detected
+    if [ -f /etc/searxng/settings.yml ]; then
+        if grep -q 'secret_key: "ultrasecretkey"' /etc/searxng/settings.yml 2>/dev/null; then
+            _secret="$(openssl rand -hex 32)"
+            sed -i "s/secret_key: \"ultrasecretkey\"/secret_key: \"${_secret}\"/" /etc/searxng/settings.yml
+        fi
+    fi
+
+    echo ":: SearXNG installed successfully!"
+    echo ":: Configuration: /etc/searxng/settings.yml"
+    echo ":: Rate limiter:  /etc/searxng/limiter.toml"
+    echo ":: Ensure Valkey is configured and running: systemctl enable --now valkey"
+    echo ":: Start SearXNG service: systemctl enable --now searxng"
+}
+
+post_upgrade() {
+    echo ":: SearXNG upgraded. Restart service if running: systemctl restart searxng"
+}

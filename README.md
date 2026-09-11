@@ -45,6 +45,7 @@ sudo pacman -S zotero-ocr
 sudo pacman -S zotero-pdf-translate
 sudo pacman -S zotero-mcp
 sudo pacman -S gdlauncher-carbon
+sudo pacman -S searxng
 ```
 
 ---
@@ -65,6 +66,8 @@ sudo pacman -S gdlauncher-carbon
 | **`zotero-pdf-translate`** | [windingwind/zotero-pdf-translate](https://github.com/windingwind/zotero-pdf-translate) | Translate for Zotero - translates PDFs, EPubs, webpages, and annotations via 20+ translation services. | `sudo pacman -S zotero-pdf-translate` |
 | **`zotero-mcp`** | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) | Model Context Protocol (MCP) server & standalone CLI (`zotero-mcp`, `zotero-cli`) for Zotero. | `sudo pacman -S zotero-mcp` |
 | **`gdlauncher-carbon`** | [GDLauncher](https://gdlauncher.com) | GDLauncher Carbon: powerful Minecraft custom launcher (Electron, Wayland-ready) with ozone auto-hinting and clean uninstallation. | `sudo pacman -S gdlauncher-carbon` |
+| **`searxng`** | [searxng/searxng](https://searxng.github.io/searxng/) | A privacy-respecting, hackable metasearch engine with systemd service and Valkey integration. | `sudo pacman -S searxng` |
+
 
 ---
 
