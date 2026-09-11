@@ -118,21 +118,9 @@ jobs:
               fi
             fi
 
-          elif [ "$CHECK" = "proton-redirect" ]; then
-            HEADERS=$(curl -sI "https://proton.me/download/mail/linux/ProtonMail-desktop-beta.deb" || true)
-            VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP '/\K[0-9]+\.[0-9]+\.[0-9]+(?=/)' || true)
-            [ -n "$VER" ] && LATEST="$VER"
           elif [ "$CHECK" = "beeper-redirect" ]; then
             HEADERS=$(curl -sI "https://api.beeper.com/desktop/download/linux/x64/stable/com.automattic.beeper.desktop" || true)
             VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'Beeper-\K[0-9.]+(?=-x86_64\.AppImage)' || true)
-            [ -n "$VER" ] && LATEST="$VER"
-          elif [ "$CHECK" = "proton-pass-api" ]; then
-            PASS_JSON=$(curl -sL "https://proton.me/download/pass/linux/version.json" || true)
-            VER=$(echo "$PASS_JSON" | jq -r '.Releases[] | select(.CategoryName=="Stable") | .Version' 2>/dev/null | head -1 || true)
-            [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
-          elif [ "$CHECK" = "fdm-debrepo" ]; then
-            PKG_INDEX=$(curl -sL "https://debrepo.freedownloadmanager.org/dists/jammy/main/binary-amd64/Packages" || true)
-            VER=$(echo "$PKG_INDEX" | grep -oP '^Version:\s*\K[0-9.]+' | head -1 || true)
             [ -n "$VER" ] && LATEST="$VER"
           elif [ "$CHECK" = "codeberg-release" ]; then
             TAG=$(curl -s "https://codeberg.org/api/v1/repos/nathawat/howdy-next/releases/latest" | jq -r '.tag_name' 2>/dev/null || true)
