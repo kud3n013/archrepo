@@ -46,6 +46,7 @@ sudo pacman -S zotero-pdf-translate
 sudo pacman -S zotero-mcp
 sudo pacman -S gdlauncher-carbon
 sudo pacman -S searxng
+sudo pacman -S proton-mail
 ```
 
 ---
@@ -67,6 +68,7 @@ sudo pacman -S searxng
 | **`zotero-mcp`** | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) | Model Context Protocol (MCP) server & standalone CLI (`zotero-mcp`, `zotero-cli`) for Zotero. | `sudo pacman -S zotero-mcp` |
 | **`gdlauncher-carbon`** | [GDLauncher](https://gdlauncher.com) | GDLauncher Carbon: powerful Minecraft custom launcher (Electron, Wayland-ready) with ozone auto-hinting and clean uninstallation. | `sudo pacman -S gdlauncher-carbon` |
 | **`searxng`** | [searxng/searxng](https://searxng.github.io/searxng/) | A privacy-respecting, hackable metasearch engine with systemd service and Valkey integration. | `sudo pacman -S searxng` |
+| **`proton-mail`** | [Proton Mail Linux Beta](https://proton.me/mail) | Proton official desktop application for Proton Mail and Proton Calendar with **system tray & close-to-tray**. | `sudo pacman -S proton-mail` |
 
 
 ---
@@ -78,7 +80,6 @@ The following packages have been retired from the active repository and are no l
 | Package | Upstream | Location | Status |
 |---|---|---|---|
 | **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | [`archive/freedownloadmanager`](archive/freedownloadmanager/) | Archived |
-| **`proton-mail`** | [Proton Mail Linux Beta](https://proton.me/mail) | [`archive/proton-mail`](archive/proton-mail/) | Archived |
 | **`proton-pass`** | [Proton Pass Linux](https://proton.me/pass) | [`archive/proton-pass`](archive/proton-pass/) | Archived |
 
 ---
