@@ -1,0 +1,4 @@
+{
+  "check": "searxng-commit",
+  "repo": "searxng/searxng"
+}

@@ -123,23 +123,24 @@ The following packages have been retired from the active repository and are no l
    touch my-package/PKGBUILD
    ```
 
-3. Register the package in [`.github/workflows/build.yml`](.github/workflows/build.yml) under `matrix.package`:
-   ```yaml
-   matrix:
-     package:
-       - name: my-package
-         upstream_repo: "owner/repo"           # if tracking GitHub releases
-         upstream_check: "github-release"      # or custom check
+3. (Optional) Add `upstream.json` to configure automated upstream version tracking:
+   ```json
+   {
+     "check": "github-release",
+     "repo": "owner/repo"
+   }
    ```
+   > [!TIP]
+   > For standard GitHub releases, if `url="https://github.com/owner/repo"` is in your `PKGBUILD`, `upstream.json` is auto-detected and optional!
 
 4. Commit and push:
    ```bash
-   git add my-package/ .github/workflows/build.yml
+   git add my-package/
    git commit -m "feat: add my-package"
    git push origin main
    ```
 
-The pipeline will automatically build the package in an Arch Linux container, update the database, and publish it to the repository.
+**That's it! You never need to touch `.github/workflows/build.yml`.** The CI pipeline automatically detects the new package from `git diff`, compiles it in an Arch Linux container, incrementally updates the repository database, and publishes it to GitHub Releases and GitHub Pages.
 
 ---
 
