@@ -34,4 +34,23 @@ else
     fi
 fi
 
-exec /opt/antigravity/antigravity "${FLAGS[@]}" "$@"
+# Process titlebar flags from config file and CLI arguments
+FINAL_FLAGS=()
+for arg in "${FLAGS[@]}" "$@"; do
+    case "$arg" in
+        --titlebar=hidden|--no-window-controls|--hide-window-controls)
+            export ANTIGRAVITY_TITLEBAR="hidden"
+            ;;
+        --titlebar=native)
+            export ANTIGRAVITY_TITLEBAR="native"
+            ;;
+        --titlebar=overlay)
+            export ANTIGRAVITY_TITLEBAR="overlay"
+            ;;
+        *)
+            FINAL_FLAGS+=("$arg")
+            ;;
+    esac
+done
+
+exec /opt/antigravity/antigravity "${FINAL_FLAGS[@]}"

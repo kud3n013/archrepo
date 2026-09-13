@@ -5,7 +5,7 @@ _pkgname=antigravity
 pkgname=antigravity
 pkgver=2.13.0
 _build=6362815968182272
-pkgrel=1
+pkgrel=2
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
 url="https://antigravity.google"
@@ -45,6 +45,9 @@ optdepends=(
     'wl-clipboard: Wayland clipboard integration'
     'xclip: X11 clipboard integration'
 )
+makedepends=(
+    'asar'
+)
 options=(!strip !debug)
 source=(
     "Antigravity-${pkgver}-${_build}-x86_64.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-hub/${pkgver}-${_build}/linux-x64/Antigravity.tar.gz"
@@ -52,12 +55,31 @@ source=(
     "${_pkgname}.desktop"
     "${_pkgname}-flags.conf"
     "${_pkgname}.png"
+    "patch-window-controls.js"
 )
 sha256sums=('a47a2434d920008792f3ce43ef502d486c326d2098082590831800b5b093f643'
-            'a58cdf0fac31cf33c247a91849aa6d8383a9436715a356c74773c49094c4fdcd'
+            'a5fcfb28857e1b73446297bf1c84cecd4e0fffa3fb8bb4f10fc0fb365b1a7c2a'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
-            '5659ed3c7e04af07aece4db774e656c3d92d09f83b96c0111d80c12940cab76f'
-            'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317')
+            '33b686fedb8630a562acf6409832e504cef2893b357abf208dec2d3b19f89337'
+            'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317'
+            'e737831925fbb6747cac6725fed65fd46123d61f1723c0165e83f6907fa35a1f')
+
+prepare() {
+    local _app_dir="${srcdir}/Antigravity-x64/resources"
+    local _asar_file="${_app_dir}/app.asar"
+    local _extract_dir="${srcdir}/asar-extracted"
+
+    # Unpack asar archive
+    rm -rf "${_extract_dir}"
+    asar extract "${_asar_file}" "${_extract_dir}"
+
+    # Apply window controls modification (supports hidden, native GTK/Qt, or overlay)
+    node "${srcdir}/patch-window-controls.js" "${_extract_dir}/dist/utils.js"
+
+    # Repack asar archive preserving unpacked dependencies
+    asar pack "${_extract_dir}" "${_asar_file}" --unpack-dir 'node_modules/chrome-devtools-mcp'
+    rm -rf "${_extract_dir}"
+}
 
 package() {
     # Install main application files to /opt/antigravity
