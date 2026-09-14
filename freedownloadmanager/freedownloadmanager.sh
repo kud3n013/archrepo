@@ -27,11 +27,21 @@ if [[ -n "$CONFIG_FILE" ]]; then
             FLAGS+=("$line")
         fi
     done < "$CONFIG_FILE"
-else
-    # Default Wayland flags if no config file exists
-    if [[ -n "$WAYLAND_DISPLAY" ]]; then
-        export QT_QPA_PLATFORM="${QT_QPA_PLATFORM:-wayland;xcb}"
-    fi
+fi
+
+# Default Wayland flags if running under Wayland and not explicitly specified
+if [[ -n "$WAYLAND_DISPLAY" && -z "$QT_QPA_PLATFORM" ]]; then
+    export QT_QPA_PLATFORM="wayland;xcb"
+fi
+
+# Free Download Manager bundles a private Qt6 runtime with only 'libqxdgdesktopportal.so'
+# and 'libqgtk3.so' in /opt/freedownloadmanager/plugins/platformthemes.
+# Desktop sessions frequently export QT_QPA_PLATFORMTHEME=kde, qt5ct, or qt6ct, which are missing
+# from FDM's bundle. When an unsupported theme is specified, Qt fails to load any platform theme plugin,
+# breaking FreeDesktop portal integration and causing dark mode detection to fail (always showing light theme).
+# Fallback to xdgdesktopportal if QT_QPA_PLATFORMTHEME is unset or not one of the bundled plugins.
+if [[ -z "$QT_QPA_PLATFORMTHEME" || ( "$QT_QPA_PLATFORMTHEME" != "xdgdesktopportal" && "$QT_QPA_PLATFORMTHEME" != "gtk3" ) ]]; then
+    export QT_QPA_PLATFORMTHEME="xdgdesktopportal"
 fi
 
 # Automatically link system-wide FDM plugins if present

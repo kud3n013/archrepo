@@ -13,9 +13,7 @@ Packages in this directory:
 
 ## Current Archived Packages
 
-| Package | Original Upstream | Reason for Archiving |
-|---|---|---|
-| [`freedownloadmanager`](./freedownloadmanager/) | [Free Download Manager](https://www.freedownloadmanager.org/) | Archived per maintainer request. |
+*Currently, there are no archived packages.*
 
 ---
 

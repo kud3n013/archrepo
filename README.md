@@ -48,6 +48,7 @@ sudo pacman -S gdlauncher-carbon
 sudo pacman -S searxng
 sudo pacman -S proton-mail
 sudo pacman -S proton-pass
+sudo pacman -S freedownloadmanager
 ```
 
 ---
@@ -71,6 +72,7 @@ sudo pacman -S proton-pass
 | **`searxng`** | [searxng/searxng](https://searxng.github.io/searxng/) | A privacy-respecting, hackable metasearch engine with systemd service and Valkey integration. | `sudo pacman -S searxng` |
 | **`proton-mail`** | [Proton Mail Linux Beta](https://proton.me/mail) | Proton official desktop application for Proton Mail and Proton Calendar with **system tray & close-to-tray**, unconstrained resizing (minWidth: 360), and responsive sidebar collapsing. | `sudo pacman -S proton-mail` |
 | **`proton-pass`** | [Proton Pass Linux](https://proton.me/pass) | Proton official desktop application for Proton Pass with **unconstrained window resizing (minWidth: 360)** and **responsive auto-collapsing item view**. | `sudo pacman -S proton-pass` |
+| **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with **desktop portal integration & system dark mode detection**. | `sudo pacman -S freedownloadmanager` |
 
 
 ---
@@ -79,9 +81,7 @@ sudo pacman -S proton-pass
 
 The following packages have been retired from the active repository and are no longer installable via `pacman`. Their packaging recipes and configurations are preserved in [`archive/`](archive/):
 
-| Package | Upstream | Location | Status |
-|---|---|---|---|
-| **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | [`archive/freedownloadmanager`](archive/freedownloadmanager/) | Archived |
+*Currently, there are no archived packages.*
 
 ---
 
