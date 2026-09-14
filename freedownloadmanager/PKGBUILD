@@ -5,7 +5,7 @@
 _pkgname=freedownloadmanager
 pkgname=freedownloadmanager
 pkgver=6.34.4.6974
-pkgrel=3
+pkgrel=4
 pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
 arch=('x86_64')
 url="https://www.freedownloadmanager.org/"
@@ -16,6 +16,10 @@ replaces=("${pkgname}-bin")
 install="${pkgname}.install"
 backup=("etc/${_pkgname}-flags.conf")
 options=(!strip !debug)
+
+makedepends=(
+    'patchelf'
+)
 
 depends=(
     'alsa-lib'
@@ -57,22 +61,36 @@ source=(
     "${_pkgname}-flags.conf"
     "${_pkgname}.desktop"
     "${_pkgname}.png"
+    "fdm-theme-fix.c"
 )
 sha512sums=('cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fefc3bde80ff81cc34464ed2c1f6ee7bfb798b32737412a9eccbd92d358c8d6c'
             'e991d0db3ecd87df7b590be7cc9616228e473b10759080f95d2aa27ff065e6e898fd6c038ccbb9c0e32dd851c829dde235b7764dbc98a72e0a790fd7e05dc7b5'
             '6b0d75ffc1442721ee3b89681792686f993697689b106b7b48ed450cab610f477e8a99d2a13e9b2ea07ddcf19a1b7ad69a78a260557441655dfc37db7d0a8769'
             '49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b'
-            '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d')
+            '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d'
+            'ad006f70539518d2f05cf004bca3208df2a61ae2048ce917bc1c2d4ae0c2ee014623d2a0f2136f51771aa7cd6b83a64000cf7c1d8624934cd9c893b9814d7f48')
 
 prepare() {
     # Extract deb archive data payload
     tar -xf data.tar.xz
 }
 
+build() {
+    # Compile the environment constructor hook that ensures portal dark theme detection
+    gcc -shared -fPIC -O2 -Wall "${srcdir}/fdm-theme-fix.c" -o "${srcdir}/libfdm-theme-fix.so"
+}
+
 package() {
     # Install application files into /opt/freedownloadmanager
     install -dm755 "${pkgdir}/opt"
     cp -a "opt/${_pkgname}" "${pkgdir}/opt/${_pkgname}"
+
+    # Install environment constructor hook into bundled libraries
+    install -Dm755 "${srcdir}/libfdm-theme-fix.so" "${pkgdir}/opt/${_pkgname}/lib/libfdm-theme-fix.so"
+
+    # Inject constructor hook into fdm binary DT_NEEDED so it loads on EVERY invocation
+    # (autostart, browser magnet/torrent handler, internal app restart, and CLI)
+    patchelf --add-needed libfdm-theme-fix.so "${pkgdir}/opt/${_pkgname}/fdm"
 
     # Ensure binary permissions
     chmod 755 "${pkgdir}/opt/${_pkgname}/fdm"

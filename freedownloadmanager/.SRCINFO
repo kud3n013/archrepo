@@ -1,11 +1,12 @@
 pkgbase = freedownloadmanager
 	pkgdesc = Fast and powerful modern download accelerator and organizer (binary release)
 	pkgver = 6.34.4.6974
-	pkgrel = 3
+	pkgrel = 4
 	url = https://www.freedownloadmanager.org/
 	install = freedownloadmanager.install
 	arch = x86_64
 	license = Freeware
+	makedepends = patchelf
 	depends = alsa-lib
 	depends = bubblewrap
 	depends = dbus
@@ -47,10 +48,12 @@ pkgbase = freedownloadmanager
 	source = freedownloadmanager-flags.conf
 	source = freedownloadmanager.desktop
 	source = freedownloadmanager.png
+	source = fdm-theme-fix.c
 	sha512sums = cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fefc3bde80ff81cc34464ed2c1f6ee7bfb798b32737412a9eccbd92d358c8d6c
 	sha512sums = e991d0db3ecd87df7b590be7cc9616228e473b10759080f95d2aa27ff065e6e898fd6c038ccbb9c0e32dd851c829dde235b7764dbc98a72e0a790fd7e05dc7b5
 	sha512sums = 6b0d75ffc1442721ee3b89681792686f993697689b106b7b48ed450cab610f477e8a99d2a13e9b2ea07ddcf19a1b7ad69a78a260557441655dfc37db7d0a8769
 	sha512sums = 49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b
 	sha512sums = 36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d
+	sha512sums = ad006f70539518d2f05cf004bca3208df2a61ae2048ce917bc1c2d4ae0c2ee014623d2a0f2136f51771aa7cd6b83a64000cf7c1d8624934cd9c893b9814d7f48
 
 pkgname = freedownloadmanager
