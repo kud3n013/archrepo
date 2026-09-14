@@ -23,13 +23,14 @@ if (code.includes("/* PROTON_TRAY_PATCH_APPLIED */")) {
   process.exit(0);
 }
 
-// 1. Patch minWidth: 900 -> 360 to allow free window tiling on Hyprland
+// 1. Patch minWidth: 900 -> 360 to allow free window tiling on Hyprland,
+// and set dark background color (#16141c) in window/view options to eliminate white startup flash
 if (code.includes("minWidth:900")) {
-  code = code.replace("minWidth:900", "minWidth:360");
-  console.log("Successfully patched minWidth: 900 -> 360");
+  code = code.replace("minWidth:900", 'minWidth:360,backgroundColor:"#16141c"');
+  console.log("Successfully patched minWidth: 900 -> 360 with dark backgroundColor");
 } else if (/minWidth:\s*900/.test(code)) {
-  code = code.replace(/minWidth:\s*900/g, "minWidth:360");
-  console.log("Successfully patched minWidth via regex");
+  code = code.replace(/minWidth:\s*900/g, 'minWidth:360,backgroundColor:"#16141c"');
+  console.log("Successfully patched minWidth via regex with dark backgroundColor");
 } else {
   console.warn("Warning: minWidth:900 not found in index.js");
 }
@@ -56,8 +57,12 @@ if (!replacedClose) {
   process.exit(1);
 }
 
-// 3. System tray, close-to-tray, and native web sidebar integration
+// 3. System tray, close-to-tray, and dark theme / reading safety integration
 const safeReadingCss = `
+  /* Dark background safety to prevent any white flash during view load */
+  html, body {
+    background-color: #16141c !important;
+  }
   /* Reading pane and message content safety */
   .main, .content-container, .message-container {
     min-width: 0 !important;
@@ -75,21 +80,12 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
 ;(()=>{
   let appTray = null;
 
-  // Set clean browser User-Agent so Proton Web renders its native, unconstrained web layout
-  // (matching web version with native collapse button, default sidebar, and mobile drawer)
-  const cleanUA = (userAgentStr) => {
-    return (userAgentStr || "").replace(/\\s*(Electron|ProtonMail)\\/[0-9.]+/gi, "");
-  };
-
+  // Set dark background on main window to prevent white flash
   try {
-    if (r.session && r.session.defaultSession) {
-      const origUA = r.session.defaultSession.getUserAgent();
-      const standardUA = cleanUA(origUA);
-      r.session.defaultSession.setUserAgent(standardUA);
+    if (typeof Ba !== "undefined" && Ba && Ba.setBackgroundColor) {
+      Ba.setBackgroundColor("#16141c");
     }
-  } catch (err) {
-    Ns.error("Failed to clean defaultSession user agent:", err);
-  }
+  } catch (err) {}
 
   const initTray = () => {
     if (appTray) return;
@@ -98,75 +94,89 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
     const trayIconPath = path.join(process.resourcesPath, "tray.png");
     const fallbackIconPath = path.join(process.resourcesPath, "icon.png");
     let trayImage = null;
+
     try {
       if (fs.existsSync(trayIconPath)) {
         trayImage = r.nativeImage.createFromPath(trayIconPath);
       } else if (fs.existsSync(fallbackIconPath)) {
-        trayImage = r.nativeImage.createFromPath(fallbackIconPath).resize({ width: 24, height: 24 });
+        trayImage = r.nativeImage.createFromPath(fallbackIconPath);
       }
-    } catch (err) {
-      Ns.error("Failed to load tray icon image:", err);
+    } catch (e) {
+      Ns.error("Failed to load tray icon image:", e);
     }
+
+    if (!trayImage || trayImage.isEmpty()) {
+      Ns.warn("Tray image is empty, system tray skipped.");
+      return;
+    }
+
     try {
-      appTray = new r.Tray(trayImage || fallbackIconPath);
+      appTray = new r.Tray(trayImage);
       appTray.setToolTip("Proton Mail");
 
-      const openCalendar = async () => {
-        try {
-          bs();
-          if (typeof Da !== "undefined" && Da && Da.calendar) {
-            const curUrl = Da.calendar.webContents.getURL();
-            if (!curUrl || curUrl === "about:blank" || curUrl === "") {
-              const calUrl = await qa(qt().calendar);
-              await rs("calendar", calUrl);
-            }
-            await Ja("calendar");
-          }
-        } catch (err) {
-          Ns.error("Open calendar failed:", err);
-        }
-      };
-
-      const openMail = async () => {
-        try {
-          bs();
-          if (typeof Da !== "undefined" && Da && Da.mail) {
-            const curUrl = Da.mail.webContents.getURL();
-            if (!curUrl || curUrl === "about:blank" || curUrl === "") {
-              const mailUrl = await qa(qt().mail);
-              await rs("mail", mailUrl);
-            }
-            await Ja("mail");
-          }
-        } catch (err) {
-          Ns.error("Open mail failed:", err);
-        }
-      };
-
-      const trayMenu = r.Menu.buildFromTemplate([
+      const contextMenu = r.Menu.buildFromTemplate([
         {
           label: "Open Proton Mail",
-          click: () => { openMail(); }
+          click: async () => {
+            try {
+              if (Ba) {
+                if (!Ba.isVisible()) {
+                  Ba.show();
+                }
+                Ba.focus();
+                if (typeof Ja === "function") {
+                  if (typeof qa === "function" && typeof qt === "function") {
+                    const mailUrl = await qa(qt().mail);
+                    await rs("mail", mailUrl);
+                  }
+                  await Ja("mail");
+                }
+              }
+            } catch (err) {
+              Ns.error("Open mail failed:", err);
+            }
+          }
         },
         {
           label: "Open Proton Calendar",
-          click: () => { openCalendar(); }
+          click: async () => {
+            try {
+              if (Ba) {
+                if (!Ba.isVisible()) {
+                  Ba.show();
+                }
+                Ba.focus();
+                if (typeof Ja === "function") {
+                  if (typeof qa === "function" && typeof qt === "function") {
+                    const calUrl = await qa(qt().calendar);
+                    await rs("calendar", calUrl);
+                  }
+                  await Ja("calendar");
+                }
+              }
+            } catch (err) {
+              Ns.error("Open calendar failed:", err);
+            }
+          }
         },
         { type: "separator" },
         {
           label: "Quit",
           click: () => {
             r.app.isQuitting = true;
+            if (Ba && !Ba.isDestroyed()) {
+              Ba.destroy();
+            }
             r.app.quit();
           }
         }
       ]);
 
-      appTray.setContextMenu(trayMenu);
+      appTray.setContextMenu(contextMenu);
 
       appTray.on("click", () => {
-        if (!_(Ba)) return;
-        if (Ba.isVisible() && !Ba.isMinimized() && Ba.isFocused()) {
+        if (!Ba) return;
+        if (Ba.isVisible()) {
           Ba.hide();
         } else {
           bs();
@@ -183,8 +193,9 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
     const attachToView = (view) => {
       if (!view || !view.webContents) return;
       try {
-        const curUA = view.webContents.getUserAgent();
-        view.webContents.setUserAgent(cleanUA(curUA));
+        if (view.setBackgroundColor) {
+          view.setBackgroundColor("#16141c");
+        }
       } catch (e) {}
 
       const inject = async () => {
@@ -238,9 +249,9 @@ if (!replacedInsert) {
 try {
   new vm.Script(code);
 } catch (err) {
-  console.error("Syntax error after patching:", err);
+  console.error("Syntax validation failed for patched code:", err);
   process.exit(1);
 }
 
 fs.writeFileSync(targetFile, code, "utf8");
-console.log("Successfully patched Proton Mail with system tray, close-to-tray, and native web sidebar integration.");
+console.log("Successfully patched Proton Mail with system tray, close-to-tray, dark startup background, and unconstrained desktop layout.");
