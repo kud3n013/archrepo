@@ -121,6 +121,11 @@ case "$CHECK" in
     [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
     ;;
 
+  proton-pass-json)
+    VER=$(curl -s "https://proton.me/download/pass/linux/version.json" | jq -r '.Releases[0].Version // empty' 2>/dev/null || true)
+    [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
+    ;;
+
   none)
     ;;
 esac
