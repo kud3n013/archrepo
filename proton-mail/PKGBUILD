@@ -5,7 +5,7 @@
 _pkgname=proton-mail
 pkgname=proton-mail
 pkgver=1.14.0
-pkgrel=3
+pkgrel=4
 pkgdesc="Proton official desktop application for Proton Mail and Proton Calendar (with system tray & close-to-tray)"
 arch=('x86_64')
 url="https://proton.me/mail"
@@ -52,7 +52,7 @@ sha256sums=('c81e5e297856f5b986c47b2338a665348d897cdf025c5cf53f3dbeefb0cf6288'
             '06e5754ed70170df93823bf62805a1f82da773ef92d6210f14209298d43908c6'
             '8099d23ec71f2074dc874a5487808aacfd56ece2c40110e98f62ed725b3180cd'
             '9a84b663bc99285a368366da54a06a614b564b05c92b9e78669b27c4545d3773'
-            '5e1ad73ceee99e9de38cdf691083c7d81b6c47666a0978bd72a5a8c77da5a63c')
+            '0e2315bbdb20ea40464762fa709fa485b1cf4ba606496d28c56da7f245ada5f6')
 
 prepare() {
     # Extract data.tar.xz from Debian package

@@ -23,7 +23,7 @@ if (code.includes("/* PROTON_TRAY_PATCH_APPLIED */")) {
   process.exit(0);
 }
 
-// 1. Patch minWidth: 900 -> 360 to allow free window tiling and responsive narrow views
+// 1. Patch minWidth: 900 -> 360 to allow free window tiling on Hyprland
 if (code.includes("minWidth:900")) {
   code = code.replace("minWidth:900", "minWidth:360");
   console.log("Successfully patched minWidth: 900 -> 360");
@@ -56,176 +56,9 @@ if (!replacedClose) {
   process.exit(1);
 }
 
-// 3. Inject system tray, close-to-tray, and responsive layout enhancements
-const responsiveCss = `
-  @media (min-width: 681px) and (max-width: 1050px) {
-    .sidebar:not([data-expanded="true"]) {
-      inline-size: 3.75rem !important;
-      width: 3.75rem !important;
-      min-width: 3.75rem !important;
-      max-width: 3.75rem !important;
-    }
-    .sidebar:not([data-expanded="true"]) .logo-container {
-      inline-size: auto !important;
-      block-size: auto !important;
-      padding-inline: 0 !important;
-      flex-direction: column !important;
-    }
-    .sidebar:not([data-expanded="true"]) .apps-dropdown-button {
-      margin-inline: auto !important;
-    }
-    .sidebar:not([data-expanded="true"]) .sidebar-header {
-      padding-inline: 0.25rem !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      gap: 0.5rem !important;
-    }
-    .sidebar:not([data-expanded="true"]) .sidebar-header [data-testid="sidebar:compose"] {
-      padding-inline: 0 !important;
-      width: 2.5rem !important;
-      min-width: 2.5rem !important;
-      display: flex !important;
-      justify-content: center !important;
-      align-items: center !important;
-    }
-    .sidebar:not([data-expanded="true"]) .sidebar-header [data-testid="sidebar:compose"] span:not(.icon):not(.sr-only) {
-      display: none !important;
-    }
-    .sidebar:not([data-expanded="true"]) .navigation-link,
-    .sidebar:not([data-expanded="true"]) .navigation-link-header-group-link {
-      padding-inline: 0 !important;
-      justify-content: center !important;
-    }
-    .sidebar:not([data-expanded="true"]) .navigation-link .flex-1,
-    .sidebar:not([data-expanded="true"]) .navigation-link-header-group-link .flex-1,
-    .sidebar:not([data-expanded="true"]) .navigation-title,
-    .sidebar:not([data-expanded="true"]) .sidebar-nav-title {
-      display: none !important;
-    }
-    .sidebar:not([data-expanded="true"]) .navigation-counter-item {
-      position: absolute !important;
-      top: 0.35em !important;
-      right: 0.35em !important;
-      transform: translateX(50%) translateY(-50%) !important;
-      width: 0.5rem !important;
-      height: 0.5rem !important;
-      overflow: hidden !important;
-      color: transparent !important;
-      background: var(--navigation-item-count-background-color, #6d4aff) !important;
-      border-radius: 50% !important;
-    }
-    .sidebar:not([data-expanded="true"]) [data-testid="sidebar:storage-meter"],
-    .sidebar:not([data-expanded="true"]) .sidebar-storage-upsell,
-    .sidebar:not([data-expanded="true"]) .sidebar-version {
-      display: none !important;
-    }
-  }
-
-  .sidebar.desktop-force-collapsed {
-    inline-size: 3.75rem !important;
-    width: 3.75rem !important;
-    min-width: 3.75rem !important;
-    max-width: 3.75rem !important;
-  }
-  .sidebar.desktop-force-collapsed .logo-container {
-    inline-size: auto !important;
-    block-size: auto !important;
-    padding-inline: 0 !important;
-    flex-direction: column !important;
-  }
-  .sidebar.desktop-force-collapsed .apps-dropdown-button {
-    margin-inline: auto !important;
-  }
-  .sidebar.desktop-force-collapsed .sidebar-header {
-    padding-inline: 0.25rem !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-  }
-  .sidebar.desktop-force-collapsed .sidebar-header [data-testid="sidebar:compose"] {
-    padding-inline: 0 !important;
-    width: 2.5rem !important;
-    min-width: 2.5rem !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-  }
-  .sidebar.desktop-force-collapsed .sidebar-header [data-testid="sidebar:compose"] span:not(.icon):not(.sr-only) {
-    display: none !important;
-  }
-  .sidebar.desktop-force-collapsed .navigation-link,
-  .sidebar.desktop-force-collapsed .navigation-link-header-group-link {
-    padding-inline: 0 !important;
-    justify-content: center !important;
-  }
-  .sidebar.desktop-force-collapsed .navigation-link .flex-1,
-  .sidebar.desktop-force-collapsed .navigation-link-header-group-link .flex-1,
-  .sidebar.desktop-force-collapsed .navigation-title,
-  .sidebar.desktop-force-collapsed .sidebar-nav-title {
-    display: none !important;
-  }
-  .sidebar.desktop-force-collapsed .navigation-counter-item {
-    position: absolute !important;
-    top: 0.35em !important;
-    right: 0.35em !important;
-    transform: translateX(50%) translateY(-50%) !important;
-    width: 0.5rem !important;
-    height: 0.5rem !important;
-    overflow: hidden !important;
-    color: transparent !important;
-    background: var(--navigation-item-count-background-color, #6d4aff) !important;
-    border-radius: 50% !important;
-  }
-  .sidebar.desktop-force-collapsed [data-testid="sidebar:storage-meter"],
-  .sidebar.desktop-force-collapsed .sidebar-storage-upsell,
-  .sidebar.desktop-force-collapsed .sidebar-version,
-  .sidebar.desktop-force-collapsed .minicalendar-container,
-  .sidebar.desktop-force-collapsed [data-testid="calendar-sidebar:calendars-list"] span:not(.icon) {
-    display: none !important;
-  }
-
-  #proton-desktop-collapse-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    bottom: 0.75rem;
-    right: 0.5rem;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 0.375rem;
-    background: var(--interaction-weak, rgba(255,255,255,0.08));
-    border: none;
-    color: var(--text-weak, #a0a0a0);
-    cursor: pointer;
-    z-index: 100;
-    transition: all 0.2s ease;
-  }
-  #proton-desktop-collapse-btn:hover {
-    background: var(--interaction-default-hover, rgba(255,255,255,0.18));
-    color: var(--text-norm, #ffffff);
-  }
-  .sidebar.desktop-force-collapsed #proton-desktop-collapse-btn,
-  @media (min-width: 681px) and (max-width: 1050px) {
-    .sidebar:not([data-expanded="true"]) #proton-desktop-collapse-btn {
-      right: auto !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-    }
-  }
-  .sidebar.desktop-force-collapsed #proton-desktop-collapse-btn svg,
-  @media (min-width: 681px) and (max-width: 1050px) {
-    .sidebar:not([data-expanded="true"]) #proton-desktop-collapse-btn svg {
-      transform: rotate(180deg) !important;
-    }
-  }
-  @media (max-width: 680px) {
-    #proton-desktop-collapse-btn {
-      display: none !important;
-    }
-  }
-
-  /* Reading pane and content safety */
+// 3. System tray, close-to-tray, and native web sidebar integration
+const safeReadingCss = `
+  /* Reading pane and message content safety */
   .main, .content-container, .message-container {
     min-width: 0 !important;
   }
@@ -241,6 +74,23 @@ const insertTargetExact = 'T().maximized&&Ba.maximize(),Ba.on("closed",()=>{Ba=n
 const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
 ;(()=>{
   let appTray = null;
+
+  // Set clean browser User-Agent so Proton Web renders its native, unconstrained web layout
+  // (matching web version with native collapse button, default sidebar, and mobile drawer)
+  const cleanUA = (userAgentStr) => {
+    return (userAgentStr || "").replace(/\\s*(Electron|ProtonMail)\\/[0-9.]+/gi, "");
+  };
+
+  try {
+    if (r.session && r.session.defaultSession) {
+      const origUA = r.session.defaultSession.getUserAgent();
+      const standardUA = cleanUA(origUA);
+      r.session.defaultSession.setUserAgent(standardUA);
+    }
+  } catch (err) {
+    Ns.error("Failed to clean defaultSession user agent:", err);
+  }
+
   const initTray = () => {
     if (appTray) return;
     const path = require("path");
@@ -327,70 +177,21 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
     }
   };
 
-  const initResponsive = () => {
-    const responsiveCss = ${JSON.stringify(responsiveCss)};
-
-    const injectScript = \`(()=>{
-      if (window.__protonDesktopResponsiveInjected) return;
-      window.__protonDesktopResponsiveInjected = true;
-
-      const styleId = "proton-desktop-responsive-custom-css";
-      if (!document.getElementById(styleId)) {
-        const style = document.createElement("style");
-        style.id = styleId;
-        style.textContent = \${JSON.stringify(responsiveCss)};
-        (document.head || document.documentElement).appendChild(style);
-      }
-
-      function setupCollapseBtn() {
-        const sidebar = document.querySelector(".sidebar");
-        if (!sidebar) return;
-        if (document.getElementById("proton-desktop-collapse-btn")) return;
-
-        const btn = document.createElement("button");
-        btn.id = "proton-desktop-collapse-btn";
-        btn.title = "Toggle navigation bar (Ctrl+[)";
-        btn.setAttribute("aria-label", "Toggle navigation bar");
-        btn.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M10.354 3.646a.5.5 0 0 1 0 .708L6.707 8l3.647 3.646a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 0 1 .708 0z"/></svg>';
-        btn.className = "sidebar-desktop-toggle-btn";
-
-        const saved = localStorage.getItem("proton-desktop-sidebar-collapsed");
-        if (saved === "true") {
-          sidebar.classList.add("desktop-force-collapsed");
-        }
-
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const isCollapsed = sidebar.classList.toggle("desktop-force-collapsed");
-          localStorage.setItem("proton-desktop-sidebar-collapsed", isCollapsed ? "true" : "false");
-        };
-
-        sidebar.appendChild(btn);
-      }
-
-      window.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === "[") {
-          const sidebar = document.querySelector(".sidebar");
-          if (sidebar) {
-            const isCollapsed = sidebar.classList.toggle("desktop-force-collapsed");
-            localStorage.setItem("proton-desktop-sidebar-collapsed", isCollapsed ? "true" : "false");
-          }
-        }
-      });
-
-      const observer = new MutationObserver(() => setupCollapseBtn());
-      observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
-      setupCollapseBtn();
-    })();\`;
+  const initWebViews = () => {
+    const safeCss = ${JSON.stringify(safeReadingCss)};
 
     const attachToView = (view) => {
       if (!view || !view.webContents) return;
+      try {
+        const curUA = view.webContents.getUserAgent();
+        view.webContents.setUserAgent(cleanUA(curUA));
+      } catch (e) {}
+
       const inject = async () => {
         try {
-          await view.webContents.insertCSS(responsiveCss);
-          await view.webContents.executeJavaScript(injectScript);
+          await view.webContents.insertCSS(safeCss);
         } catch (e) {
-          Ns.debug("Responsive injection notice:", e);
+          Ns.debug("CSS injection notice:", e);
         }
       };
       view.webContents.on("did-finish-load", inject);
@@ -412,7 +213,7 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
   });
 
   initTray();
-  initResponsive();
+  initWebViews();
 })();
 `;
 
@@ -442,4 +243,4 @@ try {
 }
 
 fs.writeFileSync(targetFile, code, "utf8");
-console.log("Successfully patched Proton Mail with system tray, close-to-tray, and responsive layout features.");
+console.log("Successfully patched Proton Mail with system tray, close-to-tray, and native web sidebar integration.");
