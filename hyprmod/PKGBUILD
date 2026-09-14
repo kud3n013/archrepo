@@ -1,0 +1,129 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://github.com/BlueManCZ/hyprmod
+
+_pkgname=hyprmod
+pkgname=hyprmod
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Native GTK4/libadwaita settings app for Hyprland"
+arch=('any')
+url="https://github.com/BlueManCZ/hyprmod"
+license=('GPL-3.0-or-later')
+depends=(
+    'gtk4'
+    'libadwaita'
+    'python'
+    'python-gobject'
+)
+makedepends=(
+    'python-build'
+    'python-hatchling'
+    'python-installer'
+    'python-wheel'
+)
+optdepends=(
+    'hyprland: the dynamic tiling Wayland compositor configured by HyprMod'
+    'xdg-desktop-portal-hyprland: Wayland desktop portal integration'
+)
+provides=(
+    'hyprmod-bin'
+    'python-hyprland-config'
+    'python-hyprland-monitors'
+    'python-hyprland-schema'
+    'python-hyprland-socket'
+    'python-hyprland-state'
+)
+conflicts=(
+    'hyprmod-bin'
+    'python-hyprland-config'
+    'python-hyprland-monitors'
+    'python-hyprland-schema'
+    'python-hyprland-socket'
+    'python-hyprland-state'
+)
+replaces=('hyprmod-bin')
+backup=('etc/hyprmod-flags.conf')
+install=hyprmod.install
+options=(!debug)
+
+_hyprland_config_whl="hyprland_config-0.9.16-py3-none-any.whl"
+_hyprland_monitors_whl="hyprland_monitors-0.9.0-py3-none-any.whl"
+_hyprland_schema_whl="hyprland_schema-0.7.1-py3-none-any.whl"
+_hyprland_socket_whl="hyprland_socket-0.12.2-py3-none-any.whl"
+_hyprland_state_whl="hyprland_state-0.4.7-py3-none-any.whl"
+
+source=(
+    "${_pkgname}-${pkgver}.tar.gz::https://github.com/BlueManCZ/${_pkgname}/archive/refs/tags/v${pkgver}.tar.gz"
+    "${_hyprland_config_whl}::https://files.pythonhosted.org/packages/15/43/b40900b6998e26dcf40699e92d8b0339ebb99ece0bc4426ff8ac1a039659/${_hyprland_config_whl}"
+    "${_hyprland_monitors_whl}::https://files.pythonhosted.org/packages/ea/e5/5515c5d0ef146622250cc9cbdfdf1b603b77087553becb1191501de88d71/${_hyprland_monitors_whl}"
+    "${_hyprland_schema_whl}::https://files.pythonhosted.org/packages/0f/24/66d5aad64573e38a5ec31820f3a920ff6a79364a329dba7f3e708bced536/${_hyprland_schema_whl}"
+    "${_hyprland_socket_whl}::https://files.pythonhosted.org/packages/e4/74/e156c61e041b357591749aa480257b129e4c9a186faed98fd72551c68049/${_hyprland_socket_whl}"
+    "${_hyprland_state_whl}::https://files.pythonhosted.org/packages/c9/43/4452549ec8208ef093c1cdd880ab2f6e0f3b0a3916dc00b7d3b8f94f83df/${_hyprland_state_whl}"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.desktop"
+    "${_pkgname}.png"
+)
+sha256sums=('fd3672ad5257bb65038fd7442553fd1a8cfb5c41a0320186797368a7f2abbc9f'
+            '1a8c78347f85054033425519ba7680eff609cca43cf43e235f38242a0614af74'
+            '0f6eeb3dae2a9db0a5eaaeca09aa63f4ff0d31d6ff7dbe763245b501208f1989'
+            '97637f24ac593232e388f99b079c4166cc8e321775e9097470f3b467cda551dc'
+            '4f1d007b7f9165447c39c66c578012bd2628331aeadb3a81c2fe2229711dc4d7'
+            'ef4e4db2f0769d49c1c3291ebb8ddcaa9fc1d59c1022e0a75407b49b794ab269'
+            '717aecdd4bbf84afd2c4faea7dcc2eec26aa5471b07b4d971154699dd594881f'
+            'b4a7091e48834f18dfb38684ef1b47f5c61f9f51dd5ae813e351149442e0f3ce'
+            'ff442c38ebc64d52eb0469e4e1aa59e10f1d4997eade82f39a266003cc08c8e2'
+            '1f55a0450134b2298c999d7341644eb85f73632353cb6970dc2aad84b82ae71f')
+
+build() {
+    cd "${_pkgname}-${pkgver}"
+    python -m build --wheel --no-isolation
+}
+
+package() {
+    cd "${_pkgname}-${pkgver}"
+
+    # 1. Install bundled pure Python micro-libraries into site-packages
+    for _whl in "$srcdir"/*.whl; do
+        python -m installer --destdir="${pkgdir}" "$_whl"
+    done
+
+    # 2. Install hyprmod wheel into site-packages
+    python -m installer --destdir="${pkgdir}" dist/*.whl
+
+    # 3. Relocate entrypoint binary to private libdir and install launcher wrapper
+    install -dm755 "${pkgdir}/usr/lib/${_pkgname}"
+    mv "${pkgdir}/usr/bin/${_pkgname}" "${pkgdir}/usr/lib/${_pkgname}/${_pkgname}"
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # 4. Install configuration file for flags/env variables
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # 5. Install FreeDesktop desktop entries (both canonical app ID and shortcut name)
+    install -Dm644 data/applications/io.github.bluemancz.hyprmod.desktop \
+        "${pkgdir}/usr/share/applications/io.github.bluemancz.hyprmod.desktop"
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" \
+        "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # 6. Install scalable SVG and high-res PNG icons
+    install -Dm644 data/icons/hicolor/scalable/apps/io.github.bluemancz.hyprmod.svg \
+        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/io.github.bluemancz.hyprmod.svg"
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/io.github.bluemancz.hyprmod.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" \
+        "${pkgdir}/usr/share/pixmaps/io.github.bluemancz.hyprmod.png"
+
+    # 7. Install AppStream metadata
+    install -Dm644 data/metainfo/io.github.bluemancz.hyprmod.metainfo.xml \
+        "${pkgdir}/usr/share/metainfo/io.github.bluemancz.hyprmod.metainfo.xml"
+
+    # 8. Install license
+    install -Dm644 LICENSE -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+    # 9. Ensure correct permissions across package files
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

@@ -50,6 +50,7 @@ sudo pacman -S proton-mail
 sudo pacman -S proton-pass
 sudo pacman -S freedownloadmanager
 sudo pacman -S sine
+sudo pacman -S hyprmod
 ```
 
 ---
@@ -75,6 +76,7 @@ sudo pacman -S sine
 | **`proton-pass`** | [Proton Pass Linux](https://proton.me/pass) | Proton official desktop application for Proton Pass with **unconstrained window resizing (minWidth: 360)** and **responsive auto-collapsing item view**. | `sudo pacman -S proton-pass` |
 | **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with **desktop portal integration & system dark mode detection**. | `sudo pacman -S freedownloadmanager` |
 | **`sine`** | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) | The ultimate mod and theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Waterfox, Firefox). | `sudo pacman -S sine` |
+| **`hyprmod`** | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Native GTK4/libadwaita settings app for Hyprland with live IPC preview, monitor management, bezier curves, keybinds, and CLI profile switching. | `sudo pacman -S hyprmod` |
 
 
 ---
