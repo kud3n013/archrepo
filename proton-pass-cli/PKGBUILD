@@ -1,0 +1,70 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Contributor: AlphaLynx <alphalynx at alphalynx dot dev>
+# Contributor: Nguyễn Quang Minh <minhnbnt at gmail dot com>
+
+_pkgname=proton-pass-cli
+pkgname=proton-pass-cli
+pkgver=2.3.3
+pkgrel=1
+pkgdesc="A command-line interface for managing your Proton Pass vaults, items, and secrets"
+arch=('x86_64')
+url="https://protonpass.github.io/pass-cli"
+license=('GPL-3.0-or-later')
+depends=('glibc' 'libgcc')
+optdepends=(
+    'xdg-utils: for web-based browser login integration'
+)
+provides=(
+    "protonpass-cli=${pkgver}"
+    "proton-pass-cli-bin=${pkgver}"
+    "pass-cli=${pkgver}"
+)
+conflicts=(
+    'protonpass-cli'
+    'proton-pass-cli-bin'
+    'pass-cli'
+)
+replaces=('proton-pass-cli-bin')
+options=(!strip !debug)
+
+_downloadUrl="https://github.com/protonpass/pass-cli/releases/download/${pkgver}"
+source=(
+    "pass-cli-${pkgver}::${_downloadUrl}/pass-cli-linux-x86_64"
+    "LICENSE-${pkgver}::https://raw.githubusercontent.com/protonpass/pass-cli/${pkgver}/LICENSE"
+)
+sha256sums=('b5b49a8b3fd0af8830c0c1979f28ea0c90ccece73f59023a8bca8245d4b68da9'
+            'c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba')
+
+package() {
+    # Install upstream CLI executable
+    install -Dm755 "${srcdir}/pass-cli-${pkgver}" "${pkgdir}/usr/bin/pass-cli"
+
+    # Convenience alias symlink
+    ln -sr "${pkgdir}/usr/bin/pass-cli" "${pkgdir}/usr/bin/proton-pass-cli"
+
+    # Shell completions (NTFS-safe execution via /tmp)
+    local _bin="/tmp/pass-cli-${pkgver}-$$-exec"
+    cp -f "${srcdir}/pass-cli-${pkgver}" "${_bin}"
+    chmod 755 "${_bin}"
+    if "${_bin}" --version &>/dev/null; then
+        "${_bin}" completions bash > pass-cli.bash
+        "${_bin}" completions zsh > _pass-cli
+        "${_bin}" completions fish > pass-cli.fish
+
+        install -Dm644 pass-cli.bash "${pkgdir}/usr/share/bash-completion/completions/pass-cli"
+        install -Dm644 _pass-cli "${pkgdir}/usr/share/zsh/site-functions/_pass-cli"
+        install -Dm644 pass-cli.fish "${pkgdir}/usr/share/fish/vendor_completions.d/pass-cli.fish"
+
+        # Alias completions
+        ln -sr "${pkgdir}/usr/share/bash-completion/completions/pass-cli" "${pkgdir}/usr/share/bash-completion/completions/proton-pass-cli"
+        ln -sr "${pkgdir}/usr/share/zsh/site-functions/_pass-cli" "${pkgdir}/usr/share/zsh/site-functions/_proton-pass-cli"
+        ln -sr "${pkgdir}/usr/share/fish/vendor_completions.d/pass-cli.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/proton-pass-cli.fish"
+    fi
+    rm -f "${_bin}"
+
+    # Upstream license
+    install -Dm644 "${srcdir}/LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    # Ensure clean permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

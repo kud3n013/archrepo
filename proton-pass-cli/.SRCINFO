@@ -1,0 +1,25 @@
+pkgbase = proton-pass-cli
+	pkgdesc = A command-line interface for managing your Proton Pass vaults, items, and secrets
+	pkgver = 2.3.3
+	pkgrel = 1
+	url = https://protonpass.github.io/pass-cli
+	arch = x86_64
+	license = GPL-3.0-or-later
+	depends = glibc
+	depends = libgcc
+	optdepends = xdg-utils: for web-based browser login integration
+	provides = protonpass-cli=2.3.3
+	provides = proton-pass-cli-bin=2.3.3
+	provides = pass-cli=2.3.3
+	conflicts = protonpass-cli
+	conflicts = proton-pass-cli-bin
+	conflicts = pass-cli
+	replaces = proton-pass-cli-bin
+	options = !strip
+	options = !debug
+	source = pass-cli-2.3.3::https://github.com/protonpass/pass-cli/releases/download/2.3.3/pass-cli-linux-x86_64
+	source = LICENSE-2.3.3::https://raw.githubusercontent.com/protonpass/pass-cli/2.3.3/LICENSE
+	sha256sums = b5b49a8b3fd0af8830c0c1979f28ea0c90ccece73f59023a8bca8245d4b68da9
+	sha256sums = c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba
+
+pkgname = proton-pass-cli
