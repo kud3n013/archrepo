@@ -4,7 +4,7 @@
 _pkgname=zalo
 pkgname=zalo-for-linux
 pkgver=26.8.20
-_commithash=87b0696
+_commithash=ecfb96a
 pkgrel=4
 pkgdesc="Zalo for Linux — unofficial port for Linux systems with Wayland & flags support"
 arch=('x86_64')
@@ -57,12 +57,12 @@ source=(
     "zalo-flags.conf"
 )
 options=(!strip !debug)
-sha256sums=('SKIP'
+sha256sums=('2b45d1ecc6b56fda6db90b96521eaeabb48130a838f37616ab669e275a529e77'
             '16b9e68906e4823eecc12b812f1bb8e9806bc08cc42c8372a6f192ff831b1b8c'
-            'SKIP'
+            '6003f1ded1519a8a9be21a91f231bd59f5341efc20858fcf84f4f401b12b0ec2'
             '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445'
-            'SKIP'
-            'SKIP')
+            'afd628a1b3c37b6b78cd6fa2d10e9616d1bff92ec30715f45ce45f1aceb1166a'
+            '0d4404a7bfcc16d2b6227aa88abec27aeb48303a042ddecfd0592ae82b1ca962')
 
 prepare() {
     chmod +x "zalo.AppImage"
