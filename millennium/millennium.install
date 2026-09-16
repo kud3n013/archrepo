@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# Remove legacy patches that Millennium used to use prior to JUL/6/2025
+# Older versions injected via LD_PRELOAD in /usr/bin/steam
+_remove_deprecated_patches() {
+    if [ -f "/usr/bin/steam.millennium.bak" ]; then
+        if grep -q "LD_PRELOAD" /usr/bin/steam.millennium.bak; then
+            printf '#!/bin/sh\nexec /usr/lib/steam/steam "$@"\n' > /usr/bin/steam
+        else
+            mv /usr/bin/steam.millennium.bak /usr/bin/steam
+        fi
+    else
+        if [ -f "/usr/bin/steam" ] && grep -q "LD_PRELOAD" /usr/bin/steam; then
+            printf '#!/bin/sh\nexec /usr/lib/steam/steam "$@"\n' > /usr/bin/steam
+        fi
+    fi
+}
+
+# Link millennium bootstrap into Steam runtime for all local users
+_link_millennium() {
+    for user_home in /home/*; do
+        local steam_dir="${user_home}/.local/share/Steam"
+        local target_dir="${steam_dir}/ubuntu12_32"
+
+        if [ -d "${target_dir}" ]; then
+            rm -f "${target_dir}/libXtst.so.6"
+            ln -s /usr/lib/millennium/libmillennium_bootstrap_x86.so "${target_dir}/libXtst.so.6"
+
+            # Enable Steam CEF remote debugging (required by Millennium)
+            touch "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+        fi
+    done
+}
+
+# Remove millennium symlinks and debugging flags for all local users
+_unlink_millennium() {
+    for user_home in /home/*; do
+        local steam_dir="${user_home}/.local/share/Steam"
+        local target_dir="${steam_dir}/ubuntu12_32"
+
+        if [ -d "${target_dir}" ]; then
+            # Only remove if it's our symlink
+            if [ -L "${target_dir}/libXtst.so.6" ]; then
+                local link_target
+                link_target=$(readlink -f "${target_dir}/libXtst.so.6" 2>/dev/null || true)
+                if [ "$link_target" = "/usr/lib/millennium/libmillennium_bootstrap_x86.so" ]; then
+                    rm -f "${target_dir}/libXtst.so.6"
+                fi
+            fi
+
+            # Remove CEF remote debugging flag
+            rm -f "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+        fi
+    done
+}
+
+post_install() {
+    _remove_deprecated_patches
+    _link_millennium
+    echo ">> Millennium installed. Restart Steam for changes to take effect."
+    echo ">> Browse themes and plugins at https://steambrew.app"
+}
+
+post_upgrade() {
+    _remove_deprecated_patches
+    _link_millennium
+    echo ">> Millennium upgraded. Restart Steam for changes to take effect."
+}
+
+post_remove() {
+    _unlink_millennium
+    echo ">> Millennium removed. Restart Steam for changes to take effect."
+}

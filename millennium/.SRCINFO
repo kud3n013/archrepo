@@ -1,0 +1,21 @@
+pkgbase = millennium
+	pkgdesc = Open-source modding framework for creating and managing Steam Client themes and plugins
+	pkgver = 3.5.0_beta.3
+	pkgrel = 1
+	url = https://github.com/SteamClientHomebrew/Millennium
+	install = millennium.install
+	arch = x86_64
+	license = MIT
+	depends = steam
+	provides = millennium-bin
+	conflicts = millennium-bin
+	conflicts = millennium-git
+	replaces = millennium-bin
+	options = !strip
+	options = !debug
+	source = millennium-3.5.0_beta.3.tar.gz::https://github.com/SteamClientHomebrew/Millennium/releases/download/v3.5.0-beta.3/millennium-v3.5.0-beta.3-linux-x86_64.tar.gz
+	source = LICENSE-3.5.0_beta.3.md::https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/refs/heads/main/LICENSE.md
+	sha256sums = 5278357879310c6754be3e1b0295757b61c8237e3a0bd2980537b312883ebd1f
+	sha256sums = f01d1b8bce439ee29491817247a38611c41f7d1de4360b5577d4498d103fbf8b
+
+pkgname = millennium

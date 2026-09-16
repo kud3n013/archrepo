@@ -131,6 +131,18 @@ case "$CHECK" in
     [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
     ;;
 
+  millennium-github-prerelease)
+    # Millennium uses pre-release tags (e.g. v3.5.0-beta.3) which /releases/latest skips.
+    # Fetch the first (most recent) release of any kind and convert hyphens to underscores.
+    if [ -n "$UPSTREAM" ]; then
+      TAG=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases" | \
+        jq -r '.[0].tag_name // empty' 2>/dev/null || true)
+      TAG="${TAG#v}"
+      TAG="${TAG//-/_}"
+      [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
+    fi
+    ;;
+
   none)
     ;;
 esac
