@@ -3,6 +3,7 @@ _cleanup_user_desktops() {
         if [ -d "$user_home/.local/share/applications" ]; then
             rm -f "$user_home/.local/share/applications/zen-browser.desktop" \
                   "$user_home/.local/share/applications/zen.desktop" \
+                  "$user_home/.local/share/applications/zen-private.desktop" \
                   "$user_home/.local/share/applications/Zen Browser.desktop" \
                   "$user_home/.local/share/applications/Zen.desktop" 2>/dev/null || true
         fi

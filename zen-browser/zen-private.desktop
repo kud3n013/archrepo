@@ -1,0 +1,22 @@
+[Desktop Entry]
+Name=Zen Browser (Private Browsing)
+Comment=Browse the web privately with Zen Browser
+GenericName=Web Browser (Private Browsing)
+Exec=/usr/bin/zen-browser --private-window %u
+Icon=zen-browser-private
+Type=Application
+StartupNotify=true
+StartupWMClass=zen
+Terminal=false
+Categories=Network;WebBrowser;
+MimeType=application/json;application/pdf;application/rdf+xml;application/rss+xml;application/x-xpinstall;application/xhtml+xml;application/xml;audio/flac;audio/ogg;audio/webm;image/avif;image/gif;image/jpeg;image/png;image/svg+xml;image/webp;text/html;text/xml;video/ogg;video/webm;x-scheme-handler/chrome;x-scheme-handler/http;x-scheme-handler/https;
+Actions=new-window;profilemanager;
+
+[Desktop Action new-window]
+Exec=/usr/bin/zen-browser --new-window %u
+Name=New Window
+Icon=zen-browser
+
+[Desktop Action profilemanager]
+Exec=/usr/bin/zen-browser --ProfileManager %u
+Name=Open Profile Manager

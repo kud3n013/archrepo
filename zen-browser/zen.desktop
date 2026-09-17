@@ -238,6 +238,7 @@ Actions=new-window;new-blank-window;new-private-window;profilemanager;
 
 [Desktop Action new-window]
 Exec=/usr/bin/zen-browser %u
+Icon=zen-browser
 Name=New Window
 Name[ach]=New Window
 Name[af]=New Window
@@ -353,6 +354,7 @@ Name[zh_TW]=開新視窗
 
 [Desktop Action new-blank-window]
 Exec=/usr/bin/zen-browser --blank-window %u
+Icon=zen-browser
 Name=New Blank Window
 Name[ach]=New Blank Window
 Name[af]=New Blank Window
@@ -468,6 +470,7 @@ Name[zh_TW]=開新空白視窗
 
 [Desktop Action new-private-window]
 Exec=/usr/bin/zen-browser --private-window %u
+Icon=zen-browser-private
 Name=New Private Window
 Name[ach]=New Private Window
 Name[af]=New Private Window
