@@ -4,13 +4,13 @@
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 
-A fully automated, self-updating Arch Linux binary package repository hosted on GitHub. Packages are built in isolated `archlinux:base-devel` containers, verified, and published directly to pacman-compatible endpoints.
+Automated, self-updating Arch Linux binary package repository. Packages are built in isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
 ---
 
 ## 🚀 Quick Setup
 
-Add this repository to your system's `/etc/pacman.conf`:
+Add to `/etc/pacman.conf`:
 
 ```ini
 [archrepo]
@@ -18,160 +18,94 @@ SigLevel = Optional TrustAll
 Server = https://github.com/kud3n013/archrepo/releases/download/packages
 ```
 
-### One-liner:
-
+**One-liner:**
 ```bash
-echo -e '\n[archrepo]\nSigLevel = Optional TrustAll\nServer = https://github.com/kud3n013/archrepo/releases/download/packages' | sudo tee -a /etc/pacman.conf
-```
-
-Synchronize the package databases:
-
-```bash
-sudo pacman -Syy
-```
-
-Now you can install any package using standard `pacman`:
-
-```bash
-sudo pacman -S zalo-for-linux
-sudo pacman -S beeper
-sudo pacman -S antigravity
-sudo pacman -S freedownloadmanager-elephant
-sudo pacman -S howdy-next
-sudo pacman -S zotero-better-bibtex
-sudo pacman -S zotmoov
-sudo pacman -S zotero-better-notes
-sudo pacman -S zotero-ocr
-sudo pacman -S zotero-pdf-translate
-sudo pacman -S zotero-mcp
-sudo pacman -S gdlauncher-carbon
-sudo pacman -S searxng
-sudo pacman -S proton-mail
-sudo pacman -S proton-pass
-sudo pacman -S proton-pass-cli
-sudo pacman -S freedownloadmanager
-sudo pacman -S sine
-sudo pacman -S zen-browser
-sudo pacman -S galaxybudsclient
-sudo pacman -S millennium
+echo -e '\n[archrepo]\nSigLevel = Optional TrustAll\nServer = https://github.com/kud3n013/archrepo/releases/download/packages' | sudo tee -a /etc/pacman.conf && sudo pacman -Syy
 ```
 
 ---
 
-## 📦 Available Packages
+## 📦 Packages
 
-| Package | Upstream | Description | Installation |
-|---|---|---|---|
-| **`zalo-for-linux`** | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) | Unofficial Zalo desktop client for Linux with **Wayland / Hyprland scaling fixes** and bundled AUR logo. | `sudo pacman -S zalo-for-linux` |
-| **`beeper`** | [Automattic / Beeper](https://www.beeper.com/changelog) | The ultimate messaging app (formerly Beeper v4) with Wayland Ozone auto-hinting and clean desktop integration. | `sudo pacman -S beeper` |
-| **`antigravity`** | [Google Antigravity](https://antigravity.google) | Google Antigravity 2.0 multi-agent orchestration platform with native Wayland support and configurable flags. | `sudo pacman -S antigravity` |
-| **`freedownloadmanager-elephant`** | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) | Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp). | `sudo pacman -S freedownloadmanager-elephant` |
-| **`howdy-next`** | [howdy-next](https://codeberg.org/nathawat/howdy-next) | C++ facial-recognition authentication for Linux (PAM). Patched build: suppresses noisy OpenCV 5 DNN warnings. | `sudo pacman -S howdy-next` |
-| **`zotero-better-bibtex`** | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) | Better BibTeX for Zotero - LaTeX bibliography and citation management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-bibtex` |
-| **`zotmoov`** | [wileyyugioh/zotmoov](https://github.com/wileyyugioh/zotmoov) | ZotMoov - moves attachments to directories based on collection/item rules. Auto-installed via distribution extensions. | `sudo pacman -S zotmoov` |
-| **`zotero-better-notes`** | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) | Better Notes for Zotero - comprehensive note taking and management. Auto-installed via distribution extensions. | `sudo pacman -S zotero-better-notes` |
-| **`zotero-ocr`** | [UB-Mannheim/zotero-ocr](https://github.com/UB-Mannheim/zotero-ocr) | Optical Character Recognition for Zotero PDFs (patched with default Arch tesseract/poppler paths). | `sudo pacman -S zotero-ocr` |
-| **`zotero-pdf-translate`** | [windingwind/zotero-pdf-translate](https://github.com/windingwind/zotero-pdf-translate) | Translate for Zotero - translates PDFs, EPubs, webpages, and annotations via 20+ translation services. | `sudo pacman -S zotero-pdf-translate` |
-| **`zotero-mcp`** | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) | Model Context Protocol (MCP) server & standalone CLI (`zotero-mcp`, `zotero-cli`) for Zotero. | `sudo pacman -S zotero-mcp` |
-| **`gdlauncher-carbon`** | [GDLauncher](https://gdlauncher.com) | GDLauncher Carbon: powerful Minecraft custom launcher (Electron, Wayland-ready) with ozone auto-hinting and clean uninstallation. | `sudo pacman -S gdlauncher-carbon` |
-| **`searxng`** | [searxng/searxng](https://searxng.github.io/searxng/) | A privacy-respecting, hackable metasearch engine with systemd service and Valkey integration. | `sudo pacman -S searxng` |
-| **`proton-mail`** | [Proton Mail Linux Beta](https://proton.me/mail) | Proton official desktop application for Proton Mail and Proton Calendar with **system tray & close-to-tray**, unconstrained resizing (minWidth: 360), and responsive sidebar collapsing. | `sudo pacman -S proton-mail` |
-| **`proton-pass`** | [Proton Pass Linux](https://proton.me/pass) | Proton official desktop application for Proton Pass with **unconstrained window resizing (minWidth: 360)** and **responsive auto-collapsing item view**. | `sudo pacman -S proton-pass` |
-| **`proton-pass-cli`** | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Official CLI (`pass-cli`, `proton-pass-cli`) for managing Proton Pass vaults, items, and secrets with shell completions (Bash, Zsh, Fish). | `sudo pacman -S proton-pass-cli` |
-| **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with **desktop portal integration & system dark mode detection**. | `sudo pacman -S freedownloadmanager` |
-| **`sine`** | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) | The ultimate mod and theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Waterfox, Firefox). | `sudo pacman -S sine` |
-| **`zen-browser`** | [zen-browser/desktop](https://github.com/zen-browser/desktop) | Experience tranquillity while browsing the web (Firefox-based) with optimized Wayland integration and dedicated private browsing profile. | `sudo pacman -S zen-browser` |
-| **`galaxybudsclient`** | [ThePBone/GalaxyBudsClient](https://github.com/ThePBone/GalaxyBudsClient) | Unofficial Galaxy Buds client for Linux (Uno Platform) with automatic Wayland DPI scaling and persistent tray menu. | `sudo pacman -S galaxybudsclient` |
-| **`millennium`** | [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium) | Modern Steam Client modding framework for custom skins, themes, and plugins. | `sudo pacman -S millennium` |
+Install any package using `sudo pacman -S <package>`.
 
----
+| Package | Description | Upstream |
+|---|---|---|
+| **`antigravity`** | Google Antigravity 2.0 multi-agent orchestration platform (native Wayland) | [Google Antigravity](https://antigravity.google) |
+| **`beeper`** | Unified messaging client (Ozone auto-hinting, clean desktop integration) | [Automattic / Beeper](https://www.beeper.com/changelog) |
+| **`freedownloadmanager`** | Download accelerator & organizer (desktop portal & dark mode detection) | [Free Download Manager](https://www.freedownloadmanager.org/) |
+| **`freedownloadmanager-elephant`** | FDM add-on for video downloading powered by yt-dlp | [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant) |
+| **`galaxybudsclient`** | Galaxy Buds manager for Linux (Wayland HiDPI auto-scaling, persistent tray) | [ThePBone/GalaxyBudsClient](https://github.com/ThePBone/GalaxyBudsClient) |
+| **`gdlauncher-carbon`** | GDLauncher Carbon Minecraft launcher (Electron, Wayland-ready) | [GDLauncher](https://gdlauncher.com) |
+| **`howdy-next`** | PAM facial-recognition authentication (suppresses OpenCV 5 DNN warnings) | [nathawat/howdy-next](https://codeberg.org/nathawat/howdy-next) |
+| **`millennium`** | Steam Client modding framework for custom skins, themes, and plugins | [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium) |
+| **`proton-mail`** | Proton Mail/Calendar desktop (system tray, unconstrained resizing, responsive sidebar) | [Proton Mail](https://proton.me/mail) |
+| **`proton-pass`** | Proton Pass desktop (unconstrained window resizing, auto-collapsing item view) | [Proton Pass](https://proton.me/pass) |
+| **`proton-pass-cli`** | Proton Pass CLI (`pass-cli`, `proton-pass-cli`) with D-Bus secrets & completions | [Proton Pass CLI](https://protonpass.github.io/pass-cli) |
+| **`searxng`** | Privacy-respecting metasearch engine with systemd service & Valkey integration | [searxng/searxng](https://searxng.github.io/searxng/) |
+| **`sine`** | Mod & theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Firefox) | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) |
+| **`zalo-for-linux`** | Zalo desktop client with Wayland / Hyprland scaling fixes and bundled logo | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) |
+| **`zen-browser`** | Firefox-based browser with Wayland integration & dedicated private browsing profile | [zen-browser/desktop](https://github.com/zen-browser/desktop) |
+| **`zotero-better-bibtex`** | Better BibTeX LaTeX bibliography and citation management for Zotero | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) |
+| **`zotero-better-notes`** | Comprehensive note taking and knowledge management for Zotero | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) |
+| **`zotero-mcp`** | Model Context Protocol (MCP) server & standalone CLI for Zotero | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) |
+| **`zotero-ocr`** | PDF Optical Character Recognition (configured with Arch poppler/tesseract) | [UB-Mannheim/zotero-ocr](https://github.com/UB-Mannheim/zotero-ocr) |
+| **`zotero-pdf-translate`** | Translate PDFs, EPubs, and annotations via 20+ translation services | [windingwind/zotero-pdf-translate](https://github.com/windingwind/zotero-pdf-translate) |
+| **`zotmoov`** | Automatic attachment mover based on collection/item rules | [wileyyugioh/zotmoov](https://github.com/wileyyugioh/zotmoov) |
 
-## 🗄️ Archived Packages
-
-The following packages have been retired from the active repository and are no longer installable via `pacman`. Their packaging recipes and configurations are preserved in [`archive/`](archive/):
+<details>
+<summary><b>🗄️ Archived Packages (1)</b></summary>
 
 | Package | Upstream | Location | Status |
 |---|---|---|---|
-| **`hyprmod`** | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | [`archive/hyprmod`](archive/hyprmod/) | Archived |
+| `hyprmod` | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | [`archive/hyprmod/`](archive/hyprmod/) | Retired per maintainer request |
+
+</details>
 
 ---
 
-## ⚙️ Architecture & Features
+## 📁 Repository Structure
 
-### 1. Dual-Tier Storage Architecture
-- **GitHub Releases (`packages` tag):** Stores binary packages (`.pkg.tar.zst`) and pacman databases (`archrepo.db`, `archrepo.files`). This bypasses GitHub's 100 MB repository limit and supports packages up to 2 GB (such as `zalo-for-linux` at ~260 MB).
-- **GitHub Pages:** Hosts the repository landing page and documentation at [kud3n013.github.io/archrepo](https://kud3n013.github.io/archrepo/).
-
-### 2. Smart Build Caching & Skip Logic
-- Before compiling any package, the workflow queries the latest release assets.
-- If the exact target package `${pkgname}-${pkgver}-${pkgrel}-x86_64.pkg.tar.zst` is already published, `makepkg` is **skipped** and the prebuilt binary is reused in seconds.
-- Only newly added packages or packages with upstream version updates are compiled.
-
-### 3. Automatic Upstream Tracking
-- A daily cron job (`0 4 * * *`) checks upstream release channels:
-  - GitHub releases (via GitHub API)
-  - Codeberg releases (via Gitea API)
-  - HTTP redirects (via redirect headers)
-- When a new version is detected, the workflow automatically:
-  1. Updates `pkgver` and commit hashes in `PKGBUILD`.
-  2. Regenerates checksums (`updpkgsums`) and `.SRCINFO`.
-  3. Commits changes back to `main`.
-  4. Compiles and publishes the updated package.
-
-### 4. Automatic Release Pruning
-- Whenever a package version is bumped, older superseded `.pkg.tar.zst` files are automatically removed from the release to keep storage clean and avoid duplicate assets.
+```text
+archrepo/
+├── packages/          # Active package build recipes (PKGBUILD, scripts, flags)
+├── archive/           # Retired package recipes (excluded from builds & database)
+├── tools/             # Maintainer developer utilities (clean.sh, scaffold.sh)
+├── templates/         # Package creation prompt template for AI assistants
+└── .github/           # CI/CD workflows and automated release scripts
+```
 
 ---
 
-## 🛠️ Adding a New Package
+## 🛠️ Maintainer Guide
 
-1. Create a new directory for the package under `packages/` (or use the maintainer scaffold tool):
+### Adding a Package
+1. **Scaffold:**
    ```bash
    ./tools/scaffold.sh my-package owner/repo
-   # or manually:
-   mkdir -p packages/my-package
    ```
-
-2. Add your `PKGBUILD` and any launcher scripts, patches, or desktop files:
+2. **Configure:** Edit `packages/my-package/PKGBUILD` and optional `upstream.json`.
+3. **Commit & Push:**
    ```bash
-   touch packages/my-package/PKGBUILD
+   git add packages/my-package/ && git commit -m "feat: add my-package" && git push
    ```
+   The CI pipeline automatically detects the package, builds it in an Arch container, updates `archrepo.db`, and publishes to GitHub Releases.
 
-3. (Optional) Add `upstream.json` to configure automated upstream version tracking:
-   ```json
-   {
-     "check": "github-release",
-     "repo": "owner/repo"
-   }
-   ```
-   > [!TIP]
-   > For standard GitHub releases, if `url="https://github.com/owner/repo"` is in your `PKGBUILD`, `upstream.json` is auto-detected and optional!
-
-4. Commit and push:
-   ```bash
-   git add packages/my-package/
-   git commit -m "feat: add my-package"
-   git push origin main
-   ```
-
-**That's it! You never need to touch `.github/workflows/build.yml`.** The CI pipeline automatically detects the new package from `git diff`, compiles it in an Arch Linux container, incrementally updates the repository database, and publishes it to GitHub Releases and GitHub Pages.
+### Helper Tools
+- **Purge local build artifacts:** `./tools/clean.sh` (supports `--dry-run`, `--pkg <name>`, `--force`)
+- **Manual CI build:** `gh workflow run build.yml -f package=<name> [-f force_rebuild=true]`
 
 ---
 
-## 🎯 Manual Triggers & Selective Builds
+## ⚙️ Architecture
 
-You can trigger builds manually with fine-grained control via **GitHub Actions** → **Build & Publish Arch Packages** → **Run workflow**, or via the `gh` CLI:
-
-```bash
-# Build only a single package without touching others
-gh workflow run build.yml -f package=zalo-for-linux
-
-# Force a clean rebuild even if the binary already exists
-gh workflow run build.yml -f package=zalo-for-linux -f force_rebuild=true
-```
+- **Dual-Tier Storage:** GitHub Releases (`packages` tag) stores `.pkg.tar.zst` binaries and databases (`archrepo.db`, `archrepo.files`), bypassing repo size limits. GitHub Pages hosts the web index.
+- **Smart Build Caching:** If a target `${pkgver}-${pkgrel}` binary is already published in Releases, compilation is skipped.
+- **Automatic Upstream Tracking:** A daily cron job (`0 4 * * *`) checks upstream GitHub/Codeberg releases and redirects, auto-bumps versions, updates checksums (`updpkgsums`), and triggers new builds.
+- **Release Pruning:** Older superseded package archives are automatically pruned upon upgrade.
 
 ---
 
 ## 📜 License
 
-The packaging scripts, automation workflows, and repository configurations are released under the [MIT License](LICENSE). Packaged software is subject to its respective upstream licenses.
+Packaging configurations, launchers, and automation scripts are released under the [MIT License](LICENSE). Packaged software is subject to its respective upstream licenses.
