@@ -1,0 +1,24 @@
+[Desktop Entry]
+Name=Zen Browser
+Comment=A privacy-focused, feature-packed Firefox-based web browser
+GenericName=Web Browser
+Exec=/usr/bin/zen-browser %u
+Icon=zen-browser
+Type=Application
+StartupNotify=true
+StartupWMClass=zen
+Terminal=false
+Categories=Network;WebBrowser;
+MimeType=application/json;application/pdf;application/rdf+xml;application/rss+xml;application/x-xpinstall;application/xhtml+xml;application/xml;audio/flac;audio/ogg;audio/webm;image/avif;image/gif;image/jpeg;image/png;image/svg+xml;image/webp;text/html;text/xml;video/ogg;video/webm;x-scheme-handler/chrome;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/mailto;
+
+[Desktop Action new-window]
+Exec=/usr/bin/zen-browser --new-window %u
+Name=New Window
+
+[Desktop Action new-private-window]
+Exec=/usr/bin/zen-browser --private-window %u
+Name=New Private Window
+
+[Desktop Action profilemanager]
+Exec=/usr/bin/zen-browser --ProfileManager %u
+Name=Open Profile Manager

@@ -1,0 +1,4 @@
+{
+  "check": "github-release",
+  "repo": "zen-browser/desktop"
+}
