@@ -1,0 +1,73 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://github.com/timschneeb/GalaxyBudsClient
+# AUR Reference: https://aur.archlinux.org/packages/galaxybudsclient-bin
+
+_pkgname=galaxybudsclient
+pkgname=galaxybudsclient
+pkgver=5.2.1
+pkgrel=1
+pkgdesc="Unofficial manager for Samsung Galaxy Buds (Buds, Buds+, Buds Live, Buds Pro, Buds2, Buds2 Pro, Buds FE, Buds3, Buds3 Pro)"
+arch=('x86_64')
+url="https://github.com/timschneeb/GalaxyBudsClient"
+license=('GPL-3.0-only')
+provides=("${_pkgname}-bin")
+conflicts=("${_pkgname}-bin" "${_pkgname}-git")
+replaces=("${_pkgname}-bin")
+install="${_pkgname}.install"
+backup=("etc/${_pkgname}-flags.conf")
+depends=(
+    'bluez'
+    'fontconfig'
+    'gcc-libs'
+    'glibc'
+    'hicolor-icon-theme'
+    'libice'
+    'libsm'
+    'libx11'
+    'libxcursor'
+    'libxi'
+    'libxrandr'
+    'openssl'
+    'zlib'
+)
+optdepends=(
+    'noto-fonts: recommended default font for Avalonia UI fallback'
+    'bluez-utils: Bluetooth management and debugging tools'
+    'libnotify: desktop notifications'
+    'wl-clipboard: clipboard support on Wayland'
+)
+options=(!strip !debug)
+source=(
+    "${_pkgname}-${pkgver}.bin::https://github.com/timschneeb/GalaxyBudsClient/releases/download/${pkgver}/GalaxyBudsClient_Linux_64bit_Portable.bin"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.desktop"
+    "${_pkgname}.png"
+)
+sha256sums=('fa3b0889c2142821f10a2df2b359c7573106c2e0559c9465dd32d983ef1f9ae3'
+            '813e0ed604ff191c40aaf4135f9c9e7c9cdbf4599d5ed23921646c40f9e1a988'
+            'eb3874a9217f2c5d66db5f47f7dee970ed4585948d6ea4728efb0d43db2b2e68'
+            '66f8142fdd119a30e05427fbacd4d00a829d21f94ed907dec00296bb7c4a8cf4'
+            'd116c9e3b2f3b1523c089676d4911e2ec0c848f5b2ae145576581d1a4adffd3d')
+
+package() {
+    # Install main standalone binary to /opt/galaxybudsclient/GalaxyBudsClient
+    install -dm755 "${pkgdir}/opt/${_pkgname}"
+    install -Dm755 "${srcdir}/${_pkgname}-${pkgver}.bin" "${pkgdir}/opt/${_pkgname}/GalaxyBudsClient"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Install default system-wide configuration flags
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install high-resolution icons (512x512)
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Fix overall permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

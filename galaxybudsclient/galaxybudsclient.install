@@ -1,0 +1,36 @@
+_cleanup_user_desktops() {
+    for user_home in /home/*; do
+        if [ -d "$user_home/.local/share/applications" ]; then
+            rm -f "$user_home/.local/share/applications/galaxybudsclient.desktop" \
+                  "$user_home/.local/share/applications/GalaxyBudsClient.desktop" \
+                  "$user_home/.local/share/applications/Galaxy Buds Manager.desktop" 2>/dev/null || true
+        fi
+    done
+    update-desktop-database -q 2>/dev/null || true
+}
+
+_cleanup_autostarts() {
+    for user_home in /home/*; do
+        if [ -d "$user_home/.config/autostart" ]; then
+            rm -f "$user_home/.config/autostart/galaxybudsclient.desktop" \
+                  "$user_home/.config/autostart/GalaxyBudsClient.desktop" 2>/dev/null || true
+        fi
+    done
+}
+
+post_install() {
+    _cleanup_user_desktops
+    echo ":: BlueZ (bluetooth.service) must be active for Galaxy Buds Manager to connect to your earbuds."
+    echo "   Ensure it is running with: sudo systemctl enable --now bluetooth.service"
+    echo ":: If you encounter an Avalonia font crash on a minimal install, install 'noto-fonts' or set LC_ALL=C."
+    echo ":: Flags can be configured in /etc/galaxybudsclient-flags.conf or ~/.config/galaxybudsclient-flags.conf."
+}
+
+post_upgrade() {
+    _cleanup_user_desktops
+}
+
+post_remove() {
+    _cleanup_user_desktops
+    _cleanup_autostarts
+}

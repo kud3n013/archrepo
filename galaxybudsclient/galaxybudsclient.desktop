@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Galaxy Buds Manager
+Comment=Unofficial manager for Samsung Galaxy Buds
+GenericName=Galaxy Buds Manager
+Exec=/usr/bin/galaxybudsclient
+Icon=galaxybudsclient
+Type=Application
+StartupNotify=true
+StartupWMClass=GalaxyBudsClient
+Categories=Utility;Settings;HardwareSettings;
+Keywords=samsung;galaxy;buds;bluetooth;earbuds;headphones;audio;
