@@ -10,6 +10,15 @@ rm -f "$HOME/.local/share/applications/galaxybudsclient.desktop" \
       "$HOME/.local/share/applications/GalaxyBudsClient.desktop" \
       "$HOME/.local/share/applications/Galaxy Buds Manager.desktop" 2>/dev/null || true
 
+# Deploy EnsureTrayMenu user hook to ensure Open and Quit tray options are always available
+USER_SCRIPTS_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/GalaxyBudsClient/scripts"
+mkdir -p "$USER_SCRIPTS_DIR"
+if [[ -f "/opt/galaxybudsclient/scripts/EnsureTrayMenu.cs" ]]; then
+    if ! cmp -s "/opt/galaxybudsclient/scripts/EnsureTrayMenu.cs" "$USER_SCRIPTS_DIR/EnsureTrayMenu.cs" 2>/dev/null; then
+        cp -f "/opt/galaxybudsclient/scripts/EnsureTrayMenu.cs" "$USER_SCRIPTS_DIR/EnsureTrayMenu.cs" 2>/dev/null || true
+    fi
+fi
+
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 USER_FLAGS_FILE="$XDG_CONFIG_HOME/galaxybudsclient-flags.conf"
 SYSTEM_FLAGS_FILE="/etc/galaxybudsclient-flags.conf"

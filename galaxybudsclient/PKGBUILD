@@ -5,7 +5,7 @@
 _pkgname=galaxybudsclient
 pkgname=galaxybudsclient
 pkgver=5.2.1
-pkgrel=2
+pkgrel=3
 pkgdesc="Unofficial manager for Samsung Galaxy Buds (Buds, Buds+, Buds Live, Buds Pro, Buds2, Buds2 Pro, Buds FE, Buds3, Buds3 Pro)"
 arch=('x86_64')
 url="https://github.com/timschneeb/GalaxyBudsClient"
@@ -43,17 +43,23 @@ source=(
     "${_pkgname}-flags.conf"
     "${_pkgname}.desktop"
     "${_pkgname}.png"
+    "EnsureTrayMenu.cs"
 )
 sha256sums=('fa3b0889c2142821f10a2df2b359c7573106c2e0559c9465dd32d983ef1f9ae3'
-            '9064c52214433d50e3f16a34e2fc7362ebd34a33e6694df4cf956f03550310ed'
+            '087afad8e44a61d14d6871233a5c75b8e4238d78d75206f4e269aba3afb57521'
             'fd2c84ee4e4259b78f9e15e4c3d499726c6ae5bba47ff9cca33c2b9f52dae4ad'
             '66f8142fdd119a30e05427fbacd4d00a829d21f94ed907dec00296bb7c4a8cf4'
-            'd116c9e3b2f3b1523c089676d4911e2ec0c848f5b2ae145576581d1a4adffd3d')
+            'd116c9e3b2f3b1523c089676d4911e2ec0c848f5b2ae145576581d1a4adffd3d'
+            '5401bef576830ac84a0bf2faa2b72fdf319a675c0b340bff2f5ba9de13e54de9')
 
 package() {
     # Install main standalone binary to /opt/galaxybudsclient/GalaxyBudsClient
     install -dm755 "${pkgdir}/opt/${_pkgname}"
     install -Dm755 "${srcdir}/${_pkgname}-${pkgver}.bin" "${pkgdir}/opt/${_pkgname}/GalaxyBudsClient"
+
+    # Install EnsureTrayMenu user hook script
+    install -dm755 "${pkgdir}/opt/${_pkgname}/scripts"
+    install -Dm644 "${srcdir}/EnsureTrayMenu.cs" "${pkgdir}/opt/${_pkgname}/scripts/EnsureTrayMenu.cs"
 
     # Install launcher wrapper script
     install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"

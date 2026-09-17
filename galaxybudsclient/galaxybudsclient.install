@@ -18,6 +18,12 @@ _cleanup_autostarts() {
     done
 }
 
+_cleanup_scripts() {
+    for user_home in /home/*; do
+        rm -f "$user_home/.local/share/GalaxyBudsClient/scripts/EnsureTrayMenu.cs" 2>/dev/null || true
+    done
+}
+
 post_install() {
     _cleanup_user_desktops
     echo ":: BlueZ (bluetooth.service) must be active for Galaxy Buds Manager to connect to your earbuds."
@@ -33,4 +39,5 @@ post_upgrade() {
 post_remove() {
     _cleanup_user_desktops
     _cleanup_autostarts
+    _cleanup_scripts
 }
