@@ -11,10 +11,10 @@ REPO_NAME="${GITHUB_REPOSITORY:-kud3n013/archrepo}"
 mkdir -p "$(dirname "$OUTPUT_HTML")"
 
 PKG_LIST=""
-for d in "${SRC_DIR}"/*/; do
+for d in "${SRC_DIR}/packages"/*/; do
   pkg_dir="${d%/}"
   pkg_name=$(basename "$pkg_dir")
-  if [ -f "${pkg_dir}/PKGBUILD" ] && [ "$pkg_name" != "archive" ] && [ "$pkg_name" != "repo" ] && [ "$pkg_name" != "main_src" ]; then
+  if [ -f "${pkg_dir}/PKGBUILD" ]; then
     name=$(grep -oP '^pkgname=\K.*' "${pkg_dir}/PKGBUILD" | tr -d '"'\' | head -1)
     desc=$(grep -oP '^pkgdesc=\K.*' "${pkg_dir}/PKGBUILD" | tr -d '"'\' | head -1)
     PKG_LIST+="${name}:::<li><code>${name}</code> - ${desc}</li>"$'\n'

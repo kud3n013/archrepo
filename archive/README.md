@@ -23,9 +23,9 @@ Packages in this directory:
 
 To reactivate any package from this archive:
 
-1. Move the package directory back to the repository root:
+1. Move the package directory back to `packages/`:
    ```bash
-   git mv archive/[package-name] ./
+   git mv archive/[package-name] packages/
    ```
 
 2. Update the package table in [`README.md`](../README.md).

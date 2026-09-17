@@ -51,6 +51,9 @@ sudo pacman -S proton-pass
 sudo pacman -S proton-pass-cli
 sudo pacman -S freedownloadmanager
 sudo pacman -S sine
+sudo pacman -S zen-browser
+sudo pacman -S galaxybudsclient
+sudo pacman -S millennium
 ```
 
 ---
@@ -77,6 +80,9 @@ sudo pacman -S sine
 | **`proton-pass-cli`** | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Official CLI (`pass-cli`, `proton-pass-cli`) for managing Proton Pass vaults, items, and secrets with shell completions (Bash, Zsh, Fish). | `sudo pacman -S proton-pass-cli` |
 | **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with **desktop portal integration & system dark mode detection**. | `sudo pacman -S freedownloadmanager` |
 | **`sine`** | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) | The ultimate mod and theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Waterfox, Firefox). | `sudo pacman -S sine` |
+| **`zen-browser`** | [zen-browser/desktop](https://github.com/zen-browser/desktop) | Experience tranquillity while browsing the web (Firefox-based) with optimized Wayland integration and dedicated private browsing profile. | `sudo pacman -S zen-browser` |
+| **`galaxybudsclient`** | [ThePBone/GalaxyBudsClient](https://github.com/ThePBone/GalaxyBudsClient) | Unofficial Galaxy Buds client for Linux (Uno Platform) with automatic Wayland DPI scaling and persistent tray menu. | `sudo pacman -S galaxybudsclient` |
+| **`millennium`** | [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium) | Modern Steam Client modding framework for custom skins, themes, and plugins. | `sudo pacman -S millennium` |
 
 ---
 
@@ -119,14 +125,16 @@ The following packages have been retired from the active repository and are no l
 
 ## 🛠️ Adding a New Package
 
-1. Create a new directory for the package on the `main` branch:
+1. Create a new directory for the package under `packages/` (or use the maintainer scaffold tool):
    ```bash
-   mkdir my-package
+   ./tools/scaffold.sh my-package owner/repo
+   # or manually:
+   mkdir -p packages/my-package
    ```
 
 2. Add your `PKGBUILD` and any launcher scripts, patches, or desktop files:
    ```bash
-   touch my-package/PKGBUILD
+   touch packages/my-package/PKGBUILD
    ```
 
 3. (Optional) Add `upstream.json` to configure automated upstream version tracking:
@@ -141,7 +149,7 @@ The following packages have been retired from the active repository and are no l
 
 4. Commit and push:
    ```bash
-   git add my-package/
+   git add packages/my-package/
    git commit -m "feat: add my-package"
    git push origin main
    ```

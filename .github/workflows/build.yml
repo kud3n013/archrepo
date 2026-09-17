@@ -102,19 +102,18 @@ jobs:
           chmod +x src/.github/scripts/check-upstream.sh
           
           # Run check-upstream with --apply
-          src/.github/scripts/check-upstream.sh "src/${PKG}" --apply
+          src/.github/scripts/check-upstream.sh "src/packages/${PKG}" --apply
 
           # Refresh checksums & .SRCINFO
-          cd "src/${PKG}"
+          cd "src/packages/${PKG}"
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
           # Commit PKGBUILD changes to main
-          cd ../..
-          cd src
+          cd "${GITHUB_WORKSPACE:-$(pwd)/../../..}/src"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "${PKG}/PKGBUILD" "${PKG}/.SRCINFO"
+          git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
           git commit -m "bump: ${PKG} automated update"
           for i in 1 2 3 4 5; do
             git pull --rebase origin main && git push origin main && break
@@ -128,7 +127,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PKG="${{ matrix.name }}"
-          cd "src/${PKG}"
+          cd "src/packages/${PKG}"
 
           PKG_FILE=$(sudo -u builder makepkg --packagelist | head -1 | xargs basename)
           echo "target_pkg=${PKG_FILE}" >> "$GITHUB_OUTPUT"
@@ -153,7 +152,7 @@ jobs:
       - name: Build package
         if: steps.cache_check.outputs.skip_build != 'true'
         run: |
-          cd "src/${{ matrix.name }}"
+          cd "src/packages/${{ matrix.name }}"
           if ! sudo -u builder makepkg -s --noconfirm; then
             echo "makepkg -s failed (likely external/AUR runtime dependencies). Installing makedepends and retrying with -d..."
             MAKEDEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /makedepends/ {print $2}')
@@ -169,7 +168,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-pkg
-          path: src/${{ matrix.name }}/*.pkg.tar.zst
+          path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
           if-no-files-found: error
 
   # ── 3. Publish newly built packages & update repository ───────────────

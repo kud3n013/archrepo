@@ -56,9 +56,9 @@ Before writing a package recipe from scratch, search and inspect the Arch User R
 ---
 
 ### Step 3: Package Directory Structure
-Inside the repository root, create `[PACKAGE_NAME]/` with the following standard layout:
+Inside the repository `packages/` directory, create `packages/[PACKAGE_NAME]/` with the following standard layout:
 ```text
-[PACKAGE_NAME]/
+packages/[PACKAGE_NAME]/
 ├── PKGBUILD               # Arch Linux package build recipe
 ├── .SRCINFO               # Generated package metadata (makepkg --printsrcinfo)
 ├── [pkgname].install      # Install/upgrade/remove scriptlet (mandatory for desktop apps)

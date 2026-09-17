@@ -29,12 +29,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "$REPO_DIR"
 
-# Collect all valid package directories (excluding archive/)
+# Collect all valid package directories in packages/
 ALL_PACKAGES=()
-for d in */; do
-  pkg="${d%/}"
-  if [ -f "$pkg/PKGBUILD" ] && [ "$pkg" != "archive" ]; then
-    ALL_PACKAGES+=("$pkg")
+for d in packages/*/; do
+  pkg_name="$(basename "$d")"
+  if [ -f "$d/PKGBUILD" ]; then
+    ALL_PACKAGES+=("$pkg_name")
   fi
 done
 
@@ -52,8 +52,8 @@ is_binary_missing() {
   local pkg="$1"
   get_release_assets
   local ver rel
-  ver=$(grep -oP '^pkgver=\K.*' "${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
-  rel=$(grep -oP '^pkgrel=\K.*' "${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
+  ver=$(grep -oP '^pkgver=\K.*' "packages/${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
+  rel=$(grep -oP '^pkgrel=\K.*' "packages/${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
   # Check if any asset starts with pkg-ver-rel
   if echo "$RELEASE_ASSETS" | grep -qE "^${pkg}-${ver}-${rel}-"; then
     return 1 # not missing
@@ -69,16 +69,17 @@ echo "Check Upstream: ${CHECK_UPSTREAM}"
 
 if [ "$EVENT" = "workflow_dispatch" ]; then
   if [ "$INPUT_PKG" != "all" ] && [ -n "$INPUT_PKG" ]; then
-    if [ -d "$INPUT_PKG" ] && [ -f "$INPUT_PKG/PKGBUILD" ]; then
+    INPUT_PKG="$(basename "$INPUT_PKG")"
+    if [ -d "packages/$INPUT_PKG" ] && [ -f "packages/$INPUT_PKG/PKGBUILD" ]; then
       PACKAGES_TO_BUILD["$INPUT_PKG"]="false"
       if [ "$CHECK_UPSTREAM" = "true" ]; then
-        RES=$("${SCRIPT_DIR}/check-upstream.sh" "$INPUT_PKG" || true)
+        RES=$("${SCRIPT_DIR}/check-upstream.sh" "packages/$INPUT_PKG" || true)
         if echo "$RES" | grep -q '^UPDATE_NEEDED=true'; then
           PACKAGES_TO_BUILD["$INPUT_PKG"]="true"
         fi
       fi
     else
-      echo "Error: Requested package '${INPUT_PKG}' not found." >&2
+      echo "Error: Requested package '${INPUT_PKG}' not found in packages/." >&2
       exit 1
     fi
   else
@@ -87,7 +88,7 @@ if [ "$EVENT" = "workflow_dispatch" ]; then
       if [ "$FORCE_REBUILD" = "true" ]; then
         PACKAGES_TO_BUILD["$pkg"]="false"
       elif [ "$CHECK_UPSTREAM" = "true" ]; then
-        RES=$("${SCRIPT_DIR}/check-upstream.sh" "$pkg" || true)
+        RES=$("${SCRIPT_DIR}/check-upstream.sh" "packages/$pkg" || true)
         if echo "$RES" | grep -q '^UPDATE_NEEDED=true'; then
           PACKAGES_TO_BUILD["$pkg"]="true"
         elif is_binary_missing "$pkg"; then
@@ -102,7 +103,7 @@ if [ "$EVENT" = "workflow_dispatch" ]; then
 elif [ "$EVENT" = "schedule" ]; then
   # Scheduled daily run: check all packages for upstream updates
   for pkg in "${ALL_PACKAGES[@]}"; do
-    RES=$("${SCRIPT_DIR}/check-upstream.sh" "$pkg" || true)
+    RES=$("${SCRIPT_DIR}/check-upstream.sh" "packages/$pkg" || true)
     if echo "$RES" | grep -q '^UPDATE_NEEDED=true'; then
       echo "Update found for ${pkg}"
       PACKAGES_TO_BUILD["$pkg"]="true"
@@ -134,9 +135,9 @@ else
   fi
 
   for pkg in "${ALL_PACKAGES[@]}"; do
-    if echo "$CHANGED_FILES" | grep -q "^${pkg}/"; then
-      PKG_FILES=$(echo "$CHANGED_FILES" | grep "^${pkg}/" || true)
-      NON_METADATA_FILES=$(echo "$PKG_FILES" | grep -vE "^${pkg}/(upstream\.json|\.SRCINFO)$" || true)
+    if echo "$CHANGED_FILES" | grep -q "^packages/${pkg}/"; then
+      PKG_FILES=$(echo "$CHANGED_FILES" | grep "^packages/${pkg}/" || true)
+      NON_METADATA_FILES=$(echo "$PKG_FILES" | grep -vE "^packages/${pkg}/(upstream\.json|\.SRCINFO)$" || true)
       if [ -n "$NON_METADATA_FILES" ] || is_binary_missing "$pkg"; then
         echo "Package modified: ${pkg}"
         PACKAGES_TO_BUILD["$pkg"]="false"
@@ -155,9 +156,9 @@ MATRIX_ITEMS=()
 for pkg in "${!PACKAGES_TO_BUILD[@]}"; do
   UPSTREAM_CHECK="none"
   UPSTREAM_REPO=""
-  if [ -f "${pkg}/upstream.json" ]; then
-    UPSTREAM_CHECK=$(jq -r '.check // "none"' "${pkg}/upstream.json")
-    UPSTREAM_REPO=$(jq -r '.repo // ""' "${pkg}/upstream.json")
+  if [ -f "packages/${pkg}/upstream.json" ]; then
+    UPSTREAM_CHECK=$(jq -r '.check // "none"' "packages/${pkg}/upstream.json")
+    UPSTREAM_REPO=$(jq -r '.repo // ""' "packages/${pkg}/upstream.json")
   fi
   UPDATE_NEEDED="${PACKAGES_TO_BUILD[$pkg]}"
   

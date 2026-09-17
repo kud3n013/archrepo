@@ -12,3 +12,8 @@ pkg/
 *.deb
 *.rpm
 LICENSE-*
+
+# Logs and patch rejects
+*.log
+*.orig
+*.rej
