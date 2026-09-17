@@ -8,6 +8,7 @@ _cleanup_user_desktops() {
         fi
     done
     update-desktop-database -q 2>/dev/null || true
+    gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true
 }
 
 post_install() {

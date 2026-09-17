@@ -3,9 +3,10 @@
 # AUR Reference: https://aur.archlinux.org/packages/zen-browser-bin
 
 _pkgname=zen-browser
+_desktopname=zen
 pkgname=zen-browser
 pkgver=1.22.2b
-pkgrel=1
+pkgrel=2
 pkgdesc="Zen Browser — a privacy-focused, feature-packed Firefox-based web browser"
 arch=('x86_64')
 url="https://github.com/zen-browser/desktop"
@@ -35,20 +36,25 @@ optdepends=(
     'wl-clipboard: Clipboard support on Wayland'
     'ffmpeg4.4: Legacy codec support for Twitch and YouTube live streams'
 )
+makedepends=(
+    'imagemagick'
+)
 options=(!strip !debug)
 source=(
-    "zen-browser-${pkgver}.tar.xz::https://github.com/zen-browser/desktop/releases/download/${pkgver}/zen.linux-x86_64.tar.xz"
-    "zen-browser.sh"
-    "zen-browser-flags.conf"
-    "zen-browser.desktop"
-    "zen-browser.install"
+    "${_pkgname}-${pkgver}.tar.xz::https://github.com/zen-browser/desktop/releases/download/${pkgver}/zen.linux-x86_64.tar.xz"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_desktopname}.desktop"
+    "${_pkgname}.png"
+    "${_pkgname}.install"
     "policies.json"
 )
 sha256sums=('163823cf56b068e81bb8a48d93c9dbda3993f54f03f8d37e684e380bfc11b892'
             '0234c2ed7fa451905beedd96c277b28263495a945d6c337b048a14b81d949290'
             'e1e70b93f4707525d517746933b668f9faabd72e2dac7640324a2e106df10769'
             '43d1850a9985cca030b4ba6778a54d4698de3efde9dbdd58e27ab4eb0dc59113'
-            'f566bbe8360ed280385dbc83f57177cc9b78cbde5a6e8cfb89cfa80890b0c9d5'
+            'f9586255a530a43531793180d91aa1840ad957fdd9dab170a859511b60becaa0'
+            '19ba5e75dc1ed9a1357bfd968bba05e5d06458118d0aa5c57227fdc7c326cffd'
             'fd9572d178ea1a5edf427ca85bad3fb2d83be2e250e62bad13951d70d977bd0f')
 
 package() {
@@ -66,18 +72,33 @@ package() {
     # Install system-wide default flags file
     install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
 
-    # Install desktop entry
-    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+    # Install desktop entry (zen.desktop matches window class/app_id and AUR convention)
+    install -Dm644 "${srcdir}/${_desktopname}.desktop" "${pkgdir}/usr/share/applications/${_desktopname}.desktop"
 
-    # Install icons — symlink from upstream's bundled icon set
+    # Install high-resolution 512x512 icons (both zen-browser.png and zen.png for dock/launcher compatibility)
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    ln -s "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_desktopname}.png"
+
+    # Generate and install 256x256 icon
+    install -dm755 "${pkgdir}/usr/share/icons/hicolor/256x256/apps"
+    magick "${srcdir}/${_pkgname}.png" -resize 256x256 "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_pkgname}.png"
+    ln -s "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_desktopname}.png"
+
+    # Bundled icons: 16x16, 32x32, 48x48, 64x64, 128x128
     for i in 16x16 32x32 48x48 64x64 128x128; do
         install -dm755 "${pkgdir}/usr/share/icons/hicolor/${i}/apps"
         ln -s "/opt/${_pkgname}/browser/chrome/icons/default/default${i/x*/}.png" \
               "${pkgdir}/usr/share/icons/hicolor/${i}/apps/${_pkgname}.png"
+        ln -s "${_pkgname}.png" \
+              "${pkgdir}/usr/share/icons/hicolor/${i}/apps/${_desktopname}.png"
     done
+
+    # Pixmaps
     install -dm755 "${pkgdir}/usr/share/pixmaps"
-    ln -s "/opt/${_pkgname}/browser/chrome/icons/default/default128.png" \
+    ln -s "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
           "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    ln -s "${_pkgname}.png" \
+          "${pkgdir}/usr/share/pixmaps/${_desktopname}.png"
 
     # Use system-provided dictionaries
     ln -Ts /usr/share/hunspell "${pkgdir}/opt/${_pkgname}/dictionaries"
