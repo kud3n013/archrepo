@@ -13,7 +13,9 @@ Packages in this directory:
 
 ## Current Archived Packages
 
-*Currently, there are no archived packages.*
+| Package | Original Upstream | Reason for Archiving |
+|---|---|---|
+| [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
 
 ---
 
@@ -26,13 +28,6 @@ To reactivate any package from this archive:
    git mv archive/[package-name] ./
    ```
 
-2. Add the package back to the build matrix in [`.github/workflows/build.yml`](../.github/workflows/build.yml) under `strategy.matrix.package`:
-   ```yaml
-   - name: [package-name]
-     upstream_repo: ""
-     upstream_check: [check-type]
-   ```
+2. Update the package table in [`README.md`](../README.md).
 
-3. Update the package table in [`README.md`](../README.md).
-
-4. Commit and push to `main`. The CI workflow will automatically compile, index, and publish the package back into `archrepo.db`.
+3. Commit and push to `main`. The CI workflow will automatically compile, index, and publish the package back into `archrepo.db`.

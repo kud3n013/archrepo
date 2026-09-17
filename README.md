@@ -51,7 +51,6 @@ sudo pacman -S proton-pass
 sudo pacman -S proton-pass-cli
 sudo pacman -S freedownloadmanager
 sudo pacman -S sine
-sudo pacman -S hyprmod
 ```
 
 ---
@@ -78,8 +77,6 @@ sudo pacman -S hyprmod
 | **`proton-pass-cli`** | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Official CLI (`pass-cli`, `proton-pass-cli`) for managing Proton Pass vaults, items, and secrets with shell completions (Bash, Zsh, Fish). | `sudo pacman -S proton-pass-cli` |
 | **`freedownloadmanager`** | [Free Download Manager](https://www.freedownloadmanager.org/) | Fast and powerful modern download accelerator and organizer with **desktop portal integration & system dark mode detection**. | `sudo pacman -S freedownloadmanager` |
 | **`sine`** | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) | The ultimate mod and theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Waterfox, Firefox). | `sudo pacman -S sine` |
-| **`hyprmod`** | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Native GTK4/libadwaita settings app for Hyprland with live IPC preview, monitor management, bezier curves, keybinds, and CLI profile switching. | `sudo pacman -S hyprmod` |
-
 
 ---
 
@@ -87,7 +84,9 @@ sudo pacman -S hyprmod
 
 The following packages have been retired from the active repository and are no longer installable via `pacman`. Their packaging recipes and configurations are preserved in [`archive/`](archive/):
 
-*Currently, there are no archived packages.*
+| Package | Upstream | Location | Status |
+|---|---|---|---|
+| **`hyprmod`** | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | [`archive/hyprmod`](archive/hyprmod/) | Archived |
 
 ---
 
