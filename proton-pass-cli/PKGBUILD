@@ -5,13 +5,14 @@
 _pkgname=proton-pass-cli
 pkgname=proton-pass-cli
 pkgver=2.3.3
-pkgrel=1
+pkgrel=2
 pkgdesc="A command-line interface for managing your Proton Pass vaults, items, and secrets"
 arch=('x86_64')
 url="https://protonpass.github.io/pass-cli"
 license=('GPL-3.0-or-later')
 depends=('glibc' 'libgcc')
 optdepends=(
+    'org.freedesktop.secrets: for persistent session credentials across reboots (e.g. gnome-keyring, keepassxc)'
     'xdg-utils: for web-based browser login integration'
 )
 provides=(
@@ -25,22 +26,33 @@ conflicts=(
     'pass-cli'
 )
 replaces=('proton-pass-cli-bin')
+backup=('etc/proton-pass-cli.conf')
 options=(!strip !debug)
 
 _downloadUrl="https://github.com/protonpass/pass-cli/releases/download/${pkgver}"
 source=(
     "pass-cli-${pkgver}::${_downloadUrl}/pass-cli-linux-x86_64"
     "LICENSE-${pkgver}::https://raw.githubusercontent.com/protonpass/pass-cli/${pkgver}/LICENSE"
+    "proton-pass-cli.sh"
+    "proton-pass-cli.conf"
 )
 sha256sums=('b5b49a8b3fd0af8830c0c1979f28ea0c90ccece73f59023a8bca8245d4b68da9'
-            'c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba')
+            'c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba'
+            'cc9d336d44b8453fcc270bc7d207a4472e582ec54ce4a8f90c366d7026535762'
+            '03eeb8a893acaf215d909595b354fb823195223edd4702cc1a0807f1a40a7d1e')
 
 package() {
-    # Install upstream CLI executable
-    install -Dm755 "${srcdir}/pass-cli-${pkgver}" "${pkgdir}/usr/bin/pass-cli"
+    # Install upstream CLI executable to private lib directory
+    install -Dm755 "${srcdir}/pass-cli-${pkgver}" "${pkgdir}/usr/lib/${pkgname}/pass-cli"
+
+    # Install launcher wrapper script (handles keyring persistence across reboots)
+    install -Dm755 "${srcdir}/proton-pass-cli.sh" "${pkgdir}/usr/bin/pass-cli"
 
     # Convenience alias symlink
     ln -sr "${pkgdir}/usr/bin/pass-cli" "${pkgdir}/usr/bin/proton-pass-cli"
+
+    # Install configuration template
+    install -Dm644 "${srcdir}/proton-pass-cli.conf" "${pkgdir}/etc/proton-pass-cli.conf"
 
     # Shell completions (NTFS-safe execution via /tmp)
     local _bin="/tmp/pass-cli-${pkgver}-$$-exec"
