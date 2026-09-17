@@ -3,7 +3,7 @@
 
 _pkgname=beeper
 pkgname=beeper
-pkgver=4.3.113
+pkgver=4.3.123
 pkgrel=1
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
@@ -28,7 +28,7 @@ source=(
     "beeper.sh"
     "beeper.desktop"
 )
-sha256sums=('c690243fbbacfac7afd143403db83d5032c3fca4038582d44bf625403dc4aa5b'
+sha256sums=('ff7d3512488e80438aa32c81bb5b00594b8b6a75c1f9c80a5f873fb703731035'
             'd1d037ee6661a8094bf31b9337b3793256c354bde5321c9bf633896c671770b3'
             '87909f61383ecc5a962f6d10a713ff53503537f4c876eb8bc478ad5fd80c3182')
 
