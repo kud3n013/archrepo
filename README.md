@@ -46,6 +46,7 @@ Install any package using `sudo pacman -S <package>`.
 | **`sine`** | Mod & theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Firefox) | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) |
 | **`zalo-for-linux`** | Zalo desktop client with Wayland / Hyprland scaling fixes and bundled logo | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) |
 | **`zen-browser`** | Firefox-based browser with Wayland integration & dedicated private browsing profile | [zen-browser/desktop](https://github.com/zen-browser/desktop) |
+| **`zotero`** | Reference manager with native title bar, KDE Global Menu, and Hyprland/KDE auto-theming | [Zotero](https://www.zotero.org) |
 | **`zotero-better-bibtex`** | Better BibTeX LaTeX bibliography and citation management for Zotero | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) |
 | **`zotero-better-notes`** | Comprehensive note taking and knowledge management for Zotero | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) |
 | **`zotero-mcp`** | Model Context Protocol (MCP) server & standalone CLI for Zotero | [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp) |

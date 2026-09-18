@@ -1,0 +1,132 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Contributor: kud3n013 <kud3n013@gmail.com>
+# Upstream: https://www.zotero.org
+# AUR Reference: https://aur.archlinux.org/packages/zotero-bin
+
+_pkgname=zotero
+pkgname=zotero
+pkgver=10.0.3
+pkgrel=1
+pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
+arch=('x86_64')
+url="https://www.zotero.org"
+license=('AGPL-3.0-or-later')
+provides=("${_pkgname}-bin")
+conflicts=("${_pkgname}-bin")
+replaces=("${_pkgname}-bin")
+install="${_pkgname}.install"
+backup=("etc/${_pkgname}-flags.conf")
+options=(!strip !debug)
+
+depends=(
+    'alsa-lib'
+    'dbus-glib'
+    'gtk3'
+    'libxt'
+    'mime-types'
+    'nss'
+)
+
+optdepends=(
+    'breeze-gtk: Qt/Breeze GTK theme integration for KDE Plasma'
+    'appmenu-gtk-module: Export menu bar to KDE Global Menu applet via D-Bus'
+    'xdg-desktop-portal: Native desktop file pickers and Wayland integration'
+    'wl-clipboard: Clipboard support on Wayland'
+    'pipewire: Screen sharing support on Wayland'
+    'libnotify: Desktop notification integration'
+)
+
+makedepends=(
+    'imagemagick'
+    'python'
+)
+
+source=(
+    "${_pkgname}-${pkgver}.tar.xz::https://download.zotero.org/client/release/${pkgver}/Zotero-${pkgver}_linux-x86_64.tar.xz"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.desktop"
+    "${_pkgname}.png"
+    "${_pkgname}.install"
+    "patch-omni.py"
+    "policies.json"
+)
+
+sha256sums=('45f1d3900b927dfb16dec52e4e3fe8672042c7be94ec6b77ca7712b9ebc9c1b6'
+            'd8f5dbe291b950713affb3bf3b3cfe9993d1c12a9cc2e377da75cdec48a7e134'
+            '8f00c7fa2fbbabd3b9c0f2a1e9e03669e0454b8343113b0dfb7fd9534e4301f5'
+            '78158fa676257a6fa607c6e10281646469611c44647aa962e397ae79e4a4cbf6'
+            'f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7'
+            '3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270'
+            'ca2307459a89f3e46d6b073e7db46e98e0b25e10126c9af3dee14f403a4395ba'
+            'e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c')
+
+package() {
+    # Create required directory hierarchy
+    install -dm755 "${pkgdir}/usr/bin"
+    install -dm755 "${pkgdir}/usr/lib/${_pkgname}"
+    install -dm755 "${pkgdir}/usr/share/applications"
+    install -dm755 "${pkgdir}/etc"
+
+    # Copy application files to /usr/lib/zotero
+    cp -r "${srcdir}/Zotero_linux-x86_64"/* "${pkgdir}/usr/lib/${_pkgname}/"
+
+    # Patch app/omni.ja to enable global menu, native title bar & theme adaptation
+    python3 "${srcdir}/patch-omni.py" "${pkgdir}/usr/lib/${_pkgname}/app/omni.ja"
+
+    # Install system-wide default preferences for Gecko runtime
+    install -dm755 "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences"
+    cat << 'PREFS' > "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences/archrepo-zotero.js"
+pref("widget.gtk.global-menu.enabled", true);
+pref("widget.gtk.global-menu.wayland.enabled", true);
+pref("browser.tabs.inTitlebar", 0);
+pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+PREFS
+
+    # Install distribution policies (disable in-app updater)
+    install -dm755 "${pkgdir}/usr/lib/${_pkgname}/distribution"
+    install -Dm644 "${srcdir}/policies.json" "${pkgdir}/usr/lib/${_pkgname}/distribution/policies.json"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Install user configuration flags file
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install desktop entry
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install high-resolution 512x512 icon
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+
+    # Generate and install 256x256 icon
+    install -dm755 "${pkgdir}/usr/share/icons/hicolor/256x256/apps"
+    magick "${srcdir}/${_pkgname}.png" -resize 256x256 "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_pkgname}.png"
+
+    # Install bundled smaller icons if present
+    if [ -d "${pkgdir}/usr/lib/${_pkgname}/icons" ]; then
+        for s in 32 64 128; do
+            if [ -f "${pkgdir}/usr/lib/${_pkgname}/icons/icon${s}.png" ]; then
+                install -Dm644 "${pkgdir}/usr/lib/${_pkgname}/icons/icon${s}.png" \
+                    "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_pkgname}.png"
+            fi
+        done
+        if [ -f "${pkgdir}/usr/lib/${_pkgname}/icons/symbolic.svg" ]; then
+            install -Dm644 "${pkgdir}/usr/lib/${_pkgname}/icons/symbolic.svg" \
+                "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/${_pkgname}-symbolic.svg"
+        fi
+    fi
+
+    # Install pixmap symlink
+    install -dm755 "${pkgdir}/usr/share/pixmaps"
+    ln -sf "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
+        "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Remove internal updater binaries (pacman manages updates)
+    rm -f "${pkgdir}/usr/lib/${_pkgname}/updater"
+    rm -f "${pkgdir}/usr/lib/${_pkgname}/updater.ini"
+    rm -f "${pkgdir}/usr/lib/${_pkgname}/zotero.desktop"
+
+    # Fix file permissions across package
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

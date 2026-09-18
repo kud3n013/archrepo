@@ -76,6 +76,12 @@ case "$CHECK" in
     [ -n "$VER" ] && LATEST="$VER"
     ;;
 
+  zotero-redirect)
+    HEADERS=$(curl -sI "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64" || true)
+    VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'client/release/\K[0-9.]+(?=/Zotero)' | head -1 || true)
+    [ -n "$VER" ] && LATEST="$VER"
+    ;;
+
   codeberg-release)
     if [ -n "$UPSTREAM" ]; then
       TAG=$(curl -s "https://codeberg.org/api/v1/repos/${UPSTREAM}/releases/latest" | jq -r '.tag_name // empty' 2>/dev/null || true)

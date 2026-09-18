@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=Zotero
+GenericName=Reference Manager
+Comment=Zotero is a free, easy-to-use tool to help you collect, organize, cite, and share your research sources.
+Exec=/usr/bin/zotero %U
+Icon=zotero
+Terminal=false
+Type=Application
+Categories=Office;Education;Science;Database;
+MimeType=x-scheme-handler/zotero;application/x-research-info-systems;text/x-research-info-systems;text/ris;application/x-endnote-refer;application/x-bibtex;text/x-bibtex;
+StartupWMClass=Zotero
+StartupNotify=true
+Actions=NewItem;
+
+[Desktop Action NewItem]
+Name=New Item
+Exec=/usr/bin/zotero
