@@ -6,7 +6,7 @@
 _pkgname=zotero
 pkgname=zotero
 pkgver=10.0.3
-pkgrel=5
+pkgrel=6
 pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
 arch=('x86_64')
 url="https://www.zotero.org"
@@ -52,12 +52,12 @@ source=(
 )
 
 sha256sums=('45f1d3900b927dfb16dec52e4e3fe8672042c7be94ec6b77ca7712b9ebc9c1b6'
-            '89ea604d2f707ccb892e817187bf4e5c1dfce5f1190f0a5b3293fa9818a461dc'
-            'c185edfd6fe3fc250fffa940f9e09cda8e996a29c0ca805ffd2cabac23791b2e'
+            '061b636020b32b1de21d4785cb35c2fa35f9caab2d63696fd7dd63c0cd2cc6bb'
+            'd8752428e47776f9700a2e448a84dc6a812b0ee03461e388e2fdd0d917ea4f03'
             'c7c1c942ce9e7c81d49962dadf2113884312d320fb53a60198a25343b7425897'
             'f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7'
             '3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270'
-            '559244c2e0a55850003ecdb3e4aa5b22ff035ca4a04bab20eac82e264ab7af01'
+            'f6517a83f4407c6dfe834cbe5dbf44d989aa1576af04038fddf437bb817237a0'
             'e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c')
 
 package() {
@@ -76,8 +76,8 @@ package() {
     # Install system-wide default preferences for Gecko runtime
     install -dm755 "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences"
     cat << 'PREFS' > "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences/archrepo-zotero.js"
-pref("widget.gtk.global-menu.enabled", false);
-pref("widget.gtk.global-menu.wayland.enabled", false);
+pref("widget.gtk.global-menu.enabled", true);
+pref("widget.gtk.global-menu.wayland.enabled", true);
 pref("browser.tabs.inTitlebar", 0);
 pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 PREFS

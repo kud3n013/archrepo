@@ -53,8 +53,8 @@ fi
 # Ensure Wayland app_id and window matching cleanly map to zotero.desktop
 export MOZ_APP_REMOTINGNAME="${MOZ_APP_REMOTINGNAME:-zotero}"
 
-# Global Menu mode (default 0 for rock-solid in-app menubar with Alt/F10/Ctrl+M; set to 1 in zotero-flags.conf to enable)
-export ZOTERO_GLOBAL_MENU="${ZOTERO_GLOBAL_MENU:-0}"
+# Global Menu mode (default 1 to export menus to KDE Global Menu via D-Bus; set to 0 in zotero-flags.conf to disable)
+export ZOTERO_GLOBAL_MENU="${ZOTERO_GLOBAL_MENU:-1}"
 
 # Loading appmenu-gtk-module causes GDK assertion failures on Wayland and breaks menus.
 if [[ "$GTK_MODULES" == *"appmenu-gtk-module"* ]]; then

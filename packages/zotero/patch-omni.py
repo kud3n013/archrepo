@@ -30,9 +30,9 @@ def patch_omni(omni_path):
             if item.filename == "defaults/preferences/zotero.js":
                 text = content.decode("utf-8", errors="ignore")
                 extra_prefs = (
-                    "\n// kud3n013/archrepo: Native Title Bar, Theme Integration & Optional Global Menu\n"
-                    'pref("widget.gtk.global-menu.enabled", false);\n'
-                    'pref("widget.gtk.global-menu.wayland.enabled", false);\n'
+                    "\n// kud3n013/archrepo: Native Title Bar, Theme Integration & KDE Global Menu\n"
+                    'pref("widget.gtk.global-menu.enabled", true);\n'
+                    'pref("widget.gtk.global-menu.wayland.enabled", true);\n'
                     'pref("browser.tabs.inTitlebar", 0);\n'
                     'pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n'
                 )
@@ -55,7 +55,7 @@ if (Zotero.isLinux) {
 		let currentDesktop = "";
 		let hideMenuBar = "";
 		let menuBarConfig = "";
-		let enableGlobalMenu = false;
+		let enableGlobalMenu = true;
 		try {
 			const env = (typeof Services !== "undefined" && Services.env) ? Services.env :
 			            (typeof Components !== "undefined" ? Components.classes["@mozilla.org/process/environment;1"]?.getService(Components.interfaces.nsIEnvironment) : null);
@@ -65,8 +65,8 @@ if (Zotero.isLinux) {
 				hideMenuBar = (env.get("ZOTERO_HIDE_MENUBAR") || "").toLowerCase();
 				menuBarConfig = (env.get("ZOTERO_MENUBAR") || "").toLowerCase();
 				const gm = (env.get("ZOTERO_GLOBAL_MENU") || "").toLowerCase();
-				if (gm === "1" || gm === "true" || gm === "on") {
-					enableGlobalMenu = true;
+				if (gm === "0" || gm === "false" || gm === "off") {
+					enableGlobalMenu = false;
 				}
 			}
 		} catch (e) {}
@@ -80,9 +80,7 @@ if (Zotero.isLinux) {
 		document.documentElement.setAttribute('zotero-desktop', isKDE ? 'kde' : 'gtk');
 
 		let menubarMode = "autohide";
-		if (enableGlobalMenu) {
-			menubarMode = "hidden";
-		} else if (hideMenuBar === "1" || hideMenuBar === "true" || menuBarConfig === "hidden") {
+		if (hideMenuBar === "1" || hideMenuBar === "true" || menuBarConfig === "hidden") {
 			menubarMode = "hidden";
 		} else if (menuBarConfig === "visible") {
 			menubarMode = "visible";
@@ -312,6 +310,30 @@ if (Zotero.isLinux) {
                 text += css_mods
                 content = text.encode("utf-8")
                 print("  -> Patched chrome/content/zotero-platform/unix/zotero.css")
+
+            # 4. Patch standalone.js to prevent D-Bus LayoutUpdated storm
+            elif item.filename == "chrome/content/zotero/standalone/standalone.js":
+                text = content.decode("utf-8", errors="ignore")
+                target = "while (addMenu.hasChildNodes()) addMenu.removeChild(addMenu.firstChild);"
+                replacement = "// archrepo: Prevent D-Bus LayoutUpdated storm in KDE Global Menu\n    if (addMenu.hasChildNodes()) return;\n    " + target
+                if target in text:
+                    text = text.replace(target, replacement, 1)
+                    content = text.encode("utf-8")
+                    print("  -> Patched chrome/content/zotero/standalone/standalone.js (prevent D-Bus storm)")
+                else:
+                    print("  WARNING: target buildNewItemMenu wipe not found in standalone.js", file=sys.stderr)
+
+            # 5. Patch itemTreeMenuBar.js to prevent D-Bus LayoutUpdated storm
+            elif item.filename == "chrome/content/zotero/elements/itemTreeMenuBar.js":
+                text = content.decode("utf-8", errors="ignore")
+                target = "menu.menupopup.replaceChildren();"
+                replacement = "// archrepo: Prevent D-Bus LayoutUpdated storm in KDE Global Menu\n    if (menu.menupopup.hasChildNodes()) return;\n    " + target
+                if target in text:
+                    text = text.replace(target, replacement, 1)
+                    content = text.encode("utf-8")
+                    print("  -> Patched chrome/content/zotero/elements/itemTreeMenuBar.js (prevent D-Bus storm)")
+                else:
+                    print("  WARNING: target replaceChildren not found in itemTreeMenuBar.js", file=sys.stderr)
 
             zout.writestr(item, content)
 
