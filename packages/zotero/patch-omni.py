@@ -4,7 +4,8 @@ patch-omni.py: Patches Zotero's app/omni.ja archive for kud3n013/archrepo
 - Enables Global Menu on Wayland and X11 by default
 - Restores OS native window title bar (Server-Side Decorations)
 - Removes fake in-app CSD title bar buttons
-- Restores native GTK menubar for Hyprland and KDE Global Menu export
+- Supports Alt key & F10 to reveal/toggle menubar on Hyprland (plus Ctrl+M permanent toggle)
+- Automatically hides in-window menubar on KDE Plasma in favor of KDE Global Menu
 """
 
 import os
@@ -50,17 +51,149 @@ if (Zotero.isLinux) {
 	document.documentElement.toggleAttribute("drawtitle", true);
 
 	try {
-		const env = Services.env;
-		const desktopEnv = (env.get("ZOTERO_DESKTOP_ENV") || "").toLowerCase();
-		const currentDesktop = (env.get("XDG_CURRENT_DESKTOP") || "").toLowerCase();
-		const hideMenuBar = (env.get("ZOTERO_HIDE_MENUBAR") || "").toLowerCase();
+		let desktopEnv = "";
+		let currentDesktop = "";
+		let hideMenuBar = "";
+		let menuBarConfig = "";
+		try {
+			const env = (typeof Services !== "undefined" && Services.env) ? Services.env :
+			            (typeof Components !== "undefined" ? Components.classes["@mozilla.org/process/environment;1"]?.getService(Components.interfaces.nsIEnvironment) : null);
+			if (env) {
+				desktopEnv = (env.get("ZOTERO_DESKTOP_ENV") || "").toLowerCase();
+				currentDesktop = (env.get("XDG_CURRENT_DESKTOP") || "").toLowerCase();
+				hideMenuBar = (env.get("ZOTERO_HIDE_MENUBAR") || "").toLowerCase();
+				menuBarConfig = (env.get("ZOTERO_MENUBAR") || "").toLowerCase();
+			}
+		} catch (e) {}
 
 		const isKDE = desktopEnv === "kde" || currentDesktop.includes("kde") || currentDesktop.includes("plasma");
 
-		if (isKDE || hideMenuBar === "1" || hideMenuBar === "true") {
+		if (isKDE || hideMenuBar === "1" || hideMenuBar === "true" || menuBarConfig === "hidden") {
 			document.documentElement.setAttribute('zotero-desktop', 'kde');
 		} else {
 			document.documentElement.setAttribute('zotero-desktop', 'gtk');
+			const defaultMode = (menuBarConfig === "visible") ? "visible" : "autohide";
+			document.documentElement.setAttribute('zotero-menubar', defaultMode);
+
+			// Setup Alt key, F10, and Ctrl+M menubar toggling on Hyprland & GTK
+			const initMenubarToggle = () => {
+				const titlebar = document.getElementById("titlebar");
+				const menubar = document.getElementById("main-menubar");
+				if (!titlebar || !menubar) return;
+
+				let isVisible = () => titlebar.getAttribute("menuparent-active") === "true";
+				let showMenu = (focusFirst = true) => {
+					titlebar.setAttribute("menuparent-active", "true");
+					if (focusFirst) {
+						let firstMenu = menubar.querySelector("menu");
+						if (firstMenu) {
+							firstMenu.focus();
+						}
+					}
+				};
+				let hideMenu = () => {
+					titlebar.removeAttribute("menuparent-active");
+				};
+
+				let altPressedOnly = false;
+
+				window.addEventListener("blur", () => {
+					altPressedOnly = false;
+				});
+
+				window.addEventListener("keydown", (e) => {
+					// Toggle permanent visibility with Ctrl+M (standard Linux shortcut)
+					if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "m") {
+						e.preventDefault();
+						let current = document.documentElement.getAttribute("zotero-menubar");
+						let next = (current === "visible") ? "autohide" : "visible";
+						document.documentElement.setAttribute("zotero-menubar", next);
+						return;
+					}
+
+					// F10 key focuses menubar (standard GTK / Linux behaviour)
+					if (e.key === "F10") {
+						e.preventDefault();
+						if (isVisible()) {
+							hideMenu();
+						} else {
+							showMenu(true);
+						}
+						return;
+					}
+
+					// Solitary Alt key down
+					if (e.key === "Alt" && !e.ctrlKey && !e.shiftKey && !e.metaKey) {
+						altPressedOnly = true;
+						return;
+					}
+
+					// Alt + Access key (e.g. Alt+F, Alt+E, Alt+V, Alt+T, Alt+H)
+					if (e.altKey && !e.ctrlKey && !e.metaKey) {
+						altPressedOnly = false;
+						let key = e.key.toLowerCase();
+						let targetMenu = menubar.querySelector(`menu[accesskey="${key}"]`) ||
+						                 menubar.querySelector(`menu[label^="${e.key.toUpperCase()}"]`);
+						if (targetMenu) {
+							e.preventDefault();
+							showMenu(false);
+							targetMenu.open = true;
+							let popup = targetMenu.querySelector("menupopup");
+							if (popup && typeof popup.openPopup === "function") {
+								try { popup.openPopup(targetMenu, "after_start", 0, 0, false, false); } catch(err) {}
+							}
+							return;
+						}
+					}
+
+					if (e.key !== "Alt") {
+						altPressedOnly = false;
+					}
+
+					// Escape key closes menu
+					if (e.key === "Escape" && isVisible()) {
+						hideMenu();
+					}
+				}, true);
+
+				window.addEventListener("keyup", (e) => {
+					if (e.key === "Alt" && altPressedOnly) {
+						altPressedOnly = false;
+						if (isVisible()) {
+							hideMenu();
+						} else {
+							showMenu(true);
+						}
+					}
+				}, true);
+
+				// Hide when clicking outside menubar
+				window.addEventListener("click", (e) => {
+					if (isVisible() && !titlebar.contains(e.target)) {
+						let openPopup = menubar.querySelector("menupopup[open='true']");
+						if (!openPopup) {
+							hideMenu();
+						}
+					}
+				}, true);
+
+				// Listen for popup closing
+				menubar.addEventListener("popuphidden", () => {
+					setTimeout(() => {
+						let active = menubar.querySelector("menu[_moz-menuactive='true']") ||
+						             menubar.querySelector("menu:focus");
+						if (!active && document.documentElement.getAttribute("zotero-menubar") === "autohide") {
+							hideMenu();
+						}
+					}, 150);
+				});
+			};
+
+			if (document.readyState === "complete" || document.readyState === "interactive") {
+				initMenubarToggle();
+			} else {
+				window.addEventListener("DOMContentLoaded", initMenubarToggle, { once: true });
+			}
 		}
 	} catch (e) {
 		Zotero.logError(e);
@@ -87,7 +220,7 @@ if (Zotero.isLinux) {
 
 #titlebar {
     height: auto !important;
-    min-height: 24px !important;
+    min-height: 0 !important;
     flex-direction: row !important;
     justify-content: flex-start !important;
     pointer-events: auto !important;
@@ -120,18 +253,23 @@ if (Zotero.isLinux) {
     padding: 2px 6px !important;
 }
 
-/* On KDE: hide redundant in-window menu bar as it is exported to KDE Global Menu */
+/* On KDE: permanently hidden in-window because KDE Global Menu handles it */
 :root[zotero-desktop="kde"] #titlebar {
-    height: 0 !important;
-    min-height: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    visibility: collapse !important;
+    display: none !important;
+}
+
+/* On Hyprland / GTK with autohide: hidden by default, revealed on Alt or F10 */
+:root[zotero-desktop="gtk"][zotero-menubar="autohide"] #titlebar {
+    display: none !important;
+}
+
+:root[zotero-desktop="gtk"][zotero-menubar="autohide"] #titlebar[menuparent-active="true"] {
+    display: flex !important;
+}
+
+/* On Hyprland / GTK with visible: always visible */
+:root[zotero-desktop="gtk"][zotero-menubar="visible"] #titlebar {
+    display: flex !important;
 }
 """
                 text += css_mods

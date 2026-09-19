@@ -84,7 +84,13 @@ if [[ "${ZOTERO_DESKTOP_ENV,,}" == "kde" ]] || [[ "$CURRENT_DESKTOP" =~ [Kk][Dd]
 elif [[ "${ZOTERO_DESKTOP_ENV,,}" == "hyprland" ]] || [[ "$CURRENT_DESKTOP" =~ [Hh]yprland|HYPRLAND ]]; then
     export ZOTERO_DESKTOP_ENV="hyprland"
     export GTK_USE_PORTAL="${GTK_USE_PORTAL:-1}"
+    # Default menubar mode on Hyprland: 'autohide' (revealed by Alt or F10, or toggled with Ctrl+M)
+    export ZOTERO_MENUBAR="${ZOTERO_MENUBAR:-autohide}"
     # GTK theme automatically follows user's gsettings / nwg-look settings
+else
+    # Default fallback for other desktop environments (GNOME, Sway, XFCE, etc.)
+    export GTK_USE_PORTAL="${GTK_USE_PORTAL:-1}"
+    export ZOTERO_MENUBAR="${ZOTERO_MENUBAR:-autohide}"
 fi
 
 exec /usr/lib/zotero/zotero-bin -app /usr/lib/zotero/app/application.ini "${FLAGS[@]}" "$@"
