@@ -5,8 +5,14 @@ _cleanup_user_desktops() {
                   "$user_home/.local/share/applications/zen.desktop" \
                   "$user_home/.local/share/applications/zen-private.desktop" \
                   "$user_home/.local/share/applications/Zen Browser.desktop" \
-                  "$user_home/.local/share/applications/Zen.desktop" 2>/dev/null || true
+                  "$user_home/.local/share/applications/Zen.desktop" \
+                  "$user_home/.local/share/applications/userapp-Zen-"*.desktop 2>/dev/null || true
         fi
+        for mimefile in "$user_home/.config/mimeapps.list" "$user_home/.local/share/applications/mimeapps.list"; do
+            if [ -f "$mimefile" ] && grep -q "userapp-Zen-" "$mimefile" 2>/dev/null; then
+                sed -i 's/userapp-Zen-[^;]*\.desktop/zen.desktop/g' "$mimefile" 2>/dev/null || true
+            fi
+        done
     done
     update-desktop-database -q 2>/dev/null || true
     gtk-update-icon-cache -q -t -f /usr/share/icons/hicolor 2>/dev/null || true

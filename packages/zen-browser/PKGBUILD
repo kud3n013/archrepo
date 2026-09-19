@@ -6,7 +6,7 @@ _pkgname=zen-browser
 _desktopname=zen
 pkgname=zen-browser
 pkgver=1.22.2b
-pkgrel=3
+pkgrel=4
 pkgdesc="Zen Browser — a privacy-focused, feature-packed Firefox-based web browser"
 arch=('x86_64')
 url="https://github.com/zen-browser/desktop"
@@ -52,13 +52,13 @@ source=(
     "policies.json"
 )
 sha256sums=('163823cf56b068e81bb8a48d93c9dbda3993f54f03f8d37e684e380bfc11b892'
-            '0234c2ed7fa451905beedd96c277b28263495a945d6c337b048a14b81d949290'
+            'ee84764f3abfdd2b248c8741bf32e0291e9a9edb7f4cfbef6baf30c570589d9c'
             'e1e70b93f4707525d517746933b668f9faabd72e2dac7640324a2e106df10769'
-            'f30ce9dcdacfeda003f2de686a916e2a7c9d102ff49e65e54fd2940c323e5f0e'
-            '3c0115754f6c960e5c1481dc502e44f1692a64c3779b9140ef8cdb4faacc4d48'
+            'b380860583eb1f6a2fc56f452912b8538965a67dd54dcbe6718c76edf7497f41'
+            'cbe684f7cde652ff40834c5c5a00df6d90243c26fe301aa7d18b971396786a7f'
             'f9586255a530a43531793180d91aa1840ad957fdd9dab170a859511b60becaa0'
             'ad34ee3868e154044b99da4b6e4893259e20245c1dbcbd49106c6245b31d97e3'
-            '7c790b21b6123a22b8142b197246de631e5c73e215060aeb2a64e17f08944f4a'
+            '15a76b752ae72834a28f048a3b2b12f1458171cae27f864e123dfaf961bad92b'
             'fd9572d178ea1a5edf427ca85bad3fb2d83be2e250e62bad13951d70d977bd0f')
 
 package() {
@@ -80,38 +80,24 @@ package() {
     install -Dm644 "${srcdir}/${_desktopname}.desktop" "${pkgdir}/usr/share/applications/${_desktopname}.desktop"
     install -Dm644 "${srcdir}/${_desktopname}-private.desktop" "${pkgdir}/usr/share/applications/${_desktopname}-private.desktop"
 
-    # Install high-resolution 512x512 icons (both zen-browser.png and zen.png for dock/launcher compatibility)
-    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
-    ln -s "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_desktopname}.png"
-
-    # Generate and install 256x256 icon
-    install -dm755 "${pkgdir}/usr/share/icons/hicolor/256x256/apps"
-    magick "${srcdir}/${_pkgname}.png" -resize 256x256 "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_pkgname}.png"
-    ln -s "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_desktopname}.png"
-
-    # Bundled icons: 16x16, 32x32, 48x48, 64x64, 128x128
-    for i in 16x16 32x32 48x48 64x64 128x128; do
-        install -dm755 "${pkgdir}/usr/share/icons/hicolor/${i}/apps"
-        ln -s "/opt/${_pkgname}/browser/chrome/icons/default/default${i/x*/}.png" \
-              "${pkgdir}/usr/share/icons/hicolor/${i}/apps/${_pkgname}.png"
-        ln -s "${_pkgname}.png" \
-              "${pkgdir}/usr/share/icons/hicolor/${i}/apps/${_desktopname}.png"
+    # Install standard browser icons across all standard resolutions (16..512px)
+    for s in 16 22 24 32 48 64 128 256 512; do
+        install -dm755 "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps"
+        if [[ "$s" -eq 512 ]]; then
+            install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+        else
+            magick "${srcdir}/${_pkgname}.png" -resize ${s}x${s} "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_pkgname}.png"
+        fi
+        ln -s "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_desktopname}.png"
     done
 
-    # Pixmaps
-    install -dm755 "${pkgdir}/usr/share/pixmaps"
-    ln -s "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
-          "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
-    ln -s "${_pkgname}.png" \
-          "${pkgdir}/usr/share/pixmaps/${_desktopname}.png"
-
-    # Install dedicated private browsing icons (scalable SVG + rendered PNGs)
+    # Install dedicated private browsing icons (scalable SVG + rendered PNGs 16..512px)
     install -Dm644 "${srcdir}/${_pkgname}-private.svg" \
             "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${_pkgname}-private.svg"
     ln -s "${_pkgname}-private.svg" \
           "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${_desktopname}-private.svg"
 
-    for s in 16 32 48 64 128 256 512; do
+    for s in 16 22 24 32 48 64 128 256 512; do
         install -dm755 "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps"
         magick -background none "${srcdir}/${_pkgname}-private.svg" -resize ${s}x${s} \
                "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_pkgname}-private.png"
@@ -119,6 +105,12 @@ package() {
               "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_desktopname}-private.png"
     done
 
+    # Pixmaps for legacy launchers
+    install -dm755 "${pkgdir}/usr/share/pixmaps"
+    ln -s "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
+          "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    ln -s "${_pkgname}.png" \
+          "${pkgdir}/usr/share/pixmaps/${_desktopname}.png"
     ln -s "/usr/share/icons/hicolor/512x512/apps/${_pkgname}-private.png" \
           "${pkgdir}/usr/share/pixmaps/${_pkgname}-private.png"
     ln -s "${_pkgname}-private.png" \

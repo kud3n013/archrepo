@@ -20,3 +20,4 @@ Icon=zen-browser
 [Desktop Action profilemanager]
 Exec=/usr/bin/zen-browser --ProfileManager %u
 Name=Open Profile Manager
+Icon=zen-browser

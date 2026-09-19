@@ -1,7 +1,7 @@
 pkgbase = zen-browser
 	pkgdesc = Zen Browser — a privacy-focused, feature-packed Firefox-based web browser
 	pkgver = 1.22.2b
-	pkgrel = 3
+	pkgrel = 4
 	url = https://github.com/zen-browser/desktop
 	install = zen-browser.install
 	arch = x86_64
@@ -39,13 +39,13 @@ pkgbase = zen-browser
 	source = zen-browser.install
 	source = policies.json
 	sha256sums = 163823cf56b068e81bb8a48d93c9dbda3993f54f03f8d37e684e380bfc11b892
-	sha256sums = 0234c2ed7fa451905beedd96c277b28263495a945d6c337b048a14b81d949290
+	sha256sums = ee84764f3abfdd2b248c8741bf32e0291e9a9edb7f4cfbef6baf30c570589d9c
 	sha256sums = e1e70b93f4707525d517746933b668f9faabd72e2dac7640324a2e106df10769
-	sha256sums = f30ce9dcdacfeda003f2de686a916e2a7c9d102ff49e65e54fd2940c323e5f0e
-	sha256sums = 3c0115754f6c960e5c1481dc502e44f1692a64c3779b9140ef8cdb4faacc4d48
+	sha256sums = b380860583eb1f6a2fc56f452912b8538965a67dd54dcbe6718c76edf7497f41
+	sha256sums = cbe684f7cde652ff40834c5c5a00df6d90243c26fe301aa7d18b971396786a7f
 	sha256sums = f9586255a530a43531793180d91aa1840ad957fdd9dab170a859511b60becaa0
 	sha256sums = ad34ee3868e154044b99da4b6e4893259e20245c1dbcbd49106c6245b31d97e3
-	sha256sums = 7c790b21b6123a22b8142b197246de631e5c73e215060aeb2a64e17f08944f4a
+	sha256sums = 15a76b752ae72834a28f048a3b2b12f1458171cae27f864e123dfaf961bad92b
 	sha256sums = fd9572d178ea1a5edf427ca85bad3fb2d83be2e250e62bad13951d70d977bd0f
 
 pkgname = zen-browser

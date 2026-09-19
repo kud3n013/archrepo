@@ -586,6 +586,7 @@ Name[zh_TW]=開新隱私視窗
 
 [Desktop Action profilemanager]
 Exec=/usr/bin/zen-browser --ProfileManager %u
+Icon=zen-browser
 Name=Open Profile Manager
 Name[ach]=Open Profile Manager
 Name[af]=Open Profile Manager
