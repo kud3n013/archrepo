@@ -4,7 +4,7 @@
 _pkgname=beeper
 pkgname=beeper
 pkgver=4.3.123
-pkgrel=2
+pkgrel=3
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -29,7 +29,7 @@ source=(
     "beeper.desktop"
 )
 sha256sums=('ff7d3512488e80438aa32c81bb5b00594b8b6a75c1f9c80a5f873fb703731035'
-            'e32ab0e1f045324437b37d5ddcb693e53760249410c9eea16c86feff16f19537'
+            '9bfa1196743b9ee470249754fbf90e79a9059be0166b94ba96202a4cf0e658a1'
             '690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32')
 
 prepare() {
