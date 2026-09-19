@@ -8,7 +8,7 @@ Terminal=false
 Type=Application
 Categories=Office;Education;Science;Database;
 MimeType=x-scheme-handler/zotero;application/x-research-info-systems;text/x-research-info-systems;text/ris;application/x-endnote-refer;application/x-bibtex;text/x-bibtex;
-StartupWMClass=Zotero
+StartupWMClass=zotero
 StartupNotify=true
 Actions=NewItem;
 

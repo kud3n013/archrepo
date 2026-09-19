@@ -6,7 +6,7 @@
 _pkgname=zotero
 pkgname=zotero
 pkgver=10.0.3
-pkgrel=3
+pkgrel=4
 pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
 arch=('x86_64')
 url="https://www.zotero.org"
@@ -29,7 +29,6 @@ depends=(
 
 optdepends=(
     'breeze-gtk: Qt/Breeze GTK theme integration for KDE Plasma'
-    'appmenu-gtk-module: Export menu bar to KDE Global Menu applet via D-Bus'
     'xdg-desktop-portal: Native desktop file pickers and Wayland integration'
     'wl-clipboard: Clipboard support on Wayland'
     'pipewire: Screen sharing support on Wayland'
@@ -53,12 +52,12 @@ source=(
 )
 
 sha256sums=('45f1d3900b927dfb16dec52e4e3fe8672042c7be94ec6b77ca7712b9ebc9c1b6'
-            '85533281fb4906247b21f2aa556dc335e01b942ea8220be17c37c53700926885'
-            '8cf3e75bd711a2ab9dcdcd64a9a96fafa023fab0eb9139236f1e7169102959dc'
-            '78158fa676257a6fa607c6e10281646469611c44647aa962e397ae79e4a4cbf6'
+            '19c3b75d25e20192cbe5633f601a2cbea6927a44d571a43f920e388c939ff32a'
+            'e9a5cb4ba8eddfb6c8d6647cae2e4ffc04a58eca9af2e54ee1615425f73956ee'
+            'c7c1c942ce9e7c81d49962dadf2113884312d320fb53a60198a25343b7425897'
             'f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7'
             '3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270'
-            '2ef21d471d51b377a0aa2ebfe0315cdee1eca4e6e1d60c5e2ecced6b9c5b8055'
+            'd8fa9b57c6c336206e170ee765efd9e2d811d95c781b3bba84eb479e7c9c8dd9'
             'e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c')
 
 package() {
@@ -77,8 +76,8 @@ package() {
     # Install system-wide default preferences for Gecko runtime
     install -dm755 "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences"
     cat << 'PREFS' > "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences/archrepo-zotero.js"
-pref("widget.gtk.global-menu.enabled", false);
-pref("widget.gtk.global-menu.wayland.enabled", false);
+pref("widget.gtk.global-menu.enabled", true);
+pref("widget.gtk.global-menu.wayland.enabled", true);
 pref("browser.tabs.inTitlebar", 0);
 pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 PREFS
@@ -93,15 +92,18 @@ PREFS
     # Install user configuration flags file
     install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
 
-    # Install desktop entry
+    # Install desktop entry and Wayland app_id symlink
     install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+    ln -sf "${_pkgname}.desktop" "${pkgdir}/usr/share/applications/Zotero.desktop"
 
-    # Install high-resolution 512x512 icon
+    # Install high-resolution 512x512 icon (and Zotero.png symlink)
     install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/Zotero.png"
 
-    # Generate and install 256x256 icon
+    # Generate and install 256x256 icon (and Zotero.png symlink)
     install -dm755 "${pkgdir}/usr/share/icons/hicolor/256x256/apps"
     magick "${srcdir}/${_pkgname}.png" -resize 256x256 "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${_pkgname}.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/Zotero.png"
 
     # Install bundled smaller icons if present
     if [ -d "${pkgdir}/usr/lib/${_pkgname}/icons" ]; then
@@ -109,18 +111,24 @@ PREFS
             if [ -f "${pkgdir}/usr/lib/${_pkgname}/icons/icon${s}.png" ]; then
                 install -Dm644 "${pkgdir}/usr/lib/${_pkgname}/icons/icon${s}.png" \
                     "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/${_pkgname}.png"
+                ln -sf "${_pkgname}.png" \
+                    "${pkgdir}/usr/share/icons/hicolor/${s}x${s}/apps/Zotero.png"
             fi
         done
         if [ -f "${pkgdir}/usr/lib/${_pkgname}/icons/symbolic.svg" ]; then
             install -Dm644 "${pkgdir}/usr/lib/${_pkgname}/icons/symbolic.svg" \
                 "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/${_pkgname}-symbolic.svg"
+            ln -sf "${_pkgname}-symbolic.svg" \
+                "${pkgdir}/usr/share/icons/hicolor/symbolic/apps/Zotero-symbolic.svg"
         fi
     fi
 
-    # Install pixmap symlink
+    # Install pixmap symlinks
     install -dm755 "${pkgdir}/usr/share/pixmaps"
     ln -sf "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
         "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    ln -sf "/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png" \
+        "${pkgdir}/usr/share/pixmaps/Zotero.png"
 
     # Remove internal updater binaries (pacman manages updates)
     rm -f "${pkgdir}/usr/lib/${_pkgname}/updater"

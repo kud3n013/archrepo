@@ -50,6 +50,16 @@ if [[ -n "$WAYLAND_DISPLAY" ]]; then
     export MOZ_ENABLE_WAYLAND="${MOZ_ENABLE_WAYLAND:-1}"
 fi
 
+# Ensure Wayland app_id and window matching cleanly map to zotero.desktop
+export MOZ_APP_REMOTINGNAME="${MOZ_APP_REMOTINGNAME:-zotero}"
+
+# Gecko contains native DBusMenu support via widget.gtk.global-menu.
+# Loading appmenu-gtk-module causes GDK assertion failures on Wayland and breaks global menu.
+if [[ "$GTK_MODULES" == *"appmenu-gtk-module"* ]]; then
+    GTK_MODULES="$(echo "$GTK_MODULES" | sed -e 's/:appmenu-gtk-module//g' -e 's/appmenu-gtk-module://g' -e 's/appmenu-gtk-module//g')"
+    export GTK_MODULES
+fi
+
 # ==============================================================================
 # Dynamic Desktop Environment & Theme Selection (Hyprland GTK vs KDE Qt)
 # ==============================================================================
@@ -69,17 +79,6 @@ if [[ "${ZOTERO_DESKTOP_ENV,,}" == "kde" ]] || [[ "$CURRENT_DESKTOP" =~ [Kk][Dd]
             export GTK_THEME="Breeze-Dark"
         else
             export GTK_THEME="Breeze"
-        fi
-    fi
-
-    # Only load AppMenu GTK module if experimental global menu is explicitly opted into
-    if [[ "${ZOTERO_GLOBAL_MENU,,}" == "1" || "${ZOTERO_GLOBAL_MENU,,}" == "true" ]]; then
-        if [[ -f "/usr/lib/gtk-3.0/modules/libappmenu-gtk-module.so" ]]; then
-            if [[ -z "$GTK_MODULES" ]]; then
-                export GTK_MODULES="appmenu-gtk-module"
-            elif [[ "$GTK_MODULES" != *"appmenu-gtk-module"* ]]; then
-                export GTK_MODULES="${GTK_MODULES}:appmenu-gtk-module"
-            fi
         fi
     fi
 

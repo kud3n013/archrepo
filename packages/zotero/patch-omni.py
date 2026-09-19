@@ -30,9 +30,9 @@ def patch_omni(omni_path):
             if item.filename == "defaults/preferences/zotero.js":
                 text = content.decode("utf-8", errors="ignore")
                 extra_prefs = (
-                    "\n// kud3n013/archrepo: Native Title Bar & Wayland Integration\n"
-                    'pref("widget.gtk.global-menu.enabled", false);\n'
-                    'pref("widget.gtk.global-menu.wayland.enabled", false);\n'
+                    "\n// kud3n013/archrepo: Global Menu, Native Title Bar & Wayland Integration\n"
+                    'pref("widget.gtk.global-menu.enabled", true);\n'
+                    'pref("widget.gtk.global-menu.wayland.enabled", true);\n'
                     'pref("browser.tabs.inTitlebar", 0);\n'
                     'pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n'
                 )
@@ -55,7 +55,7 @@ if (Zotero.isLinux) {
 		let currentDesktop = "";
 		let hideMenuBar = "";
 		let menuBarConfig = "";
-		let enableGlobalMenu = false;
+		let enableGlobalMenu = true;
 		try {
 			const env = (typeof Services !== "undefined" && Services.env) ? Services.env :
 			            (typeof Components !== "undefined" ? Components.classes["@mozilla.org/process/environment;1"]?.getService(Components.interfaces.nsIEnvironment) : null);
@@ -65,7 +65,9 @@ if (Zotero.isLinux) {
 				hideMenuBar = (env.get("ZOTERO_HIDE_MENUBAR") || "").toLowerCase();
 				menuBarConfig = (env.get("ZOTERO_MENUBAR") || "").toLowerCase();
 				const gm = (env.get("ZOTERO_GLOBAL_MENU") || "").toLowerCase();
-				enableGlobalMenu = (gm === "1" || gm === "true");
+				if (gm === "0" || gm === "false" || gm === "off") {
+					enableGlobalMenu = false;
+				}
 			}
 		} catch (e) {}
 
@@ -227,60 +229,71 @@ if (Zotero.isLinux) {
     display: none !important;
 }
 
-#titlebar {
-    height: auto !important;
-    min-height: 0 !important;
-    flex-direction: row !important;
-    justify-content: flex-start !important;
-    pointer-events: auto !important;
-    -moz-appearance: menubar !important;
-    background-color: -moz-Dialog !important;
-    background: inherit !important;
-    border: none !important;
-    border-radius: 0 !important;
-    -moz-window-dragging: no-drag !important;
-}
-
 #toolbar-menubar {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
+    display: initial !important;
+    visibility: visible !important;
+    flex: 1 !important;
     -moz-window-dragging: no-drag !important;
 }
 
-#main-menubar {
-    -moz-appearance: menubar !important;
-    display: flex !important;
+#titlebar {
+    appearance: none !important;
+    -moz-appearance: none !important;
     flex-direction: row !important;
-    justify-content: flex-start !important;
+    height: 0px !important;
+    min-height: 0px !important;
+    max-height: 0px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: var(--material-tabbar, -moz-Dialog) !important;
+    -moz-window-dragging: no-drag !important;
+}
+
+#titlebar toolbar {
+    appearance: none !important;
+}
+
+#titlebar menubar {
+    height: var(--tab-min-height, 30px) !important;
+    padding: 2px 1px !important;
     background: transparent !important;
 }
 
-#main-menubar > menu {
-    -moz-appearance: menuitem !important;
+#titlebar #main-menubar {
+    align-self: flex-start !important;
+    gap: 2px !important;
+    background: transparent !important;
+}
+
+#titlebar #main-menubar > menu {
+    appearance: none !important;
+    -moz-appearance: none !important;
     color: inherit !important;
-    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    height: 100% !important;
+    padding: 0px 8px !important;
 }
 
-/* Unified Menubar Visibility (KDE Plasma, Hyprland, etc.) */
-
-/* Auto-hide mode (default): hidden in-window until revealed by Alt or F10 */
-:root[zotero-menubar="autohide"] #titlebar {
-    display: none !important;
+#main-menubar > menu[_moz-menuactive="true"],
+#main-menubar > menu:hover {
+    background-color: var(--fill-quinary, rgba(127, 127, 127, 0.2)) !important;
+    color: inherit !important;
 }
 
-:root[zotero-menubar="autohide"] #titlebar[menuparent-active="true"] {
-    display: flex !important;
-}
-
-/* Permanently visible mode (via Ctrl+M toggle or ZOTERO_MENUBAR=visible) */
-:root[zotero-menubar="visible"] #titlebar {
-    display: flex !important;
-}
-
-/* Permanently hidden mode (e.g. ZOTERO_HIDE_MENUBAR=1 or ZOTERO_MENUBAR=hidden) */
-:root[zotero-menubar="hidden"] #titlebar {
-    display: none !important;
+/* Active or visible state (revealed via Alt key, F10, Ctrl+M, or ZOTERO_MENUBAR=visible) */
+:root[zotero-menubar="visible"] #titlebar,
+#titlebar[menuparent-active="true"] {
+    height: var(--tab-min-height, 30px) !important;
+    min-height: var(--tab-min-height, 30px) !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    border-bottom: var(--material-border, 1px solid rgba(127, 127, 127, 0.2)) !important;
 }
 """
                 text += css_mods
