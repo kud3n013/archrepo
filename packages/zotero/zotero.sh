@@ -59,6 +59,7 @@ CURRENT_DESKTOP="${XDG_CURRENT_DESKTOP:-}"
 if [[ "${ZOTERO_DESKTOP_ENV,,}" == "kde" ]] || [[ "$CURRENT_DESKTOP" =~ [Kk][Dd][Ee]|plasma|Plasma ]]; then
     export ZOTERO_DESKTOP_ENV="kde"
     export GTK_USE_PORTAL="${GTK_USE_PORTAL:-1}"
+    export ZOTERO_MENUBAR="${ZOTERO_MENUBAR:-autohide}"
 
     # Match KDE color scheme with Qt/Breeze theme if GTK_THEME is not explicitly overridden
     if [[ -z "$GTK_THEME" ]]; then
@@ -71,12 +72,14 @@ if [[ "${ZOTERO_DESKTOP_ENV,,}" == "kde" ]] || [[ "$CURRENT_DESKTOP" =~ [Kk][Dd]
         fi
     fi
 
-    # Load AppMenu GTK module for KDE Global Menu if installed on system
-    if [[ -f "/usr/lib/gtk-3.0/modules/libappmenu-gtk-module.so" ]]; then
-        if [[ -z "$GTK_MODULES" ]]; then
-            export GTK_MODULES="appmenu-gtk-module"
-        elif [[ "$GTK_MODULES" != *"appmenu-gtk-module"* ]]; then
-            export GTK_MODULES="${GTK_MODULES}:appmenu-gtk-module"
+    # Only load AppMenu GTK module if experimental global menu is explicitly opted into
+    if [[ "${ZOTERO_GLOBAL_MENU,,}" == "1" || "${ZOTERO_GLOBAL_MENU,,}" == "true" ]]; then
+        if [[ -f "/usr/lib/gtk-3.0/modules/libappmenu-gtk-module.so" ]]; then
+            if [[ -z "$GTK_MODULES" ]]; then
+                export GTK_MODULES="appmenu-gtk-module"
+            elif [[ "$GTK_MODULES" != *"appmenu-gtk-module"* ]]; then
+                export GTK_MODULES="${GTK_MODULES}:appmenu-gtk-module"
+            fi
         fi
     fi
 

@@ -1,7 +1,7 @@
 pkgbase = zotero
 	pkgdesc = A free, easy-to-use tool to help you collect, organize, cite, and share your research sources
 	pkgver = 10.0.3
-	pkgrel = 2
+	pkgrel = 3
 	url = https://www.zotero.org
 	install = zotero.install
 	arch = x86_64
@@ -35,12 +35,12 @@ pkgbase = zotero
 	source = patch-omni.py
 	source = policies.json
 	sha256sums = 45f1d3900b927dfb16dec52e4e3fe8672042c7be94ec6b77ca7712b9ebc9c1b6
-	sha256sums = f7dd6d1284814582e2d296a3c04f3e83b838bcab4d3970edb9de45ff13512804
-	sha256sums = b44fc0d5f5519ecf30b73083b690e4b4028774ee493683720d0e72109e5dffe3
+	sha256sums = 85533281fb4906247b21f2aa556dc335e01b942ea8220be17c37c53700926885
+	sha256sums = 8cf3e75bd711a2ab9dcdcd64a9a96fafa023fab0eb9139236f1e7169102959dc
 	sha256sums = 78158fa676257a6fa607c6e10281646469611c44647aa962e397ae79e4a4cbf6
 	sha256sums = f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7
 	sha256sums = 3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270
-	sha256sums = 8b159b1b2202bcf1c91e18a907df5cfe71fac0f1f472c8bd580b3c022a2c8231
+	sha256sums = 2ef21d471d51b377a0aa2ebfe0315cdee1eca4e6e1d60c5e2ecced6b9c5b8055
 	sha256sums = e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c
 
 pkgname = zotero
