@@ -7,7 +7,8 @@ _cleanup_user_desktops() {
                   "$user_home/.local/share/applications/beepertexts.desktop" 2>/dev/null || true
         fi
         if [ -d "$user_home/.local/share/icons" ]; then
-            rm -f "$user_home/.local/share/icons/beeper.png" \
+            rm -f "$user_home/.local/share/icons/Beeper.png" \
+                  "$user_home/.local/share/icons/beeper.png" \
                   "$user_home/.local/share/icons/beepertexts.png" 2>/dev/null || true
         fi
     done

@@ -4,7 +4,7 @@
 _pkgname=beeper
 pkgname=beeper
 pkgver=4.3.123
-pkgrel=1
+pkgrel=2
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -29,8 +29,8 @@ source=(
     "beeper.desktop"
 )
 sha256sums=('ff7d3512488e80438aa32c81bb5b00594b8b6a75c1f9c80a5f873fb703731035'
-            'd1d037ee6661a8094bf31b9337b3793256c354bde5321c9bf633896c671770b3'
-            '87909f61383ecc5a962f6d10a713ff53503537f4c876eb8bc478ad5fd80c3182')
+            'e32ab0e1f045324437b37d5ddcb693e53760249410c9eea16c86feff16f19537'
+            '690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32')
 
 prepare() {
     chmod +x "Beeper-${pkgver}-x86_64.AppImage"
@@ -97,14 +97,21 @@ package() {
     # Install wrapper script
     install -Dm755 "${srcdir}/beeper.sh" "${pkgdir}/usr/bin/beeper"
 
-    # Install desktop entry
+    # Install desktop entry and Wayland app_id symlink
     install -Dm644 "${srcdir}/beeper.desktop" "${pkgdir}/usr/share/applications/beeper.desktop"
+    ln -sf "beeper.desktop" "${pkgdir}/usr/share/applications/Beeper.desktop"
 
-    # Install icons
+    # Install icons and matching Wayland app_id symlinks
     install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/beepertexts.png" \
-        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/beepertexts.png"
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/Beeper.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/beepertexts.png"
+
+    # Install pixmaps
     install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/beepertexts.png" \
-        "${pkgdir}/usr/share/pixmaps/beepertexts.png"
+        "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/Beeper.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/beepertexts.png"
 
     # Install licenses
     install -Dm644 "${srcdir}/squashfs-root/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
