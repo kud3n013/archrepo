@@ -53,8 +53,10 @@ fi
 # Ensure Wayland app_id and window matching cleanly map to zotero.desktop
 export MOZ_APP_REMOTINGNAME="${MOZ_APP_REMOTINGNAME:-zotero}"
 
-# Gecko contains native DBusMenu support via widget.gtk.global-menu.
-# Loading appmenu-gtk-module causes GDK assertion failures on Wayland and breaks global menu.
+# Global Menu mode (default 0 for rock-solid in-app menubar with Alt/F10/Ctrl+M; set to 1 in zotero-flags.conf to enable)
+export ZOTERO_GLOBAL_MENU="${ZOTERO_GLOBAL_MENU:-0}"
+
+# Loading appmenu-gtk-module causes GDK assertion failures on Wayland and breaks menus.
 if [[ "$GTK_MODULES" == *"appmenu-gtk-module"* ]]; then
     GTK_MODULES="$(echo "$GTK_MODULES" | sed -e 's/:appmenu-gtk-module//g' -e 's/appmenu-gtk-module://g' -e 's/appmenu-gtk-module//g')"
     export GTK_MODULES

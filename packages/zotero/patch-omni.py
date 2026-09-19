@@ -30,9 +30,9 @@ def patch_omni(omni_path):
             if item.filename == "defaults/preferences/zotero.js":
                 text = content.decode("utf-8", errors="ignore")
                 extra_prefs = (
-                    "\n// kud3n013/archrepo: Global Menu, Native Title Bar & Wayland Integration\n"
-                    'pref("widget.gtk.global-menu.enabled", true);\n'
-                    'pref("widget.gtk.global-menu.wayland.enabled", true);\n'
+                    "\n// kud3n013/archrepo: Native Title Bar, Theme Integration & Optional Global Menu\n"
+                    'pref("widget.gtk.global-menu.enabled", false);\n'
+                    'pref("widget.gtk.global-menu.wayland.enabled", false);\n'
                     'pref("browser.tabs.inTitlebar", 0);\n'
                     'pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);\n'
                 )
@@ -55,7 +55,7 @@ if (Zotero.isLinux) {
 		let currentDesktop = "";
 		let hideMenuBar = "";
 		let menuBarConfig = "";
-		let enableGlobalMenu = true;
+		let enableGlobalMenu = false;
 		try {
 			const env = (typeof Services !== "undefined" && Services.env) ? Services.env :
 			            (typeof Components !== "undefined" ? Components.classes["@mozilla.org/process/environment;1"]?.getService(Components.interfaces.nsIEnvironment) : null);
@@ -65,8 +65,8 @@ if (Zotero.isLinux) {
 				hideMenuBar = (env.get("ZOTERO_HIDE_MENUBAR") || "").toLowerCase();
 				menuBarConfig = (env.get("ZOTERO_MENUBAR") || "").toLowerCase();
 				const gm = (env.get("ZOTERO_GLOBAL_MENU") || "").toLowerCase();
-				if (gm === "0" || gm === "false" || gm === "off") {
-					enableGlobalMenu = false;
+				if (gm === "1" || gm === "true" || gm === "on") {
+					enableGlobalMenu = true;
 				}
 			}
 		} catch (e) {}
@@ -80,7 +80,9 @@ if (Zotero.isLinux) {
 		document.documentElement.setAttribute('zotero-desktop', isKDE ? 'kde' : 'gtk');
 
 		let menubarMode = "autohide";
-		if (hideMenuBar === "1" || hideMenuBar === "true" || menuBarConfig === "hidden") {
+		if (enableGlobalMenu) {
+			menubarMode = "hidden";
+		} else if (hideMenuBar === "1" || hideMenuBar === "true" || menuBarConfig === "hidden") {
 			menubarMode = "hidden";
 		} else if (menuBarConfig === "visible") {
 			menubarMode = "visible";
@@ -150,10 +152,6 @@ if (Zotero.isLinux) {
 						e.preventDefault();
 						showMenu(false);
 						targetMenu.open = true;
-						let popup = targetMenu.querySelector("menupopup");
-						if (popup && typeof popup.openPopup === "function") {
-							try { popup.openPopup(targetMenu, "after_start", 0, 0, false, false); } catch(err) {}
-						}
 						return;
 					}
 				}
@@ -229,53 +227,76 @@ if (Zotero.isLinux) {
     display: none !important;
 }
 
-#toolbar-menubar {
-    display: initial !important;
-    visibility: visible !important;
-    flex: 1 !important;
-    -moz-window-dragging: no-drag !important;
-}
-
-#titlebar {
-    appearance: none !important;
-    -moz-appearance: none !important;
-    flex-direction: row !important;
+/* Collapsed when in autohide mode and inactive, or when explicitly hidden */
+:root[zotero-menubar="autohide"] #titlebar:not([menuparent-active="true"]),
+:root[zotero-menubar="hidden"] #titlebar {
+    display: none !important;
     height: 0px !important;
     min-height: 0px !important;
     max-height: 0px !important;
-    overflow: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    margin: 0 !important;
     padding: 0 !important;
+    margin: 0 !important;
     border: none !important;
+    overflow: hidden !important;
+}
+
+/* Revealed when active or set to permanently visible */
+:root[zotero-menubar="visible"] #titlebar,
+#titlebar[menuparent-active="true"] {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 6px !important;
+    margin: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid var(--material-border, rgba(127, 127, 127, 0.2)) !important;
     background: var(--material-tabbar, -moz-Dialog) !important;
+    color: var(--fill-primary, -moz-DialogText) !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
     -moz-window-dragging: no-drag !important;
 }
 
-#titlebar toolbar {
-    appearance: none !important;
-}
-
-#titlebar menubar {
-    height: var(--tab-min-height, 30px) !important;
-    padding: 2px 1px !important;
-    background: transparent !important;
-}
-
-#titlebar #main-menubar {
-    align-self: flex-start !important;
-    gap: 2px !important;
-    background: transparent !important;
-}
-
-#titlebar #main-menubar > menu {
-    appearance: none !important;
-    -moz-appearance: none !important;
-    color: inherit !important;
-    border-radius: 4px !important;
+#toolbar-menubar {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 !important;
     height: 100% !important;
-    padding: 0px 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    pointer-events: auto !important;
+    -moz-window-dragging: no-drag !important;
+}
+
+#toolbar-menubar #menubar-items {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+}
+
+#main-menubar {
+    height: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: auto !important;
+}
+
+#main-menubar > menu {
+    color: inherit !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    padding: 2px 8px !important;
+    margin: 1px 2px !important;
+    border-radius: 4px !important;
+    cursor: default !important;
+    font-size: 13px !important;
 }
 
 #main-menubar > menu[_moz-menuactive="true"],
@@ -284,16 +305,8 @@ if (Zotero.isLinux) {
     color: inherit !important;
 }
 
-/* Active or visible state (revealed via Alt key, F10, Ctrl+M, or ZOTERO_MENUBAR=visible) */
-:root[zotero-menubar="visible"] #titlebar,
-#titlebar[menuparent-active="true"] {
-    height: var(--tab-min-height, 30px) !important;
-    min-height: var(--tab-min-height, 30px) !important;
-    max-height: none !important;
-    overflow: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    border-bottom: var(--material-border, 1px solid rgba(127, 127, 127, 0.2)) !important;
+#main-menubar > menu[open="true"] {
+    background-color: var(--fill-quaternary, rgba(127, 127, 127, 0.3)) !important;
 }
 """
                 text += css_mods
