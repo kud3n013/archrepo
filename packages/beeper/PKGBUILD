@@ -4,7 +4,7 @@
 _pkgname=beeper
 pkgname=beeper
 pkgver=4.3.123
-pkgrel=4
+pkgrel=5
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -12,12 +12,16 @@ license=('LicenseRef-beeper')
 provides=('beeper-bin' 'beeper-v4-bin')
 conflicts=('beeper-bin' 'beeper-v4-bin')
 replaces=('beeper-bin')
+backup=("etc/${_pkgname}-flags.conf")
 install=beeper.install
 depends=(
     'libappindicator-gtk3'
     'libnotify'
     'libsecret'
     'hicolor-icon-theme'
+)
+optdepends=(
+    'appmenu-gtk-module: for KDE Plasma Global Menu support'
 )
 makedepends=(
     'asar'
@@ -27,10 +31,12 @@ source=(
     "Beeper-${pkgver}-x86_64.AppImage::https://beeper-desktop.download.beeper.com/builds/Beeper-${pkgver}-x86_64.AppImage"
     "beeper.sh"
     "beeper.desktop"
+    "beeper-flags.conf"
 )
 sha256sums=('ff7d3512488e80438aa32c81bb5b00594b8b6a75c1f9c80a5f873fb703731035'
-            'c4404f8e950e2bf14a643ca300951b8ae64ba7c5b13404e11b6f647e5a46a83b'
-            '690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32')
+            '2c7ac2620dfdf0ce12a307d92574f2d6e721334a3b90ea826096709b794a6296'
+            '690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32'
+            '3d2101c089fd0a45c58a0e45f87b3a8d8465b63a7fdc701100859c691c0c2700')
 
 prepare() {
     chmod +x "Beeper-${pkgver}-x86_64.AppImage"
@@ -96,6 +102,9 @@ package() {
 
     # Install wrapper script
     install -Dm755 "${srcdir}/beeper.sh" "${pkgdir}/usr/bin/beeper"
+
+    # Install flags configuration
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
 
     # Install desktop entry and Wayland app_id symlink
     install -Dm644 "${srcdir}/beeper.desktop" "${pkgdir}/usr/share/applications/beeper.desktop"
