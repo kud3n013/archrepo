@@ -139,6 +139,15 @@ if (Zotero.isLinux) {
 					return;
 				}
 
+				// Open Settings / Preferences with Ctrl+, / Cmd+,
+				if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key === ",") {
+					e.preventDefault();
+					try {
+						Zotero.Utilities.Internal.openPreferences();
+					} catch (err) {}
+					return;
+				}
+
 				// F10 key focuses menubar (standard GTK / Linux behaviour)
 				if (e.key === "F10") {
 					e.preventDefault();
@@ -350,6 +359,22 @@ if (Zotero.isLinux) {
                     print("  -> Patched chrome/content/zotero/elements/itemTreeMenuBar.js (prevent D-Bus storm)")
                 else:
                     print("  WARNING: target replaceChildren not found in itemTreeMenuBar.js", file=sys.stderr)
+
+            # 6. Patch zoteroPane.xhtml to add Ctrl+, shortcut to mainKeyset and menu_EditPreferencesItem
+            elif item.filename == "chrome/content/zotero/zoteroPane.xhtml":
+                text = content.decode("utf-8", errors="ignore")
+                target_keyset = '<keyset id="mainKeyset">'
+                replacement_keyset = '<keyset id="mainKeyset">\n\t\t<key id="key_preferences" key="," modifiers="accel" oncommand="Zotero.Utilities.Internal.openPreferences()"/>'
+                if target_keyset in text:
+                    text = text.replace(target_keyset, replacement_keyset, 1)
+
+                target_item = '<menuitem id="menu_EditPreferencesItem"'
+                replacement_item = '<menuitem id="menu_EditPreferencesItem" key="key_preferences"'
+                if target_item in text:
+                    text = text.replace(target_item, replacement_item, 1)
+
+                content = text.encode("utf-8")
+                print("  -> Patched chrome/content/zotero/zoteroPane.xhtml (Ctrl+, Settings shortcut)")
 
             zout.writestr(item, content)
 
