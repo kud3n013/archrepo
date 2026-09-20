@@ -16,7 +16,7 @@ if (!fs.existsSync(resolvedPath)) {
 
 let content = fs.readFileSync(resolvedPath, 'utf8');
 
-// Target snippet to match
+// Target snippet in original upstream Antigravity
 const targetCode = `        titleBarStyle: 'hidden',
         titleBarOverlay: isMacOS()
             ? false
@@ -24,34 +24,67 @@ const targetCode = `        titleBarStyle: 'hidden',
                 color: backgroundColor,
                 symbolColor: foregroundColor,
                 height: 30,
-            },`;
+            },
+        backgroundColor,`;
 
-// Replacement code supporting environment variables and CLI arguments
-const replacementCode = `        titleBarStyle: (process.env.ANTIGRAVITY_TITLEBAR === 'native' || (process.argv && process.argv.includes('--titlebar=native')))
-            ? undefined
-            : 'hidden',
-        titleBarOverlay: (isMacOS() ||
+// Replacement code supporting hidden in-window menu bar, native GTK/Qt/Global menu, and custom titlebars
+const replacementCode = `        autoHideMenuBar: true,
+        titleBarStyle: (isMacOS() ||
             process.env.ANTIGRAVITY_TITLEBAR === 'hidden' ||
-            process.env.ANTIGRAVITY_TITLEBAR === 'native' ||
-            process.env.ANTIGRAVITY_NO_WCO === '1' ||
-            (process.argv && (process.argv.includes('--titlebar=hidden') || process.argv.includes('--titlebar=native') || process.argv.includes('--no-window-controls'))))
-            ? false
-            : {
+            (process.argv && process.argv.includes('--titlebar=hidden')) ||
+            process.env.ANTIGRAVITY_TITLEBAR === 'overlay' ||
+            (process.argv && process.argv.includes('--titlebar=overlay')))
+            ? 'hidden'
+            : undefined,
+        titleBarOverlay: (!isMacOS() && (
+            process.env.ANTIGRAVITY_TITLEBAR === 'overlay' ||
+            (process.argv && process.argv.includes('--titlebar=overlay'))))
+            ? {
                 color: backgroundColor,
                 symbolColor: foregroundColor,
                 height: 30,
-            },`;
+            }
+            : false,
+        backgroundColor,`;
 
-if (!content.includes(targetCode)) {
-    const regex = /titleBarStyle:\s*'hidden',\s*titleBarOverlay:\s*isMacOS\(\)\s*\?\s*false\s*:\s*\{[\s\S]*?height:\s*30,\s*\},/;
-    if (!regex.test(content)) {
+const winCreationTarget = `devTools: !electron_1.app.isPackaged,
+        },
+    });`;
+
+const winCreationReplacement = `devTools: !electron_1.app.isPackaged,
+        },
+    });
+    if (typeof win.setAutoHideMenuBar === 'function') {
+        win.setAutoHideMenuBar(true);
+        win.setMenuBarVisibility(false);
+    }`;
+
+// Check if already patched
+if (content.includes('autoHideMenuBar: true') && content.includes('titleBarOverlay: (!isMacOS()')) {
+    console.log(`Window controls and menubar already patched in ${resolvedPath}`);
+} else if (content.includes(targetCode)) {
+    content = content.replace(targetCode, replacementCode);
+} else {
+    // Match upstream or previous patch variations (including leading whitespace)
+    const titlebarRegex = /^[ \t]*(autoHideMenuBar:\s*true,\s*)?titleBarStyle:\s*[\s\S]*?titleBarOverlay:\s*[\s\S]*?(height:\s*30,\s*\},?\s*(:\s*false,?)?|false,\s*)\s*backgroundColor,/m;
+    if (titlebarRegex.test(content)) {
+        content = content.replace(titlebarRegex, replacementCode);
+    } else {
         console.error('Error: Could not locate titleBarStyle/titleBarOverlay definition in utils.js');
         process.exit(1);
     }
-    content = content.replace(regex, replacementCode.trim());
-} else {
-    content = content.replace(targetCode, replacementCode);
+}
+
+if (!content.includes("win.setAutoHideMenuBar(true)")) {
+    if (content.includes(winCreationTarget)) {
+        content = content.replace(winCreationTarget, winCreationReplacement);
+    } else {
+        const regexWin = /devTools:\s*!electron_1\.app\.isPackaged,\s*\},?\s*\}\);/;
+        if (regexWin.test(content)) {
+            content = content.replace(regexWin, winCreationReplacement);
+        }
+    }
 }
 
 fs.writeFileSync(resolvedPath, content, 'utf8');
-console.log(`Successfully patched window controls in ${resolvedPath}`);
+console.log(`Successfully patched window controls and menubar in ${resolvedPath}`);

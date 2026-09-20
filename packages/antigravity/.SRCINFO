@@ -1,7 +1,7 @@
 pkgbase = antigravity
 	pkgdesc = Google Antigravity 2.0 multi-agent orchestration platform
 	pkgver = 2.15.0
-	pkgrel = 1
+	pkgrel = 2
 	url = https://antigravity.google
 	install = antigravity.install
 	arch = x86_64
@@ -46,10 +46,10 @@ pkgbase = antigravity
 	source = antigravity.png
 	source = patch-window-controls.js
 	sha256sums = 25aa80f2dfcf326cfac97441c692e67c70b05bac0a6a8d7df3582e93480c82e0
-	sha256sums = a5fcfb28857e1b73446297bf1c84cecd4e0fffa3fb8bb4f10fc0fb365b1a7c2a
+	sha256sums = e12e0b1d0838ac9e14b4b027c7dbfd3e3d2f8dd6914b4a5b04a6befb763c2abc
 	sha256sums = 5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692
-	sha256sums = 33b686fedb8630a562acf6409832e504cef2893b357abf208dec2d3b19f89337
+	sha256sums = 24a3ef0aa6e83573cac3fbcb104af341bf8241b98e946dd8bf090b26fa196e94
 	sha256sums = b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317
-	sha256sums = e737831925fbb6747cac6725fed65fd46123d61f1723c0165e83f6907fa35a1f
+	sha256sums = 1e0f453327d41910f8a86ea9b789c2e40cea2a9a0e46338a2c9fadf03ab4e6c6
 
 pkgname = antigravity

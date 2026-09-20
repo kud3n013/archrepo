@@ -5,7 +5,7 @@ _pkgname=antigravity
 pkgname=antigravity
 pkgver=2.15.0
 _build=6576870427328512
-pkgrel=1
+pkgrel=2
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
 url="https://antigravity.google"
@@ -58,26 +58,31 @@ source=(
     "patch-window-controls.js"
 )
 sha256sums=('25aa80f2dfcf326cfac97441c692e67c70b05bac0a6a8d7df3582e93480c82e0'
-            'a5fcfb28857e1b73446297bf1c84cecd4e0fffa3fb8bb4f10fc0fb365b1a7c2a'
+            'e12e0b1d0838ac9e14b4b027c7dbfd3e3d2f8dd6914b4a5b04a6befb763c2abc'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
-            '33b686fedb8630a562acf6409832e504cef2893b357abf208dec2d3b19f89337'
+            '24a3ef0aa6e83573cac3fbcb104af341bf8241b98e946dd8bf090b26fa196e94'
             'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317'
-            'e737831925fbb6747cac6725fed65fd46123d61f1723c0165e83f6907fa35a1f')
+            '1e0f453327d41910f8a86ea9b789c2e40cea2a9a0e46338a2c9fadf03ab4e6c6')
 
 prepare() {
     local _app_dir="${srcdir}/Antigravity-x64/resources"
     local _asar_file="${_app_dir}/app.asar"
     local _extract_dir="${srcdir}/asar-extracted"
 
+    local _asar_cmd="asar"
+    if ! command -v asar &>/dev/null && command -v npx &>/dev/null; then
+        _asar_cmd="npx --yes @electron/asar"
+    fi
+
     # Unpack asar archive
     rm -rf "${_extract_dir}"
-    asar extract "${_asar_file}" "${_extract_dir}"
+    ${_asar_cmd} extract "${_asar_file}" "${_extract_dir}"
 
-    # Apply window controls modification (supports hidden, native GTK/Qt, or overlay)
+    # Apply window controls modification (supports hidden menubar, native GTK/Qt, and KDE Global Menu)
     node "${srcdir}/patch-window-controls.js" "${_extract_dir}/dist/utils.js"
 
     # Repack asar archive preserving unpacked dependencies
-    asar pack "${_extract_dir}" "${_asar_file}" --unpack-dir 'node_modules/chrome-devtools-mcp'
+    ${_asar_cmd} pack "${_extract_dir}" "${_asar_file}" --unpack-dir 'node_modules/chrome-devtools-mcp'
     rm -rf "${_extract_dir}"
 }
 

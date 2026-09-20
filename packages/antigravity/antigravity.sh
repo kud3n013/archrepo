@@ -34,18 +34,21 @@ else
     fi
 fi
 
-# Process titlebar flags from config file and CLI arguments
+# Process titlebar and menubar flags from config file and CLI arguments
 FINAL_FLAGS=()
 for arg in "${FLAGS[@]}" "$@"; do
     case "$arg" in
         --titlebar=hidden|--no-window-controls|--hide-window-controls)
             export ANTIGRAVITY_TITLEBAR="hidden"
             ;;
-        --titlebar=native)
+        --titlebar=native|--titlebar=system)
             export ANTIGRAVITY_TITLEBAR="native"
             ;;
         --titlebar=overlay)
             export ANTIGRAVITY_TITLEBAR="overlay"
+            ;;
+        --menubar=autohide|--menubar=hidden|--hide-menubar|--no-menubar)
+            # Menubar autohide is enabled by default in patched build
             ;;
         *)
             FINAL_FLAGS+=("$arg")
