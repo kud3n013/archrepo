@@ -87,6 +87,22 @@ if (Zotero.isLinux) {
 		}
 		document.documentElement.setAttribute('zotero-menubar', menubarMode);
 
+		// archrepo: Throttle popupshowing on menubar popups to break KDE Plasma D-Bus LayoutUpdated runaway loop
+		const _lastPopupShowingTimes = new WeakMap();
+		window.addEventListener("popupshowing", (event) => {
+			let popup = event.target;
+			if (!popup || !popup.id) return;
+			if (!popup.closest || !popup.closest("#main-menubar")) return;
+			let now = Date.now();
+			let last = _lastPopupShowingTimes.get(popup) || 0;
+			// Suppress rapid re-queries within 800ms triggered by D-Bus LayoutUpdated storm
+			if (now - last < 800) {
+				event.stopImmediatePropagation();
+				return;
+			}
+			_lastPopupShowingTimes.set(popup, now);
+		}, true);
+
 		// Setup Alt key, F10, and Ctrl+M menubar toggling on all desktop environments (KDE, Hyprland, etc.)
 		const initMenubarToggle = () => {
 			const titlebar = document.getElementById("titlebar");
