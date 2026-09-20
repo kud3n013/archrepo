@@ -1,7 +1,7 @@
 pkgbase = zotero
 	pkgdesc = A free, easy-to-use tool to help you collect, organize, cite, and share your research sources
 	pkgver = 10.0.3
-	pkgrel = 9
+	pkgrel = 10
 	url = https://www.zotero.org
 	install = zotero.install
 	arch = x86_64
@@ -39,7 +39,7 @@ pkgbase = zotero
 	sha256sums = c7c1c942ce9e7c81d49962dadf2113884312d320fb53a60198a25343b7425897
 	sha256sums = f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7
 	sha256sums = 3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270
-	sha256sums = e4825feccb569edc4395f5a0ef6b7c34ce98e74765729af028174754c9b7bc31
+	sha256sums = ac408f2d6075802512455bfceb67ddde894dcf70aac9bb0b5f1db1cbed51411e
 	sha256sums = e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c
 
 pkgname = zotero
