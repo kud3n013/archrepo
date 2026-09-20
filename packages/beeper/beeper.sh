@@ -10,15 +10,12 @@ rm -f "$HOME/.local/share/applications/Beeper.desktop" \
       "$HOME/.local/share/applications/beeper.desktop" \
       "$HOME/.local/share/applications/beepertexts.desktop" 2>/dev/null || true
 
-# Preserve in-window Alt-key autohide menubar when KDE Plasma Global Menu widget is active
+# On Wayland, Electron lacks org_kde_kwin_appmenu Wayland protocol support.
+# When KDE Plasma Global Menu is active, Electron attempts X11 D-Bus registration which fails,
+# while erroneously dropping the in-window menu bar.
+# Enforce in-window menu bar so the native Alt-key autohide menu functions reliably.
 if [ -n "$WAYLAND_DISPLAY" ]; then
-    _GTK_OVERRIDE_DIR="${XDG_RUNTIME_DIR:-/tmp}/beeper-gtk"
-    mkdir -p "${_GTK_OVERRIDE_DIR}/gtk-3.0"
-    cat << 'EOF' > "${_GTK_OVERRIDE_DIR}/gtk-3.0/settings.ini"
-[Settings]
-gtk-shell-shows-menubar = 0
-EOF
-    export XDG_CONFIG_DIRS="${_GTK_OVERRIDE_DIR}:${XDG_CONFIG_DIRS:-/etc/xdg}"
+    export ELECTRON_FORCE_WINDOW_MENU_BAR="${ELECTRON_FORCE_WINDOW_MENU_BAR:-1}"
 fi
 
 # Enable Wayland Ozone platform auto-detection if on Wayland and not explicitly overridden

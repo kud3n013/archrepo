@@ -1,7 +1,7 @@
 pkgbase = beeper
 	pkgdesc = The ultimate messaging app (formerly Beeper v4)
 	pkgver = 4.3.123
-	pkgrel = 3
+	pkgrel = 4
 	url = https://www.beeper.com/changelog
 	install = beeper.install
 	arch = x86_64
@@ -22,7 +22,7 @@ pkgbase = beeper
 	source = beeper.sh
 	source = beeper.desktop
 	sha256sums = ff7d3512488e80438aa32c81bb5b00594b8b6a75c1f9c80a5f873fb703731035
-	sha256sums = 9bfa1196743b9ee470249754fbf90e79a9059be0166b94ba96202a4cf0e658a1
+	sha256sums = c4404f8e950e2bf14a643ca300951b8ae64ba7c5b13404e11b6f647e5a46a83b
 	sha256sums = 690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32
 
 pkgname = beeper
