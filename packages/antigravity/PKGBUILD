@@ -5,7 +5,7 @@ _pkgname=antigravity
 pkgname=antigravity
 pkgver=2.15.0
 _build=6576870427328512
-pkgrel=3
+pkgrel=4
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
 url="https://antigravity.google"
@@ -62,7 +62,7 @@ sha256sums=('25aa80f2dfcf326cfac97441c692e67c70b05bac0a6a8d7df3582e93480c82e0'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
             '680916db62422f0cca998360cdc1c5f5e6d97362457022a64b864e80a9be1ec3'
             'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317'
-            '0f067d01c9191979554d05d9a5a430b0a008fb0331b19eaa8729095c04cb2387')
+            'cc18392e880c89ac1d63839024b846a52710094af548ca54d786ea3a92d5c8b2')
 
 prepare() {
     local _app_dir="${srcdir}/Antigravity-x64/resources"
@@ -78,8 +78,8 @@ prepare() {
     rm -rf "${_extract_dir}"
     ${_asar_cmd} extract "${_asar_file}" "${_extract_dir}"
 
-    # Apply window controls and menubar modification (cleanly hides in-app menu, enables native GTK/Qt and KDE Global Menu)
-    node "${srcdir}/patch-window-controls.js" "${_extract_dir}/dist/utils.js" "${_extract_dir}/dist/preload.js"
+    # Apply window controls and menubar modification (ports Antigravity menus & actions to KDE Global Menu, hides in-app menu)
+    node "${srcdir}/patch-window-controls.js" "${_extract_dir}/dist/utils.js" "${_extract_dir}/dist/preload.js" "${_extract_dir}/dist/menu.js"
 
     # Repack asar archive preserving unpacked dependencies
     ${_asar_cmd} pack "${_extract_dir}" "${_asar_file}" --unpack-dir 'node_modules/chrome-devtools-mcp'
