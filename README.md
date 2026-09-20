@@ -45,7 +45,6 @@ Install any package using `sudo pacman -S <package>`.
 | **`searxng`** | Privacy-respecting metasearch engine with systemd service & Valkey integration | [searxng/searxng](https://searxng.github.io/searxng/) |
 | **`sine`** | Mod & theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Firefox) | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) |
 | **`zalo-for-linux`** | Zalo desktop client with Wayland / Hyprland scaling fixes and bundled logo | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) |
-| **`zen-browser`** | Firefox-based browser with Wayland integration & dedicated private browsing profile | [zen-browser/desktop](https://github.com/zen-browser/desktop) |
 | **`zotero`** | Reference manager with native title bar, KDE Global Menu, and Hyprland/KDE auto-theming | [Zotero](https://www.zotero.org) |
 | **`zotero-better-bibtex`** | Better BibTeX LaTeX bibliography and citation management for Zotero | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) |
 | **`zotero-better-notes`** | Comprehensive note taking and knowledge management for Zotero | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) |
@@ -55,11 +54,12 @@ Install any package using `sudo pacman -S <package>`.
 | **`zotmoov`** | Automatic attachment mover based on collection/item rules | [wileyyugioh/zotmoov](https://github.com/wileyyugioh/zotmoov) |
 
 <details>
-<summary><b>🗄️ Archived Packages (1)</b></summary>
+<summary><b>🗄️ Archived Packages (2)</b></summary>
 
 | Package | Upstream | Location | Status |
 |---|---|---|---|
 | `hyprmod` | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | [`archive/hyprmod/`](archive/hyprmod/) | Retired per maintainer request |
+| `zen-browser` | [zen-browser/desktop](https://github.com/zen-browser/desktop) | [`archive/zen-browser/`](archive/zen-browser/) | Archived per maintainer request |
 
 </details>
 
