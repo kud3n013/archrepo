@@ -149,6 +149,17 @@ case "$CHECK" in
     fi
     ;;
 
+  obsidian-desktop)
+    # Obsidian releases include both mobile (e.g. Android apk only) and desktop builds.
+    # Filter releases for the latest release containing the desktop debian package.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASES_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases?per_page=20" || true)
+      TAG=$(echo "$RELEASES_JSON" | jq -r '[.[] | select(.assets[].name | test("^obsidian_.*_amd64\\.deb$"))][0].tag_name // empty' 2>/dev/null || true)
+      TAG="${TAG#v}"
+      [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
+    fi
+    ;;
+
   none)
     ;;
 esac

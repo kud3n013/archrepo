@@ -1,0 +1,80 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://github.com/obsidianmd/obsidian-releases
+# AUR Reference: https://aur.archlinux.org/packages/obsidian-bin
+
+_pkgname=obsidian
+pkgname=obsidian
+pkgver=1.13.7
+pkgrel=1
+pkgdesc="A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)"
+arch=('x86_64')
+url="https://obsidian.md"
+license=('custom:Commercial')
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin")
+replaces=("${pkgname}-bin")
+backup=("etc/${_pkgname}-flags.conf")
+install=${pkgname}.install
+options=(!strip !debug)
+
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'cairo'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libnotify'
+    'libsecret'
+    'libxss'
+    'libxtst'
+    'nss'
+    'util-linux-libs'
+    'xdg-utils'
+)
+
+optdepends=(
+    'libappindicator-gtk3: tray icon support'
+    'wl-clipboard: clipboard support on Wayland'
+)
+
+source=(
+    "${pkgname}-${pkgver}.deb::https://github.com/obsidianmd/obsidian-releases/releases/download/v${pkgver}/obsidian_${pkgver}_amd64.deb"
+    "${pkgname}.sh"
+    "${pkgname}-flags.conf"
+    "${pkgname}.desktop"
+    "${pkgname}.png"
+)
+
+sha256sums=('17dc33b49cb3e785ecc27edd2ea0c79e40207798b554fd2886e36ebee7af9ae0'
+            'be4ebed45626bb4a4c29aa2f5622d7f73b8c870fcd08e8a82dbc3362cbc23029'
+            '1c91e7e39e9ea6e3b299854ca4765be2154c32b28b9c11dca797b570d3ff8b17'
+            '37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d'
+            '0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40')
+
+package() {
+    bsdtar -xf "${srcdir}/data.tar.xz" -C "${pkgdir}/"
+
+    # Install launcher wrapper script
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+
+    # Install Obsidian CLI symlink in /usr/bin so it is globally available
+    ln -sf "/opt/Obsidian/obsidian-cli" "${pkgdir}/usr/bin/obsidian-cli"
+
+    # Update desktop entry to call the wrapper script and create standard symlink
+    sed -i "s|/opt/Obsidian/obsidian|${_pkgname}|" "${pkgdir}/usr/share/applications/md.obsidian.Obsidian.desktop"
+    ln -sf "md.obsidian.Obsidian.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+
+    # Install flags configuration
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install high-resolution icon in standard system paths
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    # Install license files
+    install -Dm644 "${pkgdir}/opt/Obsidian/LICENSE.electron.txt" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.electron.txt"
+    install -Dm644 "${pkgdir}/opt/Obsidian/LICENSES.chromium.html" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSES.chromium.html"
+
+    # Ensure safe permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
