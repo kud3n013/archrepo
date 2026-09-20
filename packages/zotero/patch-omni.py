@@ -91,6 +91,17 @@ if (Zotero.isLinux) {
 		const _lastPopupShowingTimes = new WeakMap();
 		window.addEventListener("popupshowing", (event) => {
 			let popup = event.target;
+			if (popup && popup.id === "menu_EditPopup") {
+				let pref = document.getElementById("menu_EditPreferencesItem");
+				if (pref) {
+					pref.setAttribute("acceltext", "Ctrl+,");
+					let accel = pref.querySelector(".menu-accel");
+					if (accel && accel.value !== "Ctrl+,") {
+						accel.value = "Ctrl+,";
+						accel.textContent = "Ctrl+,";
+					}
+				}
+			}
 			if (!popup || !popup.id) return;
 			if (!popup.closest || !popup.closest("#main-menubar")) return;
 			let now = Date.now();
@@ -108,6 +119,20 @@ if (Zotero.isLinux) {
 			const titlebar = document.getElementById("titlebar");
 			const menubar = document.getElementById("main-menubar");
 			if (!titlebar || !menubar) return;
+
+			// Ensure Settings menu item displays the Ctrl+, accelerator text
+			const updateSettingsAccel = () => {
+				const editPref = document.getElementById("menu_EditPreferencesItem");
+				if (editPref) {
+					editPref.setAttribute("acceltext", "Ctrl+,");
+					const accelLabel = editPref.querySelector(".menu-accel");
+					if (accelLabel && accelLabel.value !== "Ctrl+,") {
+						accelLabel.value = "Ctrl+,";
+						accelLabel.textContent = "Ctrl+,";
+					}
+				}
+			};
+			updateSettingsAccel();
 
 			let isVisible = () => titlebar.getAttribute("menuparent-active") === "true";
 			let showMenu = (focusFirst = true) => {
@@ -369,12 +394,24 @@ if (Zotero.isLinux) {
                     text = text.replace(target_keyset, replacement_keyset, 1)
 
                 target_item = '<menuitem id="menu_EditPreferencesItem"'
-                replacement_item = '<menuitem id="menu_EditPreferencesItem" key="key_preferences"'
+                replacement_item = '<menuitem id="menu_EditPreferencesItem" key="key_preferences" acceltext="Ctrl+,"'
                 if target_item in text:
                     text = text.replace(target_item, replacement_item, 1)
 
                 content = text.encode("utf-8")
-                print("  -> Patched chrome/content/zotero/zoteroPane.xhtml (Ctrl+, Settings shortcut)")
+                print("  -> Patched chrome/content/zotero/zoteroPane.xhtml (Ctrl+, Settings shortcut & acceltext)")
+
+            # 7. Patch platformKeys.js to ensure acceltext is set on EditPreferencesItem
+            elif item.filename == "chrome/content/zotero/platformKeys.js":
+                text = content.decode("utf-8", errors="ignore")
+                target_pk = "// Set behavior on all non-macOS platforms"
+                replacement_pk = target_pk + "\n    if (editPreferencesItem) editPreferencesItem.setAttribute('acceltext', 'Ctrl+,');"
+                if target_pk in text:
+                    text = text.replace(target_pk, replacement_pk, 1)
+                    content = text.encode("utf-8")
+                    print("  -> Patched chrome/content/zotero/platformKeys.js (Ctrl+, Settings acceltext)")
+                else:
+                    print("  WARNING: target not found in platformKeys.js", file=sys.stderr)
 
             zout.writestr(item, content)
 
