@@ -64,12 +64,16 @@ if [[ "$HAS_OZONE" == false && -n "$WAYLAND_DISPLAY" ]]; then
     fi
 fi
 
-# Under X11 (or XWayland), GTK loads appmenu-gtk-module from XSETTINGS on KDE Plasma.
-# Electron unloads GTK via dlclose(), but libappmenu-gtk-module does not unregister
-# its GIO D-Bus name watcher on unload, triggering a SIGSEGV when D-Bus replies into unmapped memory.
-# Preloading libappmenu-gtk-module.so pins it in memory and prevents the crash.
-if [[ -f "/usr/lib/gtk-3.0/modules/libappmenu-gtk-module.so" ]]; then
-    export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}/usr/lib/gtk-3.0/modules/libappmenu-gtk-module.so"
-fi
+# Under X11 (or XWayland), GTK loads modules specified in XSETTINGS (e.g. appmenu-gtk-module,
+# colorreload-gtk-module, window-decorations-gtk-module) on KDE Plasma.
+# When Electron unloads GTK via dlclose(), these modules are unmapped from memory while their
+# background GIO file monitors (e.g. ~/.config/gtk-3.0/colors.css) and D-Bus callbacks remain registered.
+# This triggers an immediate SIGSEGV when switching KDE themes (dark/light) or window settings.
+# Pin all installed GTK3 modules into memory via LD_PRELOAD to prevent dlclose() from unmapping them.
+for _mod in /usr/lib/gtk-3.0/modules/*.so; do
+    if [[ -f "$_mod" ]]; then
+        export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}$_mod"
+    fi
+done
 
 exec /opt/beeper/AppRun --no-sandbox "${DEFAULT_PLATFORM_FLAGS[@]}" "${ALL_ARGS[@]}"
