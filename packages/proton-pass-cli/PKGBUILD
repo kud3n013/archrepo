@@ -4,8 +4,8 @@
 
 _pkgname=proton-pass-cli
 pkgname=proton-pass-cli
-pkgver=2.3.3
-pkgrel=3
+pkgver=2.4.1
+pkgrel=1
 pkgdesc="A command-line interface for managing your Proton Pass vaults, items, and secrets"
 arch=('x86_64')
 url="https://protonpass.github.io/pass-cli"
@@ -36,7 +36,7 @@ source=(
     "proton-pass-cli.sh"
     "proton-pass-cli.conf"
 )
-sha256sums=('b5b49a8b3fd0af8830c0c1979f28ea0c90ccece73f59023a8bca8245d4b68da9'
+sha256sums=('f4188430466e0a3d668b56791a8b430162cb20ceb108fed4fdbfcfe77d3080e6'
             'c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba'
             '49a8dbd624b82a20cfd4b128a40db6f565048503e78b676aeb01ee4dc9b94e16'
             '03eeb8a893acaf215d909595b354fb823195223edd4702cc1a0807f1a40a7d1e')
