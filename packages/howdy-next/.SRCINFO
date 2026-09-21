@@ -1,6 +1,6 @@
 pkgbase = howdy-next
 	pkgdesc = C++ rewrite of Howdy facial-recognition authentication on Linux (patched: no OpenCV WARN spam)
-	pkgver = 3.4.0
+	pkgver = 3.4.1
 	pkgrel = 1
 	url = https://codeberg.org/nathawat/howdy-next
 	install = howdy-next.install
@@ -27,11 +27,11 @@ pkgbase = howdy-next
 	replaces = howdy-next-bin
 	options = !debug
 	backup = etc/howdy/config.ini
-	source = howdy-next-3.4.0.tar.gz::https://codeberg.org/nathawat/howdy-next/archive/v3.4.0.tar.gz
+	source = howdy-next-3.4.1.tar.gz::https://codeberg.org/nathawat/howdy-next/archive/v3.4.1.tar.gz
 	source = polkit-agent-helper-howdy.conf
 	source = 0001-fix-opencv-suppress-noisy-dnn-warnings.patch
-	sha512sums = SKIP
-	sha512sums = SKIP
-	sha512sums = SKIP
+	sha512sums = 37840eab169b7b52d5aeaba2d53fca0a10de1ec87dd68f8aaa36b9abc9bf36ec8308adfb9fdc6e5bd5c6c4f9be18c6e237d7afd377dfecda103cd7034497765f
+	sha512sums = 4f96a75e45b42d164a8fa87b5fc51a42468c9447532f956cc6ec1c85324cd12830182d3c1bba7c169454dd8c6d6b5f5f48bae153158d08830effb002323ddb03
+	sha512sums = ddb28985d1a23abc007c1f2fa367ca90eca5978daf0de05b19c413c45c55e480f29b6f004fff0d8f5b17d1ad2bcc520e050a6df2c1e601fbe8829423e3628618
 
 pkgname = howdy-next
