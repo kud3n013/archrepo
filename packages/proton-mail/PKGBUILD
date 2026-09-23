@@ -4,8 +4,8 @@
 
 _pkgname=proton-mail
 pkgname=proton-mail
-pkgver=1.14.0
-pkgrel=5
+pkgver=1.15.0
+pkgrel=1
 pkgdesc="Proton official desktop application for Proton Mail and Proton Calendar (with system tray & close-to-tray)"
 arch=('x86_64')
 url="https://proton.me/mail"
@@ -46,7 +46,7 @@ source=(
     "proton-mail.png"
     "patch-tray.js"
 )
-sha256sums=('c81e5e297856f5b986c47b2338a665348d897cdf025c5cf53f3dbeefb0cf6288'
+sha256sums=('098af5b82834f3da184f7f71a02d28c44884590a8055b51752221c758f5eccb2'
             '2cf6f56e7ac141fcc13e7b3bc3dbf19542910acee86bdc52f5ba3ee92e195997'
             'b89e1368579dcf974c0178190ebddbce6b9241f4e521a2b5fde4c5cba3386d30'
             '06e5754ed70170df93823bf62805a1f82da773ef92d6210f14209298d43908c6'
