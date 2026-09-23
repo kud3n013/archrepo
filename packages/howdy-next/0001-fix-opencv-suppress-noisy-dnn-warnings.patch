@@ -1,0 +1,10 @@
+--- a/howdy/src/vision/face_model.cpp
++++ b/howdy/src/vision/face_model.cpp
+@@ -43,6 +43,7 @@ namespace howdy::native {
+ 		// Classic-engine fallback, which cannot load Howdy's supported ONNX models.
+ 		// Remove after upstream makes New engine selection/failure behavior suitable.
+ 		auto ForceOpencvNewDnnEngine() -> bool {
++			setenv("OPENCV_LOG_LEVEL", "ERROR", 1);
+ 			return setenv("OPENCV_FORCE_DNN_ENGINE", "2", 1) == 0;
+ 		}
+ 
