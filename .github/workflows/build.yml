@@ -109,17 +109,6 @@ jobs:
           sudo -u builder updpkgsums
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
 
-          # Commit PKGBUILD changes to main
-          cd "${GITHUB_WORKSPACE:-$(pwd)/../../..}/src"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
-          git commit -m "bump: ${PKG} automated update"
-          for i in 1 2 3 4 5; do
-            git pull --rebase origin main && git push origin main && break
-            sleep 3
-          done
-
       # ── Check if binary is already published in release ─────────────
       - name: Check existing release binary
         id: cache_check
@@ -171,10 +160,29 @@ jobs:
           path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
           if-no-files-found: error
 
+      # ── Commit & push upstream update to main (only after successful build) ──
+      - name: Push upstream update to main
+        if: matrix.update_needed == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PKG="${{ matrix.name }}"
+          cd "${GITHUB_WORKSPACE:-$(pwd)/../../..}/src"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
+          if ! git diff --cached --quiet; then
+            git commit -m "bump: ${PKG} automated update"
+            for i in 1 2 3 4 5; do
+              git pull --rebase origin main && git push origin main && break
+              sleep 3
+            done
+          fi
+
   # ── 3. Publish newly built packages & update repository ───────────────
   publish:
     needs: [discover, build]
-    if: needs.discover.outputs.has_packages == 'true' && needs.build.result == 'success'
+    if: ${{ !cancelled() && needs.discover.outputs.has_packages == 'true' && (needs.build.result == 'success' || needs.build.result == 'failure') }}
     runs-on: ubuntu-latest
     container:
       image: archlinux:base-devel
