@@ -36,25 +36,25 @@ if (code.includes("minWidth:900")) {
 }
 
 // 2. Patch window close handler for close-to-tray
-const targetCloseExact = 'Ba.on("close",e=>{rr||(e.preventDefault(),sn?(e=>{y(e),e.isFullScreen()?(Ns.info("close, isFullScreen on macOS"),e.setFullScreen(!1),e.on("leave-full-screen",()=>{Ns.info("close, leave-full-screen on macOS"),e.hide()})):e.hide()})(Ba):(e=>{e.hide(),e.isVisible()||(Ns.info("close, window not visible on Windows or Linux"),e.isDestroyed()||e.destroy(),an.setReason("windows-linux-exit-event"),r.app.quit())})(Ba))})';
+// Matches both 1.14.x (Ba, rr, sn, y) and 1.15.x (qs, lr, dn, L) patterns dynamically
+const closeRegex = /([a-zA-Z0-9_$]+)\.on\("close",\s*([a-zA-Z0-9_$]+)\s*=>\s*\{[a-zA-Z0-9_$]+\|\|\(\2\.preventDefault\(\),\s*([a-zA-Z0-9_$]+)\s*\?\s*\(\2\s*=>\s*\{([a-zA-Z0-9_$]+)\(\2\)[\s\S]*?windows-linux-exit-event[\s\S]*?\)\(\1\)\)\}\)/;
+const closeMatch = code.match(closeRegex);
 
-const closeReplacement = 'Ba.on("close",e=>{if(r.app.isQuitting)return;e.preventDefault();y(Ba);Ba.isFullScreen()?(Ba.setFullScreen(!1),Ba.once("leave-full-screen",()=>Ba.hide())):Ba.hide()})';
-
-let replacedClose = false;
-if (code.includes(targetCloseExact)) {
-  code = code.replace(targetCloseExact, closeReplacement);
-  replacedClose = true;
+let winVar = "Ba";
+if (closeMatch) {
+  const [fullCloseMatch, matchedWinVar, eventVar, _isMacVar, saveBoundsVar] = closeMatch;
+  winVar = matchedWinVar;
+  const closeReplacement = `${winVar}.on("close",${eventVar}=>{const _el=(typeof o==="function"?o():(typeof r!=="undefined"?r:null));if(_el?.app?.isQuitting)return;${eventVar}.preventDefault();${saveBoundsVar}(${winVar});${winVar}.isFullScreen()?(${winVar}.setFullScreen(!1),${winVar}.once("leave-full-screen",()=>${winVar}.hide())):${winVar}.hide()})`;
+  code = code.replace(fullCloseMatch, closeReplacement);
 } else {
-  const closeRegex = /Ba\.on\("close",\s*e\s*=>\s*\{rr\|\|\(e\.preventDefault\(\),\s*sn\s*\?\s*\(e\s*=>\s*\{y\(e\)[^}]*\}\)\(Ba\)\s*:\s*\(e\s*=>\s*\{e\.hide\(\)[^}]*r\.app\.quit\(\)\}\)\(Ba\)\)\}\)/;
-  if (closeRegex.test(code)) {
-    code = code.replace(closeRegex, closeReplacement);
-    replacedClose = true;
+  const targetCloseExact = 'Ba.on("close",e=>{rr||(e.preventDefault(),sn?(e=>{y(e),e.isFullScreen()?(Ns.info("close, isFullScreen on macOS"),e.setFullScreen(!1),e.on("leave-full-screen",()=>{Ns.info("close, leave-full-screen on macOS"),e.hide()})):e.hide()})(Ba):(e=>{e.hide(),e.isVisible()||(Ns.info("close, window not visible on Windows or Linux"),e.isDestroyed()||e.destroy(),an.setReason("windows-linux-exit-event"),r.app.quit())})(Ba))})';
+  const closeReplacement = 'Ba.on("close",e=>{if(r.app.isQuitting)return;e.preventDefault();y(Ba);Ba.isFullScreen()?(Ba.setFullScreen(!1),Ba.once("leave-full-screen",()=>Ba.hide())):Ba.hide()})';
+  if (code.includes(targetCloseExact)) {
+    code = code.replace(targetCloseExact, closeReplacement);
+  } else {
+    console.error("Error: Could not locate window close handler to patch in index.js");
+    process.exit(1);
   }
-}
-
-if (!replacedClose) {
-  console.error("Error: Could not locate window close handler to patch in index.js");
-  process.exit(1);
 }
 
 // 3. System tray, close-to-tray, and dark theme / reading safety integration
@@ -75,15 +75,16 @@ const safeReadingCss = `
   }
 `;
 
-const insertTargetExact = 'T().maximized&&Ba.maximize(),Ba.on("closed",()=>{Ba=null});';
 const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
 ;(()=>{
   let appTray = null;
+  const _getElectron = () => (typeof o === "function" ? o() : (typeof r !== "undefined" ? r : require("electron")));
+  const _getLogger = () => (typeof Fa !== "undefined" ? Fa : (typeof Ns !== "undefined" ? Ns : console));
 
   // Set dark background on main window to prevent white flash
   try {
-    if (typeof Ba !== "undefined" && Ba && Ba.setBackgroundColor) {
-      Ba.setBackgroundColor("#16141c");
+    if (typeof ${winVar} !== "undefined" && ${winVar} && ${winVar}.setBackgroundColor) {
+      ${winVar}.setBackgroundColor("#16141c");
     }
   } catch (err) {}
 
@@ -91,40 +92,44 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
     if (appTray) return;
     const path = require("path");
     const fs = require("fs");
+    const _el = _getElectron();
+    const _log = _getLogger();
     const trayIconPath = path.join(process.resourcesPath, "tray.png");
     const fallbackIconPath = path.join(process.resourcesPath, "icon.png");
     let trayImage = null;
 
     try {
       if (fs.existsSync(trayIconPath)) {
-        trayImage = r.nativeImage.createFromPath(trayIconPath);
+        trayImage = _el.nativeImage.createFromPath(trayIconPath);
       } else if (fs.existsSync(fallbackIconPath)) {
-        trayImage = r.nativeImage.createFromPath(fallbackIconPath);
+        trayImage = _el.nativeImage.createFromPath(fallbackIconPath);
       }
     } catch (e) {
-      Ns.error("Failed to load tray icon image:", e);
+      _log.error("Failed to load tray icon image:", e);
     }
 
     if (!trayImage || trayImage.isEmpty()) {
-      Ns.warn("Tray image is empty, system tray skipped.");
+      _log.warn("Tray image is empty, system tray skipped.");
       return;
     }
 
     try {
-      appTray = new r.Tray(trayImage);
+      appTray = new _el.Tray(trayImage);
       appTray.setToolTip("Proton Mail");
 
-      const contextMenu = r.Menu.buildFromTemplate([
+      const contextMenu = _el.Menu.buildFromTemplate([
         {
           label: "Open Proton Mail",
           click: async () => {
             try {
-              if (Ba) {
-                if (!Ba.isVisible()) {
-                  Ba.show();
+              if (${winVar}) {
+                if (!${winVar}.isVisible()) {
+                  ${winVar}.show();
                 }
-                Ba.focus();
-                if (typeof Ja === "function") {
+                ${winVar}.focus();
+                if (typeof ha === "function") {
+                  ha();
+                } else if (typeof Ja === "function") {
                   if (typeof qa === "function" && typeof qt === "function") {
                     const mailUrl = await qa(qt().mail);
                     await rs("mail", mailUrl);
@@ -133,7 +138,7 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
                 }
               }
             } catch (err) {
-              Ns.error("Open mail failed:", err);
+              _log.error("Open mail failed:", err);
             }
           }
         },
@@ -141,12 +146,14 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
           label: "Open Proton Calendar",
           click: async () => {
             try {
-              if (Ba) {
-                if (!Ba.isVisible()) {
-                  Ba.show();
+              if (${winVar}) {
+                if (!${winVar}.isVisible()) {
+                  ${winVar}.show();
                 }
-                Ba.focus();
-                if (typeof Ja === "function") {
+                ${winVar}.focus();
+                if (typeof ga === "function") {
+                  ga();
+                } else if (typeof Ja === "function") {
                   if (typeof qa === "function" && typeof qt === "function") {
                     const calUrl = await qa(qt().calendar);
                     await rs("calendar", calUrl);
@@ -155,7 +162,7 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
                 }
               }
             } catch (err) {
-              Ns.error("Open calendar failed:", err);
+              _log.error("Open calendar failed:", err);
             }
           }
         },
@@ -163,11 +170,12 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
         {
           label: "Quit",
           click: () => {
-            r.app.isQuitting = true;
-            if (Ba && !Ba.isDestroyed()) {
-              Ba.destroy();
+            const el = _getElectron();
+            el.app.isQuitting = true;
+            if (${winVar} && !${winVar}.isDestroyed()) {
+              ${winVar}.destroy();
             }
-            r.app.quit();
+            el.app.quit();
           }
         }
       ]);
@@ -175,20 +183,28 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
       appTray.setContextMenu(contextMenu);
 
       appTray.on("click", () => {
-        if (!Ba) return;
-        if (Ba.isVisible()) {
-          Ba.hide();
+        if (!${winVar}) return;
+        if (${winVar}.isVisible()) {
+          ${winVar}.hide();
         } else {
-          bs();
+          if (typeof ka === "function") {
+            ka();
+          } else if (typeof bs === "function") {
+            bs();
+          } else {
+            ${winVar}.show();
+            ${winVar}.focus();
+          }
         }
       });
     } catch (err) {
-      Ns.error("Failed to initialize Proton Mail system tray:", err);
+      _log.error("Failed to initialize Proton Mail system tray:", err);
     }
   };
 
   const initWebViews = () => {
     const safeCss = ${JSON.stringify(safeReadingCss)};
+    const _log = _getLogger();
 
     const attachToView = (view) => {
       if (!view || !view.webContents) return;
@@ -202,7 +218,7 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
         try {
           await view.webContents.insertCSS(safeCss);
         } catch (e) {
-          Ns.debug("CSS injection notice:", e);
+          _log.debug("CSS injection notice:", e);
         }
       };
       view.webContents.on("did-finish-load", inject);
@@ -212,30 +228,38 @@ const trayCode = `/* PROTON_TRAY_PATCH_APPLIED */
       }
     };
 
-    if (typeof Da !== "undefined" && Da) {
-      attachToView(Da.mail);
-      attachToView(Da.calendar);
-      attachToView(Da.account);
+    const _views = (typeof Ys !== "undefined" && Ys) ? Ys : ((typeof Da !== "undefined" && Da) ? Da : null);
+    if (_views) {
+      attachToView(_views.mail);
+      attachToView(_views.calendar);
+      attachToView(_views.account);
     }
   };
 
-  r.app.on("before-quit", () => {
-    r.app.isQuitting = true;
-  });
+  const _el = _getElectron();
+  if (_el?.app) {
+    _el.app.on("before-quit", () => {
+      _el.app.isQuitting = true;
+    });
+  }
 
   initTray();
   initWebViews();
 })();
 `;
 
+// Matches both 1.14.x (T().maximized&&Ba.maximize()...) and 1.15.x (M().maximized&&qs.maximize()...)
+const insertRegex = /([a-zA-Z0-9_$]+)\(\)\.maximized\s*&&\s*([a-zA-Z0-9_$]+)\.maximize\(\),\s*\2\.on\("closed",\s*\(\)\s*=>\s*\{\s*\2\s*=\s*null\s*\}\);/;
+const insertMatch = code.match(insertRegex);
+
 let replacedInsert = false;
-if (code.includes(insertTargetExact)) {
-  code = code.replace(insertTargetExact, insertTargetExact + "\n" + trayCode);
+if (insertMatch) {
+  code = code.replace(insertMatch[0], insertMatch[0] + "\n" + trayCode);
   replacedInsert = true;
 } else {
-  const insertRegex = /T\(\)\.maximized&&Ba\.maximize\(\),Ba\.on\("closed",\s*\(\)\s*=>\s*\{Ba=null\}\);/;
-  if (insertRegex.test(code)) {
-    code = code.replace(insertRegex, match => match + "\n" + trayCode);
+  const insertTargetExact = 'T().maximized&&Ba.maximize(),Ba.on("closed",()=>{Ba=null});';
+  if (code.includes(insertTargetExact)) {
+    code = code.replace(insertTargetExact, insertTargetExact + "\n" + trayCode);
     replacedInsert = true;
   }
 }
