@@ -15,6 +15,7 @@ replaces=('beeper-bin')
 backup=("etc/${_pkgname}-flags.conf")
 install=beeper.install
 depends=(
+    'glib2'
     'libappindicator-gtk3'
     'libnotify'
     'libsecret'
@@ -75,6 +76,79 @@ prepare() {
     if [ -n "${_linux_config_file}" ]; then
         sed -i 's/export{[a-zA-Z0-9_]* as registerLinuxConfig};/const noopFunc=function(){};export{noopFunc as registerLinuxConfig};/' "${_linux_config_file}"
     fi
+
+    # Bridge XDG Desktop Portal color-scheme to Electron nativeTheme for dynamic dark/light switching
+    python3 - <<'EOF' "${_main_dir}"
+import sys, os, re
+
+main_dir = sys.argv[1]
+main_file = None
+for f in os.listdir(main_dir):
+    if f.startswith("main-entry-") and f.endswith(".mjs"):
+        p = os.path.join(main_dir, f)
+        with open(p, "r", encoding="utf-8") as fp:
+            content = fp.read()
+        if "setNativeThemeSource" in content:
+            main_file = p
+            break
+
+if not main_file:
+    sys.exit("Error: setNativeThemeSource not found in main-entry files")
+
+m_cp = re.search(r'import\s+([a-zA-Z0-9_]+)[^;]*from\s*["\']child_process["\']', content)
+cp_var = m_cp.group(1) if m_cp else "Po"
+
+m_nt = re.search(r'nativeTheme\s+as\s+([a-zA-Z0-9_]+)', content)
+nt_var = m_nt.group(1) if m_nt else "rm"
+
+m_set = re.search(r'setNativeThemeSource\s*\(([a-zA-Z0-9_]+)\)\s*\{([^}]+)\}', content)
+if not m_set:
+    sys.exit("Error: setNativeThemeSource signature mismatch")
+param = m_set.group(1)
+
+g2_idx = content.rfind("const G2=", 0, m_set.start())
+if g2_idx == -1:
+    g2_idx = m_set.start()
+
+helper = f"""
+let _targetThemeSource="system",_portalTheme="dark";
+function _applyPortalTheme(){{
+  const _newTheme=_targetThemeSource==="system"?_portalTheme:_targetThemeSource;
+  try{{globalThis.logger?.log?.(`[PortalThemeSync] Applying themeSource: ${{_newTheme}} (target: ${{_targetThemeSource}}, portal: ${{_portalTheme}})`);}}catch(_){{}}
+  {nt_var}.themeSource=_newTheme;
+}}
+function _initPortalThemeSync(){{
+  try{{
+    try{{
+      const out={cp_var}.execFileSync("gdbus",["call","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop","--method","org.freedesktop.portal.Settings.Read","org.freedesktop.appearance","color-scheme"],{{timeout:1500,encoding:"utf8"}});
+      if(out.includes("uint32 1"))_portalTheme="dark";
+      else if(out.includes("uint32 2"))_portalTheme="light";
+    }}catch(_){{}}
+    _applyPortalTheme();
+    const mon={cp_var}.spawn("gdbus",["monitor","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop"],{{stdio:["ignore","pipe","ignore"]}});
+    mon.stdout.on("data",data=>{{
+      const s=data.toString();
+      if(s.includes("org.freedesktop.appearance")&&s.includes("color-scheme")){{
+        if(s.includes("uint32 1")){{_portalTheme="dark";_applyPortalTheme();}}
+        else if(s.includes("uint32 2")){{_portalTheme="light";_applyPortalTheme();}}
+      }}
+    }});
+    mon.on("error",()=>{{}});
+    process.on("exit",()=>{{try{{mon.kill();}}catch(_){{}}}});
+  }}catch(_){{}}
+}}
+_initPortalThemeSync();
+"""
+
+code1 = content[:g2_idx] + helper + content[g2_idx:]
+m_set2 = re.search(r'setNativeThemeSource\s*\(([a-zA-Z0-9_]+)\)\s*\{([^}]+)\}', code1)
+replacement = f"setNativeThemeSource({param}){{_targetThemeSource={param};_applyPortalTheme();}}"
+patched = code1[:m_set2.start()] + replacement + code1[m_set2.end():]
+
+with open(main_file, "w", encoding="utf-8") as fp:
+    fp.write(patched)
+print("Successfully patched", os.path.basename(main_file), "with XDG portal theme sync")
+EOF
 
     # Repack asar preserving unpacked native binaries
     asar pack --unpack "${_extract_dir}/${_unpacked_files_glob}" "${_extract_dir}" "${srcdir}/app.asar"
