@@ -91,7 +91,7 @@ if (!utilsContent.includes('function ensureHostVariant(')) {
     utilsContent = utilsContent.replace('function createWindow(url, storageManager) {', ensureHostVariantSnippet + 'function createWindow(url, storageManager) {\n    url = ensureHostVariant(url);');
 }
 
-const winCreationTargetRegex = /(webPreferences:\s*\{[\s\S]*?devTools:\s*!electron_1\.app\.isPackaged,\s*\},?\s*\}\);)/;
+const winCreationTargetRegex = /(webPreferences:\s*\{[\s\S]*?\},?\s*\}\);)/;
 const winCreationAddition = `$1
     const origLoadURL = win.loadURL.bind(win);
     win.loadURL = (targetUrl, options) => origLoadURL(ensureHostVariant(targetUrl), options);
@@ -209,6 +209,9 @@ if (menuPath && fs.existsSync(menuPath)) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupApplicationMenu = setupApplicationMenu;
 exports.addItemToSubmenu = addItemToSubmenu;
+exports.wslConnectMenuTemplate = wslConnectMenuTemplate;
+exports.wslReopenLocallyTemplate = wslReopenLocallyTemplate;
+exports.relaunchWithWslDistro = relaunchWithWslDistro;
 const electron_1 = require("electron");
 const utils_1 = require("./utils");
 const updater_1 = require("./updater");
@@ -471,6 +474,16 @@ function addItemToSubmenu(appMenu, submenuLabel, position, item) {
     if (!submenuItem?.submenu) return;
     submenuItem.submenu.insert(position, item);
 }
+
+async function wslConnectMenuTemplate() {
+    return null;
+}
+
+function wslReopenLocallyTemplate() {
+    return null;
+}
+
+function relaunchWithWslDistro(_distro) {}
 `;
     fs.writeFileSync(menuPath, fullMenuContent, 'utf8');
     console.log(`Successfully patched ${menuPath}`);
