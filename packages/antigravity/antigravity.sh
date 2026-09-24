@@ -40,17 +40,10 @@ for arg in "${ALL_ARGS[@]}"; do
     fi
 done
 
-# If no ozone platform specified and running under Wayland:
-# On KDE Plasma, run via XWayland (--ozone-platform=x11) so KWin can associate
-# the DBus menu with the window and display it in the KDE Global Menu widget.
-# On other Wayland compositors (Hyprland, Sway, GNOME, etc.), default to native Wayland.
+# If no ozone platform specified and running under Wayland, default to native Wayland
 DEFAULT_PLATFORM_FLAGS=()
 if [[ "$HAS_OZONE" == false && -n "$WAYLAND_DISPLAY" ]]; then
-    if [[ "$XDG_CURRENT_DESKTOP" =~ [Kk][Dd][Ee]|plasma|Plasma ]] || [[ "$KDE_FULL_SESSION" == "true" ]]; then
-        DEFAULT_PLATFORM_FLAGS+=("--ozone-platform=x11")
-    else
-        DEFAULT_PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
-    fi
+    DEFAULT_PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
 fi
 
 # Process titlebar and menubar flags from config file and CLI arguments
