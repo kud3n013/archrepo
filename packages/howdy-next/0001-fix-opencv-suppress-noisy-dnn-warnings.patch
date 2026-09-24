@@ -1,10 +1,66 @@
+--- a/howdy/CMakeLists.txt
++++ b/howdy/CMakeLists.txt
+@@ -239,7 +239,7 @@ target_link_libraries(
+ 
+ add_executable(howdy_compare src/bin/compare.cpp)
+ howdy_configure_native_target(howdy_compare)
+-target_link_libraries(howdy_compare PRIVATE howdy_compare_entrypoint)
++target_link_libraries(howdy_compare PRIVATE howdy_compare_entrypoint howdy_opencv)
+ set_target_properties(howdy_compare PROPERTIES OUTPUT_NAME "howdy-compare")
+ install(
+ 	TARGETS howdy_compare
+--- a/howdy/src/bin/compare.cpp
++++ b/howdy/src/bin/compare.cpp
+@@ -1,7 +1,9 @@
+ #include "compare/entrypoint.hpp"
++#include <opencv2/core/utils/logger.hpp>
+ 
+ #include <sys/types.h>
+ 
+ auto main(int argc, char **argv) -> int {
++	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 	return howdy::native::RunCompareEntrypoint(argc, argv, static_cast<uid_t>(0));
+ }
+--- a/howdy/src/bin/howdy_main.cpp
++++ b/howdy/src/bin/howdy_main.cpp
+@@ -1,6 +1,8 @@
+ #include "app/howdy.hpp"
+ #include "app/howdy_entrypoint.hpp"
++#include <opencv2/core/utils/logger.hpp>
+ 
+ auto main(int argc, char **argv) -> int {
++	cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 	return howdy::native::RunHowdyEntrypoint(argc, argv, HowdyMain);
+ }
 --- a/howdy/src/vision/face_model.cpp
 +++ b/howdy/src/vision/face_model.cpp
-@@ -43,6 +43,7 @@ namespace howdy::native {
+@@ -24,6 +24,7 @@
+ #include <opencv2/core/cvstd_wrapper.hpp>
+ #include <opencv2/core/exception.hpp>
+ #include <opencv2/core/mat.hpp>
++#include <opencv2/core/utils/logger.hpp>
+ #include <opencv2/core/types.hpp>
+ #include <opencv2/imgproc.hpp>
+ #include <opencv2/objdetect/face.hpp>
+@@ -43,6 +44,8 @@ namespace howdy::native {
  		// Classic-engine fallback, which cannot load Howdy's supported ONNX models.
  		// Remove after upstream makes New engine selection/failure behavior suitable.
  		auto ForceOpencvNewDnnEngine() -> bool {
++			cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
 +			setenv("OPENCV_LOG_LEVEL", "ERROR", 1);
  			return setenv("OPENCV_FORCE_DNN_ENGINE", "2", 1) == 0;
  		}
  
+@@ -67,10 +70,12 @@ namespace howdy::native {
+ 		backend_->create_detector = [](const std::string &path, const cv::Size &size,
+ 		                               float score_threshold, float nms_threshold,
+ 		                               int top_k) -> cv::Ptr<cv::FaceDetectorYN> {
++			cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 			return cv::FaceDetectorYN::create(path, "", size, score_threshold, nms_threshold,
+ 			                                  top_k);
+ 		};
+ 		backend_->create_recognizer = [](const std::string &path) -> cv::Ptr<cv::FaceRecognizerSF> {
++			cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
+ 			return cv::FaceRecognizerSF::create(path, "");
+ 		};
+ 		Initialize(config);
