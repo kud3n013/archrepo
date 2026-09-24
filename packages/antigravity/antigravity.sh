@@ -66,8 +66,11 @@ for arg in "${ALL_ARGS[@]}"; do
         --titlebar=overlay)
             export ANTIGRAVITY_TITLEBAR="overlay"
             ;;
-        --menubar=autohide|--menubar=hidden|--hide-menubar|--no-menubar)
-            # Menubar autohide is enabled by default in patched build
+        --menubar=in-app|--menubar=web)
+            export ANTIGRAVITY_MENUBAR="in-app"
+            ;;
+        --menubar=native|--menubar=system|--menubar=autohide|--menubar=hidden|--hide-menubar|--no-menubar)
+            export ANTIGRAVITY_MENUBAR="native"
             ;;
         *)
             FINAL_FLAGS+=("$arg")

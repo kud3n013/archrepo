@@ -36,7 +36,7 @@ if (!fs.existsSync(utilsPath)) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. Patch dist/utils.js
+// 1. Patch dist/utils.js (Window decorations & menubar auto-hide)
 // ---------------------------------------------------------------------------
 let utilsContent = fs.readFileSync(utilsPath, 'utf8');
 
@@ -68,40 +68,15 @@ if (titlebarRegex.test(utilsContent)) {
     process.exit(1);
 }
 
-const ensureHostVariantSnippet = `
-function ensureHostVariant(rawUrl) {
-    if (!rawUrl || typeof rawUrl !== 'string') return rawUrl;
-    try {
-        const u = new URL(rawUrl);
-        if (!u.searchParams.has('hostVariant')) {
-            u.searchParams.set('hostVariant', 'gemini-app');
-            return u.toString();
-        }
-    } catch {
-        if (!rawUrl.includes('hostVariant=gemini-app')) {
-            const sep = rawUrl.includes('?') ? '&' : '?';
-            return rawUrl + sep + 'hostVariant=gemini-app';
-        }
-    }
-    return rawUrl;
-}
-`;
-
-if (!utilsContent.includes('function ensureHostVariant(')) {
-    utilsContent = utilsContent.replace('function createWindow(url, storageManager) {', ensureHostVariantSnippet + 'function createWindow(url, storageManager) {\n    url = ensureHostVariant(url);');
-}
-
+// Ensure clean window creation with auto-hide menu bar without altering window URL / hostVariant
 const winCreationTargetRegex = /(webPreferences:\s*\{[\s\S]*?\},?\s*\}\);)/;
 const winCreationAddition = `$1
-    const origLoadURL = win.loadURL.bind(win);
-    win.loadURL = (targetUrl, options) => origLoadURL(ensureHostVariant(targetUrl), options);
     if (typeof win.setAutoHideMenuBar === 'function') {
         win.setAutoHideMenuBar(true);
         win.setMenuBarVisibility(false);
     }`;
 
-if (!utilsContent.includes('const origLoadURL = win.loadURL.bind(win);')) {
-    utilsContent = utilsContent.replace(/\s*if\s*\(typeof win\.setAutoHideMenuBar === 'function'\)\s*\{\s*win\.setAutoHideMenuBar\(true\);\s*win\.setMenuBarVisibility\(false\);\s*\}/g, '');
+if (!utilsContent.includes('win.setAutoHideMenuBar(true)')) {
     if (winCreationTargetRegex.test(utilsContent)) {
         utilsContent = utilsContent.replace(winCreationTargetRegex, winCreationAddition);
     } else {
@@ -114,26 +89,56 @@ fs.writeFileSync(utilsPath, utilsContent, 'utf8');
 console.log(`Successfully patched ${utilsPath}`);
 
 // ---------------------------------------------------------------------------
-// 2. Patch dist/preload.js
+// 2. Patch dist/preload.js (Clean in-app menu suppression & action IPC bridge)
 // ---------------------------------------------------------------------------
 if (preloadPath && fs.existsSync(preloadPath)) {
     let preloadContent = fs.readFileSync(preloadPath, 'utf8');
     const preloadMarker = '/* antigravity-runtime-patch */';
-    if (!preloadContent.includes(preloadMarker)) {
-        // Strip previous patch marker if present
-        preloadContent = preloadContent.replace(/\/\* antigravity-host-variant-patch \*\/[\s\S]*?\} catch \(_e\) \{\}\s*\n/, '');
-        const preloadPatch = `${preloadMarker}
-try {
-    const currentUrl = new URL(window.location.href);
-    if (currentUrl.protocol.startsWith('http') && currentUrl.searchParams.get('hostVariant') !== 'gemini-app') {
-        currentUrl.searchParams.set('hostVariant', 'gemini-app');
-        window.history.replaceState(null, '', currentUrl.toString());
-    }
-} catch (_e) {}
 
+    // Strip legacy patches if present
+    preloadContent = preloadContent.replace(/\/\* antigravity-host-variant-patch \*\/[\s\S]*?\} catch \(_e\) \{\}\s*\n?/g, '');
+    preloadContent = preloadContent.replace(/\/\* antigravity-runtime-patch \*\/[\s\S]*?\} catch \(_e\) \{\}\s*\n?/g, '');
+
+    const preloadPatch = `${preloadMarker}
+// Cleanly disable in-app React menu bar via feature flag gating (unless --menubar=in-app is specified)
 try {
-    const { ipcRenderer } = require('electron');
-    ipcRenderer.on('antigravity:menu-action', (_event, action) => {
+    const menubarMode = (typeof process !== 'undefined' && process.env && process.env.ANTIGRAVITY_MENUBAR) || 'native';
+    if (menubarMode !== 'in-app') {
+        const { webFrame: __antigravityWebFrame } = require('electron');
+        __antigravityWebFrame.executeJavaScript(\`
+            (() => {
+                try {
+                    const origSet = Map.prototype.set;
+                    Map.prototype.set = function(key, val) {
+                        if (key === "titlebarComponent" && val && typeof val === "object") {
+                            val.showMenuBar = false;
+                            val.showAppIcon = false;
+                        }
+                        return origSet.apply(this, arguments);
+                    };
+                    const origGet = Map.prototype.get;
+                    Map.prototype.get = function(key) {
+                        const val = origGet.apply(this, arguments);
+                        if (key === "titlebarComponent" && val && typeof val === "object") {
+                            val.showMenuBar = false;
+                            val.showAppIcon = false;
+                        }
+                        return val;
+                    };
+                } catch (err) {
+                    console.error("Failed to initialize clean titlebar hook:", err);
+                }
+            })();
+        \`);
+    }
+} catch (err) {
+    console.error("Failed to inject titlebar preload hook:", err);
+}
+
+// Native application menu IPC action bridge
+try {
+    const { ipcRenderer: __antigravityIpc } = require('electron');
+    __antigravityIpc.on('antigravity:menu-action', (_event, action) => {
         try {
             switch (action) {
                 case 'new-conversation': {
@@ -193,12 +198,9 @@ try {
     });
 } catch (_e) {}
 `;
-        preloadContent = preloadPatch + preloadContent;
-        fs.writeFileSync(preloadPath, preloadContent, 'utf8');
-        console.log(`Successfully patched ${preloadPath}`);
-    } else {
-        console.log(`Preload already patched in ${preloadPath}`);
-    }
+    preloadContent = preloadPatch + '\n' + preloadContent;
+    fs.writeFileSync(preloadPath, preloadContent, 'utf8');
+    console.log(`Successfully patched ${preloadPath}`);
 }
 
 // ---------------------------------------------------------------------------

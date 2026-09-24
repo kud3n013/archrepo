@@ -58,11 +58,11 @@ source=(
     "patch-window-controls.js"
 )
 sha256sums=('6a9b0ff60f7bd0d165022034aad9b047b3b0cf2ac56134feded8e68760e2ab01'
-            'cda0081dd5516a7647f346a8b95e50cdb286dc623e696099e26a720a2514285e'
+            '7a282b1e797cc3e9fb2d92a1e01ac5ad90209395c9ab0c7bb74e21f917b26b7f'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
-            '680916db62422f0cca998360cdc1c5f5e6d97362457022a64b864e80a9be1ec3'
+            'd7dda12f69d1e9708a54193223039ed1e07eae4cf4bd2d2f1b8ee69ed153a594'
             'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317'
-            '0c5c8671d9769aa7ee0d3d01477dd11715926a2477db1f713785e2134c098d8a')
+            '1bec76ab7e480eb85d00e507fadd976eb7a41b943d9dc66d0b16e915ec468744')
 
 prepare() {
     local _app_dir="${srcdir}/Antigravity-x64/resources"
