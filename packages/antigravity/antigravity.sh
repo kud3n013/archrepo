@@ -40,11 +40,35 @@ for arg in "${ALL_ARGS[@]}"; do
     fi
 done
 
-# If no ozone platform specified and running under Wayland, default to native Wayland
+# On Wayland, Electron lacks native org_kde_kwin_appmenu Wayland protocol support.
+# On KDE Plasma, run via XWayland (--ozone-platform=x11) so KWin can associate
+# the DBus menu with the window and display it in the KDE Global Menu widget.
+# On other Wayland compositors (Hyprland, Sway, GNOME, etc.), default to native Wayland.
 DEFAULT_PLATFORM_FLAGS=()
-if [[ "$HAS_OZONE" == false && -n "$WAYLAND_DISPLAY" ]]; then
-    DEFAULT_PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
+IS_KDE=false
+if [[ "$XDG_CURRENT_DESKTOP" =~ [Kk][Dd][Ee]|plasma|Plasma ]] || [[ "$KDE_FULL_SESSION" == "true" ]]; then
+    IS_KDE=true
 fi
+
+if [[ "$HAS_OZONE" == false && -n "$WAYLAND_DISPLAY" ]]; then
+    if [[ "$IS_KDE" == true ]]; then
+        DEFAULT_PLATFORM_FLAGS+=("--ozone-platform=x11")
+    else
+        DEFAULT_PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
+    fi
+fi
+
+# Under X11 (or XWayland), GTK loads modules specified in XSETTINGS (e.g. appmenu-gtk-module,
+# colorreload-gtk-module, window-decorations-gtk-module) on KDE Plasma.
+# When Electron unloads GTK via dlclose(), these modules are unmapped from memory while their
+# background GIO file monitors and D-Bus callbacks remain registered.
+# This causes an immediate SIGSEGV (SEGV_ACCERR) when GIO iterations run.
+# Pin all installed GTK3 modules into memory via LD_PRELOAD to prevent dlclose() from unmapping them.
+for _mod in /usr/lib/gtk-3.0/modules/*.so; do
+    if [[ -f "$_mod" ]]; then
+        export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}$_mod"
+    fi
+done
 
 # Process titlebar and menubar flags from config file and CLI arguments
 FINAL_FLAGS=("${DEFAULT_PLATFORM_FLAGS[@]}")
