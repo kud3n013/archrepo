@@ -4,7 +4,7 @@
 
 _pkgname=proton-pass
 pkgname=proton-pass
-pkgver=1.41.0
+pkgver=1.41.1
 pkgrel=1
 pkgdesc="Official desktop application for Proton Pass: end-to-end encrypted password and identity manager (responsive layout & unconstrained resizing)"
 arch=('x86_64')
@@ -60,7 +60,7 @@ source=(
     "${_pkgname}.png"
     "patch-pass.js"
 )
-sha512sums=('2c5c379ca4315b60fd217535b6b906b0e63f0c8839a9e018d58fe9f6f064074e8ec4f5be7048482dd6e8c769fa17e10c8322ef0b5b8257785088af3db19392b9'
+sha512sums=('a4bb0e90270d0fde7beb2aa7a99a1595fc3bc3fbe1ae0062e842d387cdd46a17c24c5b36dd35a3fa37bd6b879dba123b5e7d4a7a3cf679236e1b8b5e416b34c2'
             'f487ebfc94a90013143b58e382b5f05e20f793a03156b757c864e6cced86ca4289a7d613da4f314a504dbd413a51ffde0b8feaf2f4bcd1a59712bd5b96754a60'
             'e6d115db69fd5287d492651807017802ae63955a216226c53e4390af07419f282e2914d1f6862140ac1b5460d390c64134ac4a6eba8338f9648bcef9bfe05bd6'
             '017ca5f2509669efd33a8520a27c784e237a5300b0a37fb69c26076df4e2b167be848eda9ac3214d9d22dbd82cc4706763226b89f280103c52341a72411e3803'
