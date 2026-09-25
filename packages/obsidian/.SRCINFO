@@ -1,11 +1,12 @@
 pkgbase = obsidian
 	pkgdesc = A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)
 	pkgver = 1.13.7
-	pkgrel = 1
+	pkgrel = 2
 	url = https://obsidian.md
 	install = obsidian.install
 	arch = x86_64
 	license = custom:Commercial
+	makedepends = asar
 	depends = alsa-lib
 	depends = at-spi2-core
 	depends = cairo
@@ -31,10 +32,12 @@ pkgbase = obsidian
 	source = obsidian-flags.conf
 	source = obsidian.desktop
 	source = obsidian.png
+	source = patch-portal-theme.js
 	sha256sums = 17dc33b49cb3e785ecc27edd2ea0c79e40207798b554fd2886e36ebee7af9ae0
 	sha256sums = be4ebed45626bb4a4c29aa2f5622d7f73b8c870fcd08e8a82dbc3362cbc23029
 	sha256sums = 1c91e7e39e9ea6e3b299854ca4765be2154c32b28b9c11dca797b570d3ff8b17
 	sha256sums = 37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d
 	sha256sums = 0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40
+	sha256sums = 5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a
 
 pkgname = obsidian
