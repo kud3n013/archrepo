@@ -6,7 +6,7 @@
 _pkgname=zotero
 pkgname=zotero
 pkgver=10.0.3
-pkgrel=10
+pkgrel=11
 pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
 arch=('x86_64')
 url="https://www.zotero.org"
@@ -47,16 +47,18 @@ source=(
     "${_pkgname}.desktop"
     "${_pkgname}.png"
     "${_pkgname}.install"
+    "${_pkgname}-globalmenu.c"
     "patch-omni.py"
     "policies.json"
 )
 
 sha256sums=('45f1d3900b927dfb16dec52e4e3fe8672042c7be94ec6b77ca7712b9ebc9c1b6'
-            '061b636020b32b1de21d4785cb35c2fa35f9caab2d63696fd7dd63c0cd2cc6bb'
+            'f80f66ba38fbb4e33ecbcd1912a2cb7fba65947ca6aec3bd4fdb17cb97f3e41e'
             'd8752428e47776f9700a2e448a84dc6a812b0ee03461e388e2fdd0d917ea4f03'
             'c7c1c942ce9e7c81d49962dadf2113884312d320fb53a60198a25343b7425897'
             'f6e7a114ee74ebcdca351feb7655b8750692541420519f53a2e0dce5c3bfd6a7'
             '3d5e384a134a473344ac4c7246f263dc47b93e5d859f178f927c129e412d3270'
+            'f1088dc0a07f318a0dc332898329283a004000fdc55101166be0e36580e0884f'
             'ac408f2d6075802512455bfceb67ddde894dcf70aac9bb0b5f1db1cbed51411e'
             'e977c3d690224dd727d8761d2c0a66ba41bfd02ae0fd7850c4545d06b5a8e63c')
 
@@ -72,6 +74,11 @@ package() {
 
     # Patch app/omni.ja to enable global menu, native title bar & theme adaptation
     python3 "${srcdir}/patch-omni.py" "${pkgdir}/usr/lib/${_pkgname}/app/omni.ja"
+
+    # Compile and install Global Menu shortcut bridge for KDE Plasma / Qt
+    gcc -shared -fPIC -O2 "${srcdir}/${_pkgname}-globalmenu.c" \
+        -o "${pkgdir}/usr/lib/${_pkgname}/lib${_pkgname}-globalmenu.so" \
+        $(pkg-config --cflags --libs glib-2.0) -ldl
 
     # Install system-wide default preferences for Gecko runtime
     install -dm755 "${pkgdir}/usr/lib/${_pkgname}/app/defaults/preferences"

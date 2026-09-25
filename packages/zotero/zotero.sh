@@ -97,4 +97,9 @@ else
     export ZOTERO_MENUBAR="${ZOTERO_MENUBAR:-autohide}"
 fi
 
+# Enable Global Menu shortcut bridge for KDE Plasma / Qt appmenu
+if [[ "$ZOTERO_GLOBAL_MENU" != "0" ]] && [[ -f "/usr/lib/zotero/libzotero-globalmenu.so" ]]; then
+    export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}/usr/lib/zotero/libzotero-globalmenu.so"
+fi
+
 exec /usr/lib/zotero/zotero-bin -app /usr/lib/zotero/app/application.ini "${FLAGS[@]}" "$@"
