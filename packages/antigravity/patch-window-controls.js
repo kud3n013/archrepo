@@ -85,6 +85,168 @@ if (!utilsContent.includes('win.setAutoHideMenuBar(true)')) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// 1b. Linux XDG Desktop Portal theme synchronization bridge
+// ---------------------------------------------------------------------------
+const themeModeRegex = /function getThemeMode\(\)\s*\{[\s\S]*?\n\}/;
+const portalThemeHelper = `// ---------------------------------------------------------------------------
+// Linux XDG Desktop Portal theme synchronization bridge
+// ---------------------------------------------------------------------------
+let _portalTheme = 'dark';
+let _targetThemeSource = 'system';
+let _portalSyncInitialized = false;
+
+function _readPortalThemeSync() {
+    if (process.platform !== 'linux') {
+        return electron_1.nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+    }
+    const cp = require('child_process');
+    try {
+        const out = cp.execFileSync('gdbus', [
+            'call', '--session', '--dest', 'org.freedesktop.portal.Desktop',
+            '--object-path', '/org/freedesktop/portal/desktop',
+            '--method', 'org.freedesktop.portal.Settings.Read',
+            'org.freedesktop.appearance', 'color-scheme'
+        ], { timeout: 1000, encoding: 'utf8' });
+        if (out.includes('uint32 1')) return 'dark';
+        if (out.includes('uint32 2')) return 'light';
+    } catch (_) {}
+    try {
+        const out2 = cp.execFileSync('dbus-send', [
+            '--session', '--print-reply=literal',
+            '--dest=org.freedesktop.portal.Desktop',
+            '/org/freedesktop/portal/desktop',
+            'org.freedesktop.portal.Settings.Read',
+            'string:org.freedesktop.appearance', 'string:color-scheme'
+        ], { timeout: 1000, encoding: 'utf8' });
+        if (out2.includes('uint32 1')) return 'dark';
+        if (out2.includes('uint32 2')) return 'light';
+    } catch (_) {}
+    try {
+        const kde = cp.execFileSync('kreadconfig6', ['--group', 'General', '--key', 'ColorScheme'], { timeout: 500, encoding: 'utf8' }).trim();
+        if (kde.toLowerCase().includes('dark')) return 'dark';
+        if (kde) return 'light';
+    } catch (_) {}
+    try {
+        const gs = cp.execFileSync('gsettings', ['get', 'org.gnome.desktop.interface', 'color-scheme'], { timeout: 500, encoding: 'utf8' });
+        if (gs.includes('prefer-dark')) return 'dark';
+        if (gs.includes('prefer-light')) return 'light';
+    } catch (_) {}
+    return electron_1.nativeTheme.shouldUseDarkColors ? 'dark' : 'light';
+}
+
+function _readConfigThemeMode() {
+    try {
+        const filePath = (0, paths_1.getSettingsPbPath)();
+        if (fs.existsSync(filePath)) {
+            const config = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            const mode = config?.userSettings?.themeMode;
+            if (mode && mode.includes('LIGHT')) return 'light';
+            if (mode && mode.includes('DARK')) return 'dark';
+            return 'system';
+        }
+    } catch (_) {}
+    return 'system';
+}
+
+function _applyPortalTheme() {
+    _portalTheme = _readPortalThemeSync();
+    _targetThemeSource = _readConfigThemeMode();
+    if (_targetThemeSource === 'system') {
+        electron_1.nativeTheme.themeSource = _portalTheme;
+    } else {
+        electron_1.nativeTheme.themeSource = _targetThemeSource;
+    }
+}
+
+function _initPortalThemeSync() {
+    if (_portalSyncInitialized || process.platform !== 'linux') return;
+    _portalSyncInitialized = true;
+    _applyPortalTheme();
+
+    const cp = require('child_process');
+    try {
+        const mon = cp.spawn('gdbus', [
+            'monitor', '--session',
+            '--dest', 'org.freedesktop.portal.Desktop',
+            '--object-path', '/org/freedesktop/portal/desktop'
+        ], { stdio: ['ignore', 'pipe', 'ignore'] });
+        mon.stdout.on('data', (data) => {
+            const s = data.toString();
+            if (s.includes('org.freedesktop.appearance') && s.includes('color-scheme')) {
+                if (s.includes('uint32 1') || s.includes('1')) {
+                    _portalTheme = 'dark';
+                } else if (s.includes('uint32 2') || s.includes('2')) {
+                    _portalTheme = 'light';
+                }
+                if (_targetThemeSource === 'system') {
+                    electron_1.nativeTheme.themeSource = _portalTheme;
+                }
+            }
+        });
+        mon.on('error', () => {});
+    } catch (_) {}
+
+    try {
+        const configPath = (0, paths_1.getSettingsPbPath)();
+        const configDir = path_1.default.dirname(configPath);
+        if (fs.existsSync(configDir)) {
+            fs.watch(configDir, (_eventType, filename) => {
+                if (!filename || filename === 'config.json') {
+                    _applyPortalTheme();
+                }
+            });
+        }
+    } catch (_) {}
+
+    electron_1.nativeTheme.on('updated', () => {
+        const isDark = electron_1.nativeTheme.shouldUseDarkColors;
+        const bg = isDark ? '#131313' : '#FAFAFA';
+        for (const win of electron_1.BrowserWindow.getAllWindows()) {
+            try {
+                win.setBackgroundColor(bg);
+            } catch (_) {}
+        }
+    });
+}
+
+_initPortalThemeSync();
+
+function getThemeMode() {
+    try {
+        if (typeof _applyPortalTheme === 'function') {
+            _applyPortalTheme();
+        }
+        const filePath = (0, paths_1.getSettingsPbPath)();
+        if (!fs.existsSync(filePath)) {
+            return _portalTheme === 'dark' ? 'DARK' : 'LIGHT';
+        }
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const config = JSON.parse(content);
+        const themeMode = config?.userSettings?.themeMode;
+        if (themeMode && themeMode.includes('INHERIT')) {
+            return _portalTheme === 'dark' ? 'DARK' : 'LIGHT';
+        }
+        if (themeMode && themeMode.includes('LIGHT')) {
+            return 'LIGHT';
+        }
+        return 'DARK';
+    }
+    catch (e) {
+        console.error('Error reading theme mode:', e);
+        return 'DARK';
+    }
+}`;
+
+if (!utilsContent.includes('_portalSyncInitialized')) {
+    if (themeModeRegex.test(utilsContent)) {
+        utilsContent = utilsContent.replace(themeModeRegex, portalThemeHelper);
+    } else {
+        console.error('Error: Could not locate getThemeMode in utils.js');
+        process.exit(1);
+    }
+}
+
 fs.writeFileSync(utilsPath, utilsContent, 'utf8');
 console.log(`Successfully patched ${utilsPath}`);
 

@@ -1,7 +1,7 @@
 pkgbase = antigravity
 	pkgdesc = Google Antigravity 2.0 multi-agent orchestration platform
 	pkgver = 2.17.0
-	pkgrel = 3
+	pkgrel = 4
 	url = https://antigravity.google
 	install = antigravity.install
 	arch = x86_64
@@ -50,6 +50,6 @@ pkgbase = antigravity
 	sha256sums = 5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692
 	sha256sums = d7dda12f69d1e9708a54193223039ed1e07eae4cf4bd2d2f1b8ee69ed153a594
 	sha256sums = b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317
-	sha256sums = 1bec76ab7e480eb85d00e507fadd976eb7a41b943d9dc66d0b16e915ec468744
+	sha256sums = b1b814ef57cab650aaddcd33a6ac002bf0c8ca56bc134620848e3bff7cccd844
 
 pkgname = antigravity
