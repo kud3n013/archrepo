@@ -5,7 +5,7 @@
 _pkgname=obsidian
 pkgname=obsidian
 pkgver=1.13.7
-pkgrel=2
+pkgrel=3
 pkgdesc="A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)"
 arch=('x86_64')
 url="https://obsidian.md"
@@ -34,9 +34,11 @@ depends=(
 
 makedepends=(
     'asar'
+    'glib2'
 )
 
 optdepends=(
+    'appmenu-gtk-module: for KDE Plasma Global Menu support'
     'libappindicator-gtk3: tray icon support'
     'wl-clipboard: clipboard support on Wayland'
 )
@@ -48,18 +50,22 @@ source=(
     "${pkgname}.desktop"
     "${pkgname}.png"
     "patch-portal-theme.js"
+    "${pkgname}-globalmenu.c"
+    "patch-globalmenu.js"
 )
 
 sha256sums=('17dc33b49cb3e785ecc27edd2ea0c79e40207798b554fd2886e36ebee7af9ae0'
-            'be4ebed45626bb4a4c29aa2f5622d7f73b8c870fcd08e8a82dbc3362cbc23029'
-            '1c91e7e39e9ea6e3b299854ca4765be2154c32b28b9c11dca797b570d3ff8b17'
+            'd41ca0fc089e33cdcb088d4a37a21babc19cf7a8862d4746a163002ec28c5ef0'
+            '2d34e72032d0ffd1bb9a93e8cce80dfc2ff23c88ed2f95206e27c18c1cbdb5bd'
             '37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d'
             '0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40'
-            '5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a')
+            '5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a'
+            '8cb8d012c74481c26696c02c25aeed1dacf3da7fcec596aa4172e85be18417c1'
+            '019e90137432e215d09ac6c1edcf8be321a100ac4bae8f61dba66c61022803e7')
 
 prepare() {
     cd "${srcdir}"
-    rm -rf "${srcdir}/deb-data" "${srcdir}/app-extracted"
+    rm -rf "${srcdir}/deb-data" "${srcdir}/app-extracted" "${srcdir}/obsidian-extracted"
     mkdir -p "${srcdir}/deb-data"
     bsdtar -xf "${srcdir}/data.tar.xz" -C "${srcdir}/deb-data"
 
@@ -74,12 +80,30 @@ prepare() {
     # Apply real-time XDG portal theme synchronization bridge
     node "${srcdir}/patch-portal-theme.js" "${srcdir}/app-extracted/main.js"
 
-    # Validate syntax of patched main.js
+    # Unpack obsidian.asar
+    ${_asar_cmd} extract "${srcdir}/deb-data/opt/Obsidian/resources/obsidian.asar" "${srcdir}/obsidian-extracted"
+
+    # Apply KDE Global Menu integration patches to app.asar and obsidian.asar
+    node "${srcdir}/patch-globalmenu.js" "${srcdir}/app-extracted/main.js" "${srcdir}/obsidian-extracted/main.js"
+
+    # Validate syntax of patched files
     node -c "${srcdir}/app-extracted/main.js"
+    node -c "${srcdir}/obsidian-extracted/main.js"
+
+    # Repack obsidian.asar
+    ${_asar_cmd} pack "${srcdir}/obsidian-extracted" "${srcdir}/deb-data/opt/Obsidian/resources/obsidian.asar"
+    rm -rf "${srcdir}/obsidian-extracted"
 
     # Repack app.asar preserving native unpacked binaries
     ${_asar_cmd} pack "${srcdir}/app-extracted" "${srcdir}/deb-data/opt/Obsidian/resources/app.asar" --unpack '{*.node,*.mm}'
     rm -rf "${srcdir}/app-extracted"
+}
+
+build() {
+    cd "${srcdir}"
+    gcc -shared -fPIC -O2 "${srcdir}/${_pkgname}-globalmenu.c" \
+        -o "${srcdir}/lib${_pkgname}-globalmenu.so" \
+        $(pkg-config --cflags --libs glib-2.0) -ldl
 }
 
 package() {
@@ -90,6 +114,9 @@ package() {
 
     # Install Obsidian CLI symlink in /usr/bin so it is globally available
     ln -sf "/opt/Obsidian/obsidian-cli" "${pkgdir}/usr/bin/obsidian-cli"
+
+    # Install Global Menu shortcut bridge for KDE Plasma / Qt
+    install -Dm755 "${srcdir}/lib${_pkgname}-globalmenu.so" "${pkgdir}/opt/Obsidian/lib${_pkgname}-globalmenu.so"
 
     # Update desktop entry to call the wrapper script and create standard symlink
     sed -i "s|/opt/Obsidian/obsidian|${_pkgname}|" "${pkgdir}/usr/share/applications/md.obsidian.Obsidian.desktop"
