@@ -4,7 +4,7 @@
 _pkgname=beeper
 pkgname=beeper
 pkgver=4.3.144
-pkgrel=1
+pkgrel=2
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -52,11 +52,12 @@ prepare() {
         chmod +x "${_extract_bin}"
     fi
 
+    rm -rf "${srcdir}/squashfs-root"
     "${_extract_bin}" --appimage-extract >/dev/null
     [ "${_extract_bin}" != "./${_appimage}" ] && rm -f "${_extract_bin}"
 
     # Explicitly set APPDIR in AppRun
-    sed -Ei 's@^(if \[ -z "\$APPDIR" ] ; then)$@APPDIR="/opt/beeper"\n\1@' "${srcdir}/squashfs-root/AppRun"
+    sed -Ei 's@^(if \[ -z "\$APPDIR" ] ; then)$@APPDIR="${APPDIR:-/opt/beeper}"\n\1@' "${srcdir}/squashfs-root/AppRun"
 
     local _app_dir="${srcdir}/squashfs-root/resources"
     local _asar_file="${_app_dir}/app.asar"
@@ -79,7 +80,7 @@ prepare() {
 
     # Bridge XDG Desktop Portal color-scheme to Electron nativeTheme for dynamic dark/light switching
     python3 - <<'EOF' "${_main_dir}"
-import sys, os, re
+import sys, os, re, subprocess
 
 main_dir = sys.argv[1]
 main_file = None
@@ -95,9 +96,6 @@ for f in os.listdir(main_dir):
 if not main_file:
     sys.exit("Error: setNativeThemeSource not found in main-entry files")
 
-m_cp = re.search(r'import\s+([a-zA-Z0-9_]+)[^;]*from\s*["\']child_process["\']', content)
-cp_var = m_cp.group(1) if m_cp else "Po"
-
 m_nt = re.search(r'nativeTheme\s+as\s+([a-zA-Z0-9_]+)', content)
 nt_var = m_nt.group(1) if m_nt else "rm"
 
@@ -106,10 +104,15 @@ if not m_set:
     sys.exit("Error: setNativeThemeSource signature mismatch")
 param = m_set.group(1)
 
-g2_idx = content.rfind("const G2=", 0, m_set.start())
-if g2_idx == -1:
-    g2_idx = m_set.start()
+# Prepend child_process import
+content = 'import _portalChildProcess from "node:child_process";\n' + content
 
+# Replace setNativeThemeSource in the object literal
+m_set2 = re.search(r'setNativeThemeSource\s*\(([a-zA-Z0-9_]+)\)\s*\{([^}]+)\}', content)
+replacement = f"setNativeThemeSource({param}){{_targetThemeSource={param};_applyPortalTheme();}}"
+content = content[:m_set2.start()] + replacement + content[m_set2.end():]
+
+# Append portal sync implementation cleanly at module level (bottom of file)
 helper = f"""
 let _targetThemeSource="system",_portalTheme="dark";
 function _applyPortalTheme(){{
@@ -120,12 +123,18 @@ function _applyPortalTheme(){{
 function _initPortalThemeSync(){{
   try{{
     try{{
-      const out={cp_var}.execFileSync("gdbus",["call","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop","--method","org.freedesktop.portal.Settings.Read","org.freedesktop.appearance","color-scheme"],{{timeout:1500,encoding:"utf8"}});
+      const out=_portalChildProcess.execFileSync("gdbus",["call","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop","--method","org.freedesktop.portal.Settings.Read","org.freedesktop.appearance","color-scheme"],{{timeout:1500,encoding:"utf8"}});
       if(out.includes("uint32 1"))_portalTheme="dark";
       else if(out.includes("uint32 2"))_portalTheme="light";
-    }}catch(_){{}}
+    }}catch(_){{
+      try{{
+        const out2=_portalChildProcess.execFileSync("dbus-send",["--session","--print-reply=literal","--dest=org.freedesktop.portal.Desktop","/org/freedesktop/portal/desktop","org.freedesktop.portal.Settings.Read","string:org.freedesktop.appearance","string:color-scheme"],{{timeout:1500,encoding:"utf8"}});
+        if(out2.includes("uint32 1"))_portalTheme="dark";
+        else if(out2.includes("uint32 2"))_portalTheme="light";
+      }}catch(_){{}}
+    }}
     _applyPortalTheme();
-    const mon={cp_var}.spawn("gdbus",["monitor","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop"],{{stdio:["ignore","pipe","ignore"]}});
+    const mon=_portalChildProcess.spawn("gdbus",["monitor","--session","--dest","org.freedesktop.portal.Desktop","--object-path","/org/freedesktop/portal/desktop"],{{stdio:["ignore","pipe","ignore"]}});
     mon.stdout.on("data",data=>{{
       const s=data.toString();
       if(s.includes("org.freedesktop.appearance")&&s.includes("color-scheme")){{
@@ -140,14 +149,13 @@ function _initPortalThemeSync(){{
 _initPortalThemeSync();
 """
 
-code1 = content[:g2_idx] + helper + content[g2_idx:]
-m_set2 = re.search(r'setNativeThemeSource\s*\(([a-zA-Z0-9_]+)\)\s*\{([^}]+)\}', code1)
-replacement = f"setNativeThemeSource({param}){{_targetThemeSource={param};_applyPortalTheme();}}"
-patched = code1[:m_set2.start()] + replacement + code1[m_set2.end():]
+content = content + "\n" + helper
 
 with open(main_file, "w", encoding="utf-8") as fp:
-    fp.write(patched)
-print("Successfully patched", os.path.basename(main_file), "with XDG portal theme sync")
+    fp.write(content)
+
+subprocess.run(["node", "-c", main_file], check=True)
+print("Successfully patched and validated", os.path.basename(main_file), "with XDG portal theme sync")
 EOF
 
     # Repack asar preserving unpacked native binaries

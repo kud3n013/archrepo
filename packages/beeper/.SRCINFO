@@ -1,7 +1,7 @@
 pkgbase = beeper
 	pkgdesc = The ultimate messaging app (formerly Beeper v4)
 	pkgver = 4.3.144
-	pkgrel = 1
+	pkgrel = 2
 	url = https://www.beeper.com/changelog
 	install = beeper.install
 	arch = x86_64
