@@ -5,7 +5,7 @@ _pkgname=antigravity
 pkgname=antigravity
 pkgver=2.17.0
 _build=5217732355031040
-pkgrel=4
+pkgrel=5
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
 url="https://antigravity.google"
@@ -62,7 +62,7 @@ sha256sums=('6a9b0ff60f7bd0d165022034aad9b047b3b0cf2ac56134feded8e68760e2ab01'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
             'd7dda12f69d1e9708a54193223039ed1e07eae4cf4bd2d2f1b8ee69ed153a594'
             'b27f0e4a6f14f491ba31bb24533a1f43c677362b12a0744a53fdd09d7c785317'
-            'b1b814ef57cab650aaddcd33a6ac002bf0c8ca56bc134620848e3bff7cccd844')
+            'ce4e5b288978d821ff0a3d7f1857442f378cb1b32d12e86ebd275eec2f4a3b07')
 
 prepare() {
     local _app_dir="${srcdir}/Antigravity-x64/resources"

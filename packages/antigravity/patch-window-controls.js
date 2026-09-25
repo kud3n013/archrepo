@@ -95,6 +95,7 @@ const portalThemeHelper = `// --------------------------------------------------
 let _portalTheme = 'dark';
 let _targetThemeSource = 'system';
 let _portalSyncInitialized = false;
+let _isAppQuitting = false;
 
 function _readPortalThemeSync() {
     if (process.platform !== 'linux') {
@@ -107,7 +108,7 @@ function _readPortalThemeSync() {
             '--object-path', '/org/freedesktop/portal/desktop',
             '--method', 'org.freedesktop.portal.Settings.Read',
             'org.freedesktop.appearance', 'color-scheme'
-        ], { timeout: 1000, encoding: 'utf8' });
+        ], { timeout: 1500, encoding: 'utf8' });
         if (out.includes('uint32 1')) return 'dark';
         if (out.includes('uint32 2')) return 'light';
     } catch (_) {}
@@ -118,7 +119,7 @@ function _readPortalThemeSync() {
             '/org/freedesktop/portal/desktop',
             'org.freedesktop.portal.Settings.Read',
             'string:org.freedesktop.appearance', 'string:color-scheme'
-        ], { timeout: 1000, encoding: 'utf8' });
+        ], { timeout: 1500, encoding: 'utf8' });
         if (out2.includes('uint32 1')) return 'dark';
         if (out2.includes('uint32 2')) return 'light';
     } catch (_) {}
@@ -150,20 +151,12 @@ function _readConfigThemeMode() {
 }
 
 function _applyPortalTheme() {
-    _portalTheme = _readPortalThemeSync();
-    _targetThemeSource = _readConfigThemeMode();
-    if (_targetThemeSource === 'system') {
-        electron_1.nativeTheme.themeSource = _portalTheme;
-    } else {
-        electron_1.nativeTheme.themeSource = _targetThemeSource;
-    }
+    const newTheme = _targetThemeSource === 'system' ? _portalTheme : _targetThemeSource;
+    electron_1.nativeTheme.themeSource = newTheme;
 }
 
-function _initPortalThemeSync() {
-    if (_portalSyncInitialized || process.platform !== 'linux') return;
-    _portalSyncInitialized = true;
-    _applyPortalTheme();
-
+function _startPortalMonitor() {
+    if (process.platform !== 'linux' || _isAppQuitting) return;
     const cp = require('child_process');
     try {
         const mon = cp.spawn('gdbus', [
@@ -171,29 +164,56 @@ function _initPortalThemeSync() {
             '--dest', 'org.freedesktop.portal.Desktop',
             '--object-path', '/org/freedesktop/portal/desktop'
         ], { stdio: ['ignore', 'pipe', 'ignore'] });
+
         mon.stdout.on('data', (data) => {
             const s = data.toString();
-            if (s.includes('org.freedesktop.appearance') && s.includes('color-scheme')) {
-                if (s.includes('uint32 1') || s.includes('1')) {
-                    _portalTheme = 'dark';
-                } else if (s.includes('uint32 2') || s.includes('2')) {
-                    _portalTheme = 'light';
-                }
-                if (_targetThemeSource === 'system') {
-                    electron_1.nativeTheme.themeSource = _portalTheme;
+            for (const line of s.split('\\n')) {
+                if (line.includes('org.freedesktop.appearance') && line.includes('color-scheme')) {
+                    if (line.includes('uint32 1') || /color-scheme['"],\\s*<[a-z0-9@_]*\\s*1\\s*>/i.test(line)) {
+                        _portalTheme = 'dark';
+                        _applyPortalTheme();
+                    } else if (line.includes('uint32 2') || /color-scheme['"],\\s*<[a-z0-9@_]*\\s*2\\s*>/i.test(line)) {
+                        _portalTheme = 'light';
+                        _applyPortalTheme();
+                    }
                 }
             }
         });
+
         mon.on('error', () => {});
+        mon.on('close', () => {
+            if (!_isAppQuitting) {
+                setTimeout(_startPortalMonitor, 2000);
+            }
+        });
+
+        process.on('exit', () => {
+            _isAppQuitting = true;
+            try { mon.kill(); } catch (_) {}
+        });
     } catch (_) {}
+}
+
+function _initPortalThemeSync() {
+    if (_portalSyncInitialized || process.platform !== 'linux') return;
+    _portalSyncInitialized = true;
+    _portalTheme = _readPortalThemeSync();
+    _targetThemeSource = _readConfigThemeMode();
+    _applyPortalTheme();
+    _startPortalMonitor();
 
     try {
         const configPath = (0, paths_1.getSettingsPbPath)();
         const configDir = path_1.default.dirname(configPath);
         if (fs.existsSync(configDir)) {
+            let debounceTimer = null;
             fs.watch(configDir, (_eventType, filename) => {
                 if (!filename || filename === 'config.json') {
-                    _applyPortalTheme();
+                    if (debounceTimer) clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        _targetThemeSource = _readConfigThemeMode();
+                        _applyPortalTheme();
+                    }, 100);
                 }
             });
         }
@@ -202,9 +222,17 @@ function _initPortalThemeSync() {
     electron_1.nativeTheme.on('updated', () => {
         const isDark = electron_1.nativeTheme.shouldUseDarkColors;
         const bg = isDark ? '#131313' : '#FAFAFA';
+        const fg = isDark ? '#FAFAFA' : '#383A42';
         for (const win of electron_1.BrowserWindow.getAllWindows()) {
             try {
                 win.setBackgroundColor(bg);
+                if (typeof win.setTitleBarOverlay === 'function') {
+                    win.setTitleBarOverlay({
+                        color: bg,
+                        symbolColor: fg,
+                        height: 30
+                    });
+                }
             } catch (_) {}
         }
     });
@@ -214,23 +242,10 @@ _initPortalThemeSync();
 
 function getThemeMode() {
     try {
-        if (typeof _applyPortalTheme === 'function') {
-            _applyPortalTheme();
-        }
-        const filePath = (0, paths_1.getSettingsPbPath)();
-        if (!fs.existsSync(filePath)) {
-            return _portalTheme === 'dark' ? 'DARK' : 'LIGHT';
-        }
-        const content = fs.readFileSync(filePath, 'utf-8');
-        const config = JSON.parse(content);
-        const themeMode = config?.userSettings?.themeMode;
-        if (themeMode && themeMode.includes('INHERIT')) {
-            return _portalTheme === 'dark' ? 'DARK' : 'LIGHT';
-        }
-        if (themeMode && themeMode.includes('LIGHT')) {
-            return 'LIGHT';
-        }
-        return 'DARK';
+        const mode = _readConfigThemeMode();
+        if (mode === 'light') return 'LIGHT';
+        if (mode === 'dark') return 'DARK';
+        return _portalTheme === 'dark' ? 'DARK' : 'LIGHT';
     }
     catch (e) {
         console.error('Error reading theme mode:', e);
