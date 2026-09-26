@@ -61,6 +61,7 @@ replaces=(
   "${pkgname}-bin"
   "${pkgname}-editor"
 )
+options=('!debug')
 backup=("etc/${pkgname}-flags.conf")
 install="${pkgname}.install"
 
@@ -83,10 +84,9 @@ sha256sums=(
 _srcenv() {
   cd "${srcdir}/${_archive}"
   export CARGO_HOME="${srcdir}/cargo-home"
-  export CARGO_PROFILE_RELEASE_DEBUG=2
+  export CARGO_PROFILE_RELEASE_DEBUG=0
   export CARGO_PROFILE_RELEASE_STRIP=false
   export CARGO_PROFILE_RELEASE_LTO=thin
-  export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=1
   export CARGO_PROFILE_RELEASE_OPT_LEVEL=3
   CFLAGS+=' -ffat-lto-objects'
   CXXFLAGS+=' -ffat-lto-objects'

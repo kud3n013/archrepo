@@ -47,6 +47,7 @@ pkgbase = zed
 	conflicts = zed-editor
 	replaces = zed-bin
 	replaces = zed-editor
+	options = !debug
 	backup = etc/zed-flags.conf
 	source = https://github.com/zed-industries/zed/archive/v1.21.0/zed-1.21.0.tar.gz
 	source = zed.sh

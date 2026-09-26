@@ -118,7 +118,7 @@ jobs:
           PKG="${{ matrix.name }}"
           cd "src/packages/${PKG}"
 
-          PKG_FILE=$(sudo -u builder makepkg --packagelist | head -1 | xargs basename)
+          PKG_FILE=$(sudo -u builder makepkg --packagelist | sed -n '1p' | xargs basename)
           echo "target_pkg=${PKG_FILE}" >> "$GITHUB_OUTPUT"
 
           FORCE="${{ github.event.inputs.force_rebuild || 'false' }}"

@@ -154,13 +154,14 @@ For modern Wayland compositors (such as Hyprland, Sway, KDE Wayland) and high-re
 
 ---
 
-### Step 9: Verification & Delivery Checklist
-Before completing the task:
+### Step 9: Git Push, CI Inspection & Autonomous Remediation Loop
+Before finishing:
 - [ ] Run `makepkg --printsrcinfo > .SRCINFO` to verify syntax.
 - [ ] Test package build with `makepkg` (ensure files, wrapper, flags, and desktop entry are placed in correct `${pkgdir}` paths).
 - [ ] Verify tarball contents with `tar -tf [pkgname]-*.pkg.tar.zst`.
 - [ ] Clean up local temporary/build files (`src/`, `pkg/`, tarballs).
-- [ ] Commit and push changes to `main`.
-- [ ] Monitor GitHub Actions workflow run to verify clean build and release publication.
-- [ ] Provide user with the exact pacman install command (`sudo pacman -Sy [pkgname]`).
+- [ ] Commit and push changes to `main`: `git add packages/[pkgname]/ && git commit -m "feat([pkgname]): add package" && git push origin main`.
+- [ ] **Wait & Inspect CI Build**: Run `gh run watch` to monitor the GitHub Actions build live.
+- [ ] **Remediate Failures**: If the CI run fails, inspect `gh run view --log-failed`, diagnose the failure (missing dependencies, checksums, flags), apply fixes locally, bump `pkgrel`, regenerate `.SRCINFO`, commit, and push again. **Repeat until the CI build succeeds (`conclusion: success`).**
+- [ ] Provide user with the exact pacman install command (`sudo pacman -Syu [pkgname]`).
 ```
