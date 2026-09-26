@@ -3,8 +3,8 @@
 
 _pkgname=beeper
 pkgname=beeper
-pkgver=4.3.144
-pkgrel=2
+pkgver=4.3.152
+pkgrel=1
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -34,7 +34,7 @@ source=(
     "beeper.desktop"
     "beeper-flags.conf"
 )
-sha256sums=('0272fa8c451e6fdf7a061265a3bf656f41e006a36263e087b2c19ae4625d5f13'
+sha256sums=('81e16d64a5ae425d31eacdc6e420a8ec0923d81f258480f844e8a4098b9c77ec'
             '765e2b3e39089e66f4f17697048330f36031b3bc18266d1c58bba4c7025ed28e'
             '690219ebbdde65466ca17b01e3b3c215ae94210ea89f71d084b2edb12c20ba32'
             '3d2101c089fd0a45c58a0e45f87b3a8d8465b63a7fdc701100859c691c0c2700')
