@@ -45,6 +45,7 @@ Install any package using `sudo pacman -S <package>`.
 | **`searxng`** | Privacy-respecting metasearch engine with systemd service & Valkey integration | [searxng/searxng](https://searxng.github.io/searxng/) |
 | **`sine`** | Mod & theme manager for Firefox-based browsers (Zen, Floorp, LibreWolf, Firefox) | [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine) |
 | **`zalo-for-linux`** | Zalo desktop client with Wayland / Hyprland scaling fixes and bundled logo | [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux) |
+| **`zed`** | High-performance, multiplayer code editor (native Wayland GPUI, Vulkan) | [Zed](https://zed.dev) |
 | **`zotero`** | Reference manager with native title bar, KDE Global Menu, and Hyprland/KDE auto-theming | [Zotero](https://www.zotero.org) |
 | **`zotero-better-bibtex`** | Better BibTeX LaTeX bibliography and citation management for Zotero | [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex) |
 | **`zotero-better-notes`** | Comprehensive note taking and knowledge management for Zotero | [windingwind/zotero-better-notes](https://github.com/windingwind/zotero-better-notes) |
