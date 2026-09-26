@@ -1,0 +1,60 @@
+pkgbase = zed-globalmenu
+	pkgdesc = A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter (with KDE Global Menu patch)
+	pkgver = 1.21.0
+	pkgrel = 1
+	url = https://zed.dev
+	install = zed-globalmenu.install
+	arch = x86_64
+	license = GPL-3.0-or-later
+	license = AGPL-3.0-or-later
+	license = Apache-2.0
+	makedepends = cargo
+	makedepends = clang
+	makedepends = cmake
+	makedepends = gettext
+	makedepends = git
+	makedepends = pkgconf
+	makedepends = protobuf
+	makedepends = vulkan-headers
+	makedepends = vulkan-validation-layers
+	depends = alsa-lib
+	depends = curl
+	depends = fontconfig
+	depends = gcc-libs
+	depends = git
+	depends = glib2
+	depends = glibc
+	depends = libx11
+	depends = libxcb
+	depends = libxkbcommon
+	depends = libxkbcommon-x11
+	depends = sqlite
+	depends = vulkan-driver
+	depends = vulkan-icd-loader
+	depends = wayland
+	depends = zstd
+	optdepends = org.freedesktop.secrets: to keep you logged into your Zed account
+	optdepends = clang: improved C/C++ language support
+	optdepends = rust-analyzer: improved Rust language support
+	optdepends = nodejs>=18: improved JavaScript/TypeScript language support
+	optdepends = npm: package manager for extensions and language servers
+	provides = zed=1.21.0
+	provides = zed-bin=1.21.0
+	provides = zed-editor=1.21.0
+	provides = zeditor=1.21.0
+	conflicts = zed
+	conflicts = zed-bin
+	conflicts = zed-editor
+	replaces = zed-editor
+	options = !debug
+	backup = etc/zed-globalmenu-flags.conf
+	source = zed-1.21.0.tar.gz::https://github.com/zed-industries/zed/archive/v1.21.0.tar.gz
+	source = zed-globalmenu.patch
+	source = zed-globalmenu.sh
+	source = zed-globalmenu-flags.conf
+	sha256sums = 37356f2cb6ca4714937be200edad278cb0f6137b4c3eec66a0743b5f523e1ee5
+	sha256sums = d22c45629fd80d238c98926eca88e6ef38fc11d7417994e112972f4610ba15ce
+	sha256sums = 7a0d9e2dc08e54a995c270e82efe65c6564f4963accf81daa69479403dd1be8d
+	sha256sums = bce9b29655dcc73c3b47233cf0b1f483cda3d302c30a1e60fe4326f4a42d07f4
+
+pkgname = zed-globalmenu

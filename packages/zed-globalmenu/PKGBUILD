@@ -1,0 +1,198 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Contributor: Caleb Maclennan <caleb@alerque.com>
+
+pkgname=zed-globalmenu
+pkgver=1.21.0
+pkgrel=1
+pkgdesc="A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter (with KDE Global Menu patch)"
+arch=('x86_64')
+url="https://zed.dev"
+_url="https://github.com/zed-industries/zed"
+license=('GPL-3.0-or-later' 'AGPL-3.0-or-later' 'Apache-2.0')
+depends=(
+  'alsa-lib'
+  'curl'
+  'fontconfig'
+  'gcc-libs'
+  'git'
+  'glib2'
+  'glibc'
+  'libx11'
+  'libxcb'
+  'libxkbcommon'
+  'libxkbcommon-x11'
+  'sqlite'
+  'vulkan-driver'
+  'vulkan-icd-loader'
+  'wayland'
+  'zstd'
+)
+makedepends=(
+  'cargo'
+  'clang'
+  'cmake'
+  'gettext'
+  'git'
+  'pkgconf'
+  'protobuf'
+  'vulkan-headers'
+  'vulkan-validation-layers'
+)
+optdepends=(
+  'org.freedesktop.secrets: to keep you logged into your Zed account'
+  'clang: improved C/C++ language support'
+  'rust-analyzer: improved Rust language support'
+  'nodejs>=18: improved JavaScript/TypeScript language support'
+  'npm: package manager for extensions and language servers'
+)
+provides=(
+  "zed=${pkgver}"
+  "zed-bin=${pkgver}"
+  "zed-editor=${pkgver}"
+  "zeditor=${pkgver}"
+)
+conflicts=(
+  'zed'
+  'zed-bin'
+  'zed-editor'
+)
+replaces=(
+  'zed-editor'
+)
+options=('!debug')
+backup=("etc/${pkgname}-flags.conf")
+install="${pkgname}.install"
+
+_appid="dev.zed.Zed"
+_archive="zed-${pkgver}"
+
+source=(
+  "${_archive}.tar.gz::${_url}/archive/v${pkgver}.tar.gz"
+  "${pkgname}.patch"
+  "${pkgname}.sh"
+  "${pkgname}-flags.conf"
+)
+sha256sums=(
+  '37356f2cb6ca4714937be200edad278cb0f6137b4c3eec66a0743b5f523e1ee5'
+  'd22c45629fd80d238c98926eca88e6ef38fc11d7417994e112972f4610ba15ce'
+  '7a0d9e2dc08e54a995c270e82efe65c6564f4963accf81daa69479403dd1be8d'
+  'bce9b29655dcc73c3b47233cf0b1f483cda3d302c30a1e60fe4326f4a42d07f4'
+)
+
+_srcenv() {
+  cd "${srcdir}/${_archive}"
+  export CARGO_HOME="${srcdir}/cargo_home"
+  export CARGO_PROFILE_RELEASE_DEBUG=0
+  export CARGO_PROFILE_RELEASE_STRIP=true
+  export CARGO_PROFILE_RELEASE_LTO=false
+  export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
+  export CARGO_PROFILE_RELEASE_OPT_LEVEL=2
+  export CARGO_BUILD_JOBS=2
+  export LIBSQLITE3_SYS_USE_PKG_CONFIG=1
+  export ZSTD_SYS_USE_PKG_CONFIG=1
+  CFLAGS+=' -ffat-lto-objects'
+  CXXFLAGS+=' -ffat-lto-objects'
+  RUSTFLAGS+=" --remap-path-prefix ${PWD}=/"
+}
+
+prepare() {
+  cd "${srcdir}/${_archive}"
+
+  echo "==> Applying KDE Global Menu patch..."
+  patch -p1 -i "${srcdir}/${pkgname}.patch"
+
+  echo "==> Preparing desktop and metadata files..."
+  export DO_STARTUP_NOTIFY="true"
+  export APP_ICON="zed"
+  export APP_NAME="Zed"
+  export APP_CLI="zed"
+  export APP_ID="${_appid}"
+  export APP_ARGS="%U"
+  export BRANDING_LIGHT="#99c1f1"
+  export BRANDING_DARK="#1a5fb4"
+  envsubst < "crates/zed/resources/zed.desktop.in" > "${_appid}.desktop"
+  envsubst < "crates/zed/resources/flatpak/zed.metainfo.xml.in" > "${_appid}.metainfo.xml"
+  sed -i '/@release_info@/d' "${_appid}.metainfo.xml"
+
+  # Fallback licenses if cargo-about is missing or deprecated
+  if [[ ! -s assets/licenses.md ]]; then
+    mkdir -p assets
+    cat LICENSE-APACHE LICENSE-GPL > assets/licenses.md 2>/dev/null || touch assets/licenses.md
+  fi
+}
+
+build() {
+  _srcenv
+  export ZED_UPDATE_EXPLANATION='Updates are handled by pacman'
+  export RELEASE_VERSION="${pkgver}"
+  export PROTOC=/usr/bin/protoc
+  export PROTOC_INCLUDE=/usr/include
+
+  cargo build --release --frozen --package zed --package cli
+
+  target/release/cli --completions bash > completions.bash 2>/dev/null || true
+  target/release/cli --completions fish > completions.fish 2>/dev/null || true
+  target/release/cli --completions zsh > completions.zsh 2>/dev/null || true
+}
+
+package() {
+  cd "${srcdir}/${_archive}"
+
+  # Internal binaries and resolution symlinks
+  install -Dm0755 target/release/zed "${pkgdir}/usr/lib/${pkgname}/zed-editor"
+  ln -s zed-editor "${pkgdir}/usr/lib/${pkgname}/zed"
+  install -Dm0755 target/release/cli "${pkgdir}/usr/lib/${pkgname}/zed-cli"
+
+  # Launcher wrapper & compatibility symlinks
+  install -Dm0755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+  ln -s "${pkgname}" "${pkgdir}/usr/bin/zed"
+  ln -s "${pkgname}" "${pkgdir}/usr/bin/zeditor"
+
+  # User flags configuration template
+  install -Dm0644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+  # Desktop entries
+  install -Dm0644 "${_appid}.desktop" "${pkgdir}/usr/share/applications/${_appid}.desktop"
+  ln -s "${_appid}.desktop" "${pkgdir}/usr/share/applications/zed.desktop"
+  ln -s "${_appid}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+  # AppStream Metainfo
+  install -Dm0644 "${_appid}.metainfo.xml" "${pkgdir}/usr/share/metainfo/${_appid}.metainfo.xml"
+
+  # Icons
+  install -Dm0644 "crates/zed/resources/app-icon.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zed.png"
+  ln -s zed.png "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+  install -Dm0644 "crates/zed/resources/app-icon@2x.png" "${pkgdir}/usr/share/icons/hicolor/1024x1024/apps/zed.png"
+  ln -s zed.png "${pkgdir}/usr/share/icons/hicolor/1024x1024/apps/${pkgname}.png"
+  install -Dm0644 "crates/zed/resources/app-icon.png" "${pkgdir}/usr/share/pixmaps/zed.png"
+  ln -s zed.png "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+
+  # Shell completions
+  if [[ -s completions.bash ]]; then
+    install -Dm0644 completions.bash "${pkgdir}/usr/share/bash-completion/completions/zed"
+    ln -s zed "${pkgdir}/usr/share/bash-completion/completions/zeditor"
+    ln -s zed "${pkgdir}/usr/share/bash-completion/completions/${pkgname}"
+  fi
+
+  if [[ -s completions.fish ]]; then
+    install -Dm0644 completions.fish "${pkgdir}/usr/share/fish/vendor_completions.d/zed.fish"
+    ln -s zed.fish "${pkgdir}/usr/share/fish/vendor_completions.d/zeditor.fish"
+    ln -s zed.fish "${pkgdir}/usr/share/fish/vendor_completions.d/${pkgname}.fish"
+  fi
+
+  if [[ -s completions.zsh ]]; then
+    install -Dm0644 completions.zsh "${pkgdir}/usr/share/zsh/site-functions/_zed"
+    ln -s _zed "${pkgdir}/usr/share/zsh/site-functions/_zeditor"
+    ln -s _zed "${pkgdir}/usr/share/zsh/site-functions/_${pkgname}"
+  fi
+
+  # Licenses
+  install -Dm0644 LICENSE-APACHE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE-APACHE"
+  install -Dm0644 LICENSE-GPL "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE-GPL"
+  if [[ -f assets/licenses.md ]]; then
+    install -Dm0644 assets/licenses.md "${pkgdir}/usr/share/licenses/${pkgname}/licenses.md"
+  fi
+
+  # Normalize permissions
+  chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
