@@ -1,0 +1,18 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Stirling-PDF
+GenericName=PDF Manipulation Tool
+Comment=Locally hosted web application that allows you to perform various operations on PDF files
+TryExec=stirling-pdf-desktop
+Exec=stirling-pdf-desktop %F
+Icon=stirling-pdf-desktop
+Terminal=false
+MimeType=application/pdf;
+Categories=Office;Graphics;Utility;
+Actions=open-file;
+StartupWMClass=Stirling-PDF
+
+[Desktop Action open-file]
+Name=Open PDF File
+Exec=stirling-pdf-desktop %F

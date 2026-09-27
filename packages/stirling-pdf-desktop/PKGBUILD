@@ -1,0 +1,102 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://github.com/Stirling-Tools/Stirling-PDF
+# AUR Reference: https://aur.archlinux.org/packages/stirling-pdf-desktop
+
+_pkgname=stirling-pdf-desktop
+pkgname=stirling-pdf-desktop
+pkgver=3.0.1
+pkgrel=1
+pkgdesc="Locally hosted, web-based PDF manipulation tool (Tauri desktop app, official build)"
+arch=('x86_64')
+url="https://github.com/Stirling-Tools/Stirling-PDF"
+license=('MIT')
+provides=("${pkgname}-bin" "stirling-pdf")
+conflicts=("${pkgname}-bin" "stirling-pdf" "stirling-pdf-bin" "stirling-pdf-git")
+replaces=("${pkgname}-bin")
+backup=("etc/${_pkgname}-flags.conf")
+install=${pkgname}.install
+options=(!strip !debug)
+
+depends=(
+    'alsa-lib'
+    'cairo'
+    'gdk-pixbuf2'
+    'glib2'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libappindicator-gtk3'
+    'pango'
+    'webkit2gtk-4.1'
+    'xdg-utils'
+)
+
+optdepends=(
+    'breeze-gtk: for matching KDE Plasma Breeze Qt window decorations and styling in GTK'
+    'kde-gtk-config: for synchronizing KDE Plasma window decorations with GTK applications'
+    'wl-clipboard: clipboard support on Wayland'
+)
+
+source=(
+    "${pkgname}-${pkgver}.deb::https://github.com/Stirling-Tools/Stirling-PDF/releases/download/v${pkgver}/Stirling-PDF-linux-x86_64.deb"
+    "${pkgname}.sh"
+    "${pkgname}-flags.conf"
+    "${pkgname}.desktop"
+    "${pkgname}.png"
+)
+
+noextract=("${pkgname}-${pkgver}.deb")
+
+sha256sums=('4aefd82c4909778aea46cae1b9dafdb242c18f176eb35613ccbf80f225f0dd9a'
+            'ef94c75e9497382b7119e939c578210480d578d13c45fb3bc39476852ecc34ff'
+            '8a49235f2239c3089239f81fe58d97ff39c1ca397c3e27975135d2b47eb175d1'
+            'd1ad4c67e6b14cc2c04e52214e503e47296349b73e0a0b51b2f8ffa93326c5f9'
+            '29f86b1564696b6cad72e31f535d74b52661a9b63973f632ca9fd5b30c8a1593')
+
+prepare() {
+    cd "${srcdir}"
+    rm -rf "${srcdir}/deb-data"
+    mkdir -p "${srcdir}/deb-data"
+    bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.deb" data.tar.*
+    bsdtar -xf "${srcdir}/data.tar."* -C "${srcdir}/deb-data"
+}
+
+package() {
+    cp -a "${srcdir}/deb-data/." "${pkgdir}/"
+
+    # Move binary into resource directory so JRE and JAR assets are found reliably
+    mkdir -p "${pkgdir}/usr/lib/Stirling PDF"
+    mv "${pkgdir}/usr/bin/Stirling-PDF" "${pkgdir}/usr/lib/Stirling PDF/Stirling-PDF"
+    chmod 755 "${pkgdir}/usr/lib/Stirling PDF/Stirling-PDF"
+
+    # Create standard naming symlink for the library directory
+    ln -sf "Stirling PDF" "${pkgdir}/usr/lib/${pkgname}"
+
+    # Install launcher wrapper script with KDE Qt titlebar handling and stability flags
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+    ln -sf "${_pkgname}" "${pkgdir}/usr/bin/stirling-pdf"
+    ln -sf "${_pkgname}" "${pkgdir}/usr/bin/Stirling-PDF"
+
+    # Clean up upstream desktop file and install standard FreeDesktop entry
+    rm -f "${pkgdir}/usr/share/applications/Stirling PDF.desktop"
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+    ln -sf "${_pkgname}.desktop" "${pkgdir}/usr/share/applications/stirling-pdf.desktop"
+
+    # Install user-configurable flags file
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    # Install high-resolution application icon in standard paths
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/stirling-pdf.png"
+    ln -sf "${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/Stirling-PDF.png"
+
+    # Install license file
+    install -Dm644 /dev/stdin "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE" <<EOF
+Copyright (c) 2023-2026 Stirling-Tools / Stirling PDF Inc.
+Licensed under the MIT License and proprietary additions.
+See: https://github.com/Stirling-Tools/Stirling-PDF/blob/main/LICENSE
+EOF
+
+    # Ensure secure and standard permissions
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
