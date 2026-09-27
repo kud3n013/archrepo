@@ -50,6 +50,7 @@ depends=(
 
 makedepends=(
     'glib2'
+    'nodejs'
 )
 
 optdepends=(
