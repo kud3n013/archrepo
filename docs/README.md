@@ -12,7 +12,7 @@ This directory contains individual documentation pages for all active packages a
 |---|---|---|---|---|
 | [**`antigravity`**](antigravity.md) | `2.17.0-5` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity 2.0 multi-agent platform (Wayland window controls) |
 | [**`beeper`**](beeper.md) | `4.3.152-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unified messaging client with portal theme sync & Wayland auto-hinting |
-| [**`cursor`**](cursor.md) | `3.22.7-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | AI-first code editor with native Wayland auto-hinting & flags support |
+| [**`cursor`**](cursor.md) | `3.22.7-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | AI-first code editor with KDE Global Menu, Wayland auto-hinting & flags |
 | [**`freedownloadmanager`**](freedownloadmanager.md) | `6.34.4.6974-4` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Download accelerator with injected dark mode & portal fix |
 | [**`galaxybudsclient`**](galaxybudsclient.md) | `5.2.1-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Galaxy Buds manager with dynamic Wayland HiDPI auto-scaling & persistent tray |
 | [**`gdlauncher-carbon`**](gdlauncher-carbon.md) | `2.0.40-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | GDLauncher Carbon Minecraft launcher with Wayland support |

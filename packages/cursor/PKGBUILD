@@ -5,8 +5,8 @@ _pkgname=cursor
 pkgname=cursor
 pkgver=3.22.7
 _commithash=37076c6c3f9e253c0fa2305197e45befd13a2268
-pkgrel=1
-pkgdesc="AI-first code editor built for pair programming with artificial intelligence (official binary release)"
+pkgrel=2
+pkgdesc="AI-first code editor built for pair programming with artificial intelligence (official binary release with KDE Global Menu integration)"
 arch=('x86_64')
 url="https://www.cursor.com"
 license=('custom:Commercial')
@@ -48,7 +48,12 @@ depends=(
     'xdg-utils'
 )
 
+makedepends=(
+    'glib2'
+)
+
 optdepends=(
+    'appmenu-gtk-module: for KDE Plasma Global Menu export via XWayland'
     'bash-completion: bash shell completions'
     'zsh: zsh shell completions'
     'libdbusmenu-glib: KDE Plasma Global Menu integration'
@@ -61,20 +66,37 @@ source=(
     "${pkgname}-flags.conf"
     "${pkgname}.desktop"
     "${pkgname}-url-handler.desktop"
+    "${pkgname}-globalmenu.c"
+    "patch-globalmenu.js"
 )
 
 noextract=("${pkgname}_${pkgver}_amd64.deb")
 
 sha256sums=('923fd2d29cd11ceb0e230032b5649571c03c3076fd629a5d5b169b0f337800ab'
-            '1bc40d4445b2c7250369427088e0860253fde65652629c26bd83a3a891c87e20'
+            '99e4463b667d6b580616303cb34084aad006d78dd177439d4eefe988c4cf3ab2'
             '14aa994c5a9d6bf3bad36b3e3fe5bee0cec5b50896ee6717c3f2314bf4e2ca9d'
             '1e0189f87fbe6252277e12123c23ed0760431336e012eb55dcb10289549890ec'
-            '3bc1ff3dc782de1eb3b8b2d1a5e2d879fbe4447396f8dc734001474d70ec8a02')
+            '3bc1ff3dc782de1eb3b8b2d1a5e2d879fbe4447396f8dc734001474d70ec8a02'
+            'e38eac6d0bca9bddede22410c7b0dbcfcaab11b42710278fff716a9d082a675c'
+            '9e105794701081a392877b7514f01f22ef16e8d296cb53ceb8e65bf91f7d124e')
 
 prepare() {
     cd "${srcdir}"
     bsdtar -xf "${pkgname}_${pkgver}_amd64.deb" data.tar.xz
     bsdtar -xf data.tar.xz
+
+    # Patch Cursor main process to export menus to DBus/KWin and auto-hide in-window menubar
+    node "${srcdir}/patch-globalmenu.js" "${srcdir}/usr/share/cursor/resources/app/out/main.js"
+
+    # Validate JavaScript syntax
+    node -c "${srcdir}/usr/share/cursor/resources/app/out/main.js"
+}
+
+build() {
+    cd "${srcdir}"
+    gcc -shared -fPIC -O2 "${srcdir}/${pkgname}-globalmenu.c" \
+        -o "${srcdir}/lib${pkgname}-globalmenu.so" \
+        $(pkg-config --cflags --libs glib-2.0) -ldl
 }
 
 package() {
@@ -95,9 +117,10 @@ package() {
     install -dm755 "${pkgdir}/usr/share"
     ln -s "../../opt/${_pkgname}" "${pkgdir}/usr/share/${_pkgname}"
 
-    # 3. Binaries and launcher in /usr/bin
+    # 3. Binaries, launcher, and globalmenu C shim in /usr/bin and /opt/cursor
     install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
     ln -sf "/opt/${_pkgname}/bin/cursor-tunnel" "${pkgdir}/usr/bin/cursor-tunnel"
+    install -Dm755 "${srcdir}/lib${pkgname}-globalmenu.so" "${pkgdir}/opt/${_pkgname}/lib${pkgname}-globalmenu.so"
 
     # 4. Configuration flags in /etc
     install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
