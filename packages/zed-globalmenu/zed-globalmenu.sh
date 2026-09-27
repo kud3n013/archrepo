@@ -9,6 +9,9 @@ rm -f "$HOME/.local/share/applications/zed.desktop" 2>/dev/null || true
 rm -f "$HOME/.local/share/applications/dev.zed.Zed.desktop" 2>/dev/null || true
 rm -f "$HOME/.local/share/applications/zed-globalmenu.desktop" 2>/dev/null || true
 
+# Force native system server-side window decorations by default on Linux
+export ZED_WINDOW_DECORATIONS="${ZED_WINDOW_DECORATIONS:-server}"
+
 # Load user and system flags configuration
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 SYSTEM_FLAGS_FILES=("/etc/zed-flags.conf" "/etc/zed-globalmenu-flags.conf")

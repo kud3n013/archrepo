@@ -160,8 +160,10 @@ Before finishing:
 - [ ] Test package build with `makepkg` (ensure files, wrapper, flags, and desktop entry are placed in correct `${pkgdir}` paths).
 - [ ] Verify tarball contents with `tar -tf [pkgname]-*.pkg.tar.zst`.
 - [ ] Clean up local temporary/build files (`src/`, `pkg/`, tarballs).
+- [ ] *(Optional Pre-Commit Audit)*: Run `./.agents/skills/copilot-cli-assistant/scripts/code_review.sh HEAD` to audit diffs and shell scripts.
 - [ ] Commit and push changes to `main`: `git add packages/[pkgname]/ && git commit -m "feat([pkgname]): add package" && git push origin main`.
 - [ ] **Wait & Inspect CI Build**: Run `gh run watch` to monitor the GitHub Actions build live.
-- [ ] **Remediate Failures**: If the CI run fails, inspect `gh run view --log-failed`, diagnose the failure (missing dependencies, checksums, flags), apply fixes locally, bump `pkgrel`, regenerate `.SRCINFO`, commit, and push again. **Repeat until the CI build succeeds (`conclusion: success`).**
+- [ ] **Remediate Failures via Copilot Offloading**: If the CI run fails, **DO NOT** dump raw runner logs into context with `gh run view --log-failed`. Instead, run `./.agents/skills/copilot-cli-assistant/scripts/ci_diagnose.sh "kud3n013/archrepo" "build.yml"` to summarize the failure using GitHub Actions MCP tools (saving 95%+ tokens). Analyze the distilled root cause (missing dependencies, checksums, build flags), apply fixes locally, bump `pkgrel`, regenerate `.SRCINFO`, commit, and push again. **Repeat until the CI build succeeds (`conclusion: success`).**
 - [ ] Provide user with the exact pacman install command (`sudo pacman -Syu [pkgname]`).
 ```
+

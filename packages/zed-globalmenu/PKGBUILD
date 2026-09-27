@@ -74,19 +74,21 @@ source=(
 )
 sha256sums=(
   '37356f2cb6ca4714937be200edad278cb0f6137b4c3eec66a0743b5f523e1ee5'
-  'd22c45629fd80d238c98926eca88e6ef38fc11d7417994e112972f4610ba15ce'
-  '7a0d9e2dc08e54a995c270e82efe65c6564f4963accf81daa69479403dd1be8d'
-  'bce9b29655dcc73c3b47233cf0b1f483cda3d302c30a1e60fe4326f4a42d07f4'
+  '9e176c97115ae422b9dbecb19f7101553ddc35f5f829e71121c9b164d894a825'
+  'b5888a2ebacbec7ca29eb09d5ac94aae2ceb5475e071dbc4a4669d6fe968756f'
+  '17b19db0787d1840ec641b213f5ed61b8ab7174022a994bcec453e04a4d0cae0'
 )
 
 _srcenv() {
+  export PATH="${HOME}/.cargo/bin:${PATH}"
   export CARGO_HOME="${srcdir}/cargo_home"
+  export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-${HOME}/.cache/cargo-target/zed}"
   export CARGO_PROFILE_RELEASE_DEBUG=0
   export CARGO_PROFILE_RELEASE_STRIP=true
   export CARGO_PROFILE_RELEASE_LTO=false
   export CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16
   export CARGO_PROFILE_RELEASE_OPT_LEVEL=2
-  export CARGO_BUILD_JOBS=2
+  export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-$(nproc)}"
   export LIBSQLITE3_SYS_USE_PKG_CONFIG=1
   export ZSTD_SYS_USE_PKG_CONFIG=1
   CFLAGS+=' -ffat-lto-objects'
@@ -132,20 +134,23 @@ build() {
   export PROTOC=/usr/bin/protoc
   export PROTOC_INCLUDE=/usr/include
 
+  local target_dir="${CARGO_TARGET_DIR:-target}"
   cargo build --release --frozen --package zed --package cli
 
-  target/release/cli --completions bash > completions.bash 2>/dev/null || true
-  target/release/cli --completions fish > completions.fish 2>/dev/null || true
-  target/release/cli --completions zsh > completions.zsh 2>/dev/null || true
+  "${target_dir}/release/cli" --completions bash > completions.bash 2>/dev/null || true
+  "${target_dir}/release/cli" --completions fish > completions.fish 2>/dev/null || true
+  "${target_dir}/release/cli" --completions zsh > completions.zsh 2>/dev/null || true
 }
 
 package() {
   cd "${srcdir}/${_archive}"
+  _srcenv
+  local target_dir="${CARGO_TARGET_DIR:-target}"
 
   # Internal binaries and resolution symlinks
-  install -Dm0755 target/release/zed "${pkgdir}/usr/lib/${pkgname}/zed-editor"
+  install -Dm0755 "${target_dir}/release/zed" "${pkgdir}/usr/lib/${pkgname}/zed-editor"
   ln -s zed-editor "${pkgdir}/usr/lib/${pkgname}/zed"
-  install -Dm0755 target/release/cli "${pkgdir}/usr/lib/${pkgname}/zed-cli"
+  install -Dm0755 "${target_dir}/release/cli" "${pkgdir}/usr/lib/${pkgname}/zed-cli"
 
   # Launcher wrapper & compatibility symlinks
   install -Dm0755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"

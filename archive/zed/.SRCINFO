@@ -40,7 +40,7 @@ pkgbase = zed
 	source = zed.sh
 	source = zed-flags.conf
 	sha256sums = b79a992e960ed4067cb2b50d66789ed8618eeb1780ed6a0f8f1e71dd80f74200
-	sha256sums = 3b77e3a9c2df8d2aecab9179c4215d6ce1f4d9060623f71a54d1933c6f359589
-	sha256sums = fe562f2e57b5e8bc332bd27eb44fcdeb4dadbb756c74a456f7d2e9f6b9a0d4f5
+	sha256sums = e728e7e2a88be01ed0c1a6d09a5e0015b0cae4a8ebc6d865246dae629c46ee5a
+	sha256sums = 1fb53a07590a6d21151416b2d984134a6f7c672a1f43172df36911733384cf66
 
 pkgname = zed

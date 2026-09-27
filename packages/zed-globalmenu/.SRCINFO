@@ -53,8 +53,8 @@ pkgbase = zed-globalmenu
 	source = zed-globalmenu.sh
 	source = zed-globalmenu-flags.conf
 	sha256sums = 37356f2cb6ca4714937be200edad278cb0f6137b4c3eec66a0743b5f523e1ee5
-	sha256sums = d22c45629fd80d238c98926eca88e6ef38fc11d7417994e112972f4610ba15ce
-	sha256sums = 7a0d9e2dc08e54a995c270e82efe65c6564f4963accf81daa69479403dd1be8d
-	sha256sums = bce9b29655dcc73c3b47233cf0b1f483cda3d302c30a1e60fe4326f4a42d07f4
+	sha256sums = 9e176c97115ae422b9dbecb19f7101553ddc35f5f829e71121c9b164d894a825
+	sha256sums = b5888a2ebacbec7ca29eb09d5ac94aae2ceb5475e071dbc4a4669d6fe968756f
+	sha256sums = 17b19db0787d1840ec641b213f5ed61b8ab7174022a994bcec453e04a4d0cae0
 
 pkgname = zed-globalmenu
