@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-24%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-22%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -64,10 +64,6 @@ Each package entry below provides direct links to its dedicated documentation in
   - Mod and theme manager for Firefox-based browsers (Zen Browser, Floorp, LibreWolf, Firefox). Upstream: [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine)
 - [**`zalo-for-linux`**](docs/zalo-for-linux.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-26.9.10--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zalo-for-linux.md) `sudo pacman -S zalo-for-linux`
   - Zalo desktop messaging client with patched async call deadlocks and Wayland auto-hinting. Upstream: [doandat943/zalo-for-linux](https://github.com/doandat943/zalo-for-linux)
-- [**`zed`**](docs/zed.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zed.md) `sudo pacman -S zed`
-  - Ultra-fast, multiplayer code editor from Atom/Tree-sitter creators with native Wayland GPUI & Vulkan acceleration. Upstream: [Zed](https://zed.dev)
-- [**`zed-globalmenu`**](docs/zed-globalmenu.md) [![build](https://img.shields.io/badge/build-failing-red)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zed-globalmenu.md) `sudo pacman -S zed-globalmenu`
-  - Zed code editor built from source with KDE Global Menu / DBus AppMenu integration patch. Upstream: [Zed](https://zed.dev) / [PR #62033](https://github.com/zed-industries/zed/pull/62033)
 - [**`zotero`**](docs/zotero.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-10.0.3--11-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zotero.md) `sudo pacman -S zotero`
   - Reference manager with native title bar decorations, KDE Global Menu via LD_PRELOAD, and Hyprland/KDE auto-theming. Upstream: [Zotero](https://www.zotero.org)
 
@@ -93,11 +89,13 @@ Each package entry below provides direct links to its dedicated documentation in
 ---
 
 <details>
-<summary><b>🗄️ Archived Packages (2)</b></summary>
+<summary><b>🗄️ Archived Packages (4)</b></summary>
 
 The following packages have been retired from active distribution and their binary packages pruned from the database:
 
 - [**`hyprmod`**](docs/hyprmod.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-0.4.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/hyprmod/`](archive/hyprmod/) &bull; Upstream: [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) (Retired per maintainer request)
+- [**`zed`**](docs/zed.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zed/`](archive/zed/) &bull; Upstream: [Zed](https://zed.dev) (Archived per maintainer request)
+- [**`zed-globalmenu`**](docs/zed-globalmenu.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zed-globalmenu/`](archive/zed-globalmenu/) &bull; Upstream: [Zed](https://zed.dev) (Archived per maintainer request)
 - [**`zen-browser`**](docs/zen-browser.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.22.2b--4-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zen-browser/`](archive/zen-browser/) &bull; Upstream: [zen-browser/desktop](https://github.com/zen-browser/desktop) (Archived per maintainer request)
 
 See [`archive/README.md`](archive/README.md) for instructions on restoring archived packages.

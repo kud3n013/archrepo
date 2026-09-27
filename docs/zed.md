@@ -1,56 +1,28 @@
-# Zed (`zed`)
+# Zed (Archived) (`zed`)
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![status](https://img.shields.io/badge/status-archived-lightgrey)](../archive/README.md)
 [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![type](https://img.shields.io/badge/type-original-blue)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://zed.dev)
 
-High-performance, multiplayer code editor written in Rust with native Wayland GPUI hardware acceleration.
+> [!NOTE]
+> This package is archived and no longer actively distributed in `archrepo`.
+> Build recipes are preserved in [`archive/zed/`](../archive/zed/).
+
+Ultra-fast, multiplayer code editor from Atom/Tree-sitter creators with native Wayland GPUI & Vulkan acceleration.
 
 ---
 
-## 📥 Installation
+## 🗄️ Archive Status
 
-```bash
-sudo pacman -S zed
-```
-
----
-
-## 🔍 Package Information
-
-| Attribute | Value |
-|---|---|
-| **Package Name** | `zed` |
-| **Current Version** | `1.21.0-1` |
-| **Package Type** | **Original** |
-| **Build Status** | `passing` |
-| **Upstream Project** | [Zed Industries](https://zed.dev) |
-| **Category** | Core Application |
+- **Status**: Archived
+- **Reason**: Archived per maintainer request.
+- **Archive Directory**: [`archive/zed/`](../archive/zed/)
+- **Upstream**: [Zed](https://zed.dev)
 
 ---
-
-### Overview
-Zed is a lightning-fast code editor engineered by the creators of Atom and Tree-sitter. It leverages Rust and Vulkan GPUI for instant startup and silky 120 FPS rendering.
-
-### Packaging Details
-- Upstream pre-compiled binary release packaged with launcher wrapper.
-- Supports system and user flags in `~/.config/zed-flags.conf`.
-
----
-
-## ⚙️ Configuration & Flags
-
-Configuration file: `~/.config/zed-flags.conf`
-
-```bash
-# Custom Zed flags
-# --foreground
-# --wait
-```
 
 ## 🔗 Related Links
 
-- [Upstream Repository / Website](https://zed.dev)
-- [archrepo Releases](https://github.com/kud3n013/archrepo/releases/tag/packages)
+- [Upstream Website](https://zed.dev)
+- [Archive Documentation](../archive/README.md)
 - [Back to archrepo README](../README.md)

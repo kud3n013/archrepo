@@ -24,8 +24,6 @@ This directory contains individual documentation pages for all active packages a
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`zalo-for-linux`**](zalo-for-linux.md) | `26.9.10-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zalo client with patched async call deadlocks and Wayland support |
-| [**`zed`**](zed.md) | `1.21.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | High-performance code editor with native Wayland GPUI & Vulkan |
-| [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Modified | ![failing](https://img.shields.io/badge/build-failing-red) | Zed code editor built from source with KDE Global Menu (AppMenu DBus) patch |
 | [**`zotero`**](zotero.md) | `10.0.3-11` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Reference manager with native title bar, KDE Global Menu & Hyprland theming |
 
 ---
@@ -49,6 +47,8 @@ This directory contains individual documentation pages for all active packages a
 | Package | Last Version | Status | Reason |
 |---|---|---|---|
 | [**`hyprmod`**](hyprmod.md) | `0.4.0-1` | Archived | Retired per maintainer request |
+| [**`zed`**](zed.md) | `1.21.0-1` | Archived | Archived per maintainer request |
+| [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Archived | Archived per maintainer request |
 | [**`zen-browser`**](zen-browser.md) | `1.22.2b-4` | Archived | Archived per maintainer request |
 
 ---
