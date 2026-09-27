@@ -29,6 +29,6 @@ To reactivate any package from this archive:
    git mv archive/[package-name] packages/
    ```
 
-2. Update the package table in [`README.md`](../README.md).
+2. Update the package list in [`README.md`](../README.md).
 
 3. Commit and push to `main`. The CI workflow will automatically compile, index, and publish the package back into `archrepo.db`.
