@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-22%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-23%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -40,6 +40,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Google Antigravity 2.0 multi-agent orchestration platform with native Wayland window controls and KDE Plasma Global Menu export. Upstream: [Google Antigravity](https://antigravity.google)
 - [**`beeper`**](docs/beeper.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-4.3.152--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/beeper.md) `sudo pacman -S beeper`
   - Unified multi-network messaging client with XDG desktop portal dark theme sync and Wayland auto-hinting. Upstream: [Automattic / Beeper](https://www.beeper.com/changelog)
+- [**`cursor`**](docs/cursor.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.22.7--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/cursor.md) `sudo pacman -S cursor`
+  - AI-first code editor built for pair programming with artificial intelligence, packaged from official Debian releases with Wayland flags loader. Upstream: [Cursor](https://www.cursor.com)
 - [**`freedownloadmanager`**](docs/freedownloadmanager.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-6.34.4.6974--4-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/freedownloadmanager.md) `sudo pacman -S freedownloadmanager`
   - Modern download accelerator and BitTorrent client with injected LD_PRELOAD library for system dark mode detection via portal. Upstream: [Free Download Manager](https://www.freedownloadmanager.org/)
 - [**`galaxybudsclient`**](docs/galaxybudsclient.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-5.2.1--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/galaxybudsclient.md) `sudo pacman -S galaxybudsclient`

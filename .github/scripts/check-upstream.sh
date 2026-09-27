@@ -82,6 +82,19 @@ case "$CHECK" in
     [ -n "$VER" ] && LATEST="$VER"
     ;;
 
+  cursor-redirect)
+    HEADERS=$(curl -sI "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" || true)
+    [ -z "$(echo "$HEADERS" | grep -i '^location:')" ] && HEADERS=$(curl -sI "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/3.22" || true)
+    VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'cursor_\K[0-9.]+(?=_amd64\.deb)' | head -1 || true)
+    NEW_COMMIT=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'production/\K[0-9a-fA-F]+(?=/linux)' | head -1 || true)
+    [ -n "$VER" ] && LATEST="$VER"
+    CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+    if [ -n "$NEW_COMMIT" ] && [ "$NEW_COMMIT" != "$CURRENT_COMMIT" ]; then
+      UPDATE_NEEDED=true
+      EXTRA_INFO="commit: ${CURRENT_COMMIT} -> ${NEW_COMMIT}"
+    fi
+    ;;
+
   codeberg-release)
     if [ -n "$UPSTREAM" ]; then
       TAG=$(curl -s "https://codeberg.org/api/v1/repos/${UPSTREAM}/releases/latest" | jq -r '.tag_name // empty' 2>/dev/null || true)
