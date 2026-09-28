@@ -5,7 +5,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/steam-globalmenu
+ExecStart=/usr/bin/steam-globalmenu --silent
 Restart=on-failure
 RestartSec=3
 

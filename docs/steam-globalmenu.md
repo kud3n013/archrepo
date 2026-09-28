@@ -1,11 +1,11 @@
 # Steam Global Menu (`steam-globalmenu`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.0.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-1.1.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-archrepo-informational)](https://github.com/kud3n013/archrepo)
 
-Daemon bridge exporting the Steam client menu bar, navigation shortcuts, and dynamically parsed recent games to the KDE Plasma Global Menu widget via the DBusMenu protocol.
+High-performance, lightweight C daemon bridge exporting the Steam client menu bar, navigation shortcuts, and dynamically parsed recent games to the KDE Plasma Global Menu widget via the DBusMenu protocol.
 
 ---
 
@@ -28,7 +28,7 @@ systemctl --user enable --now steam-globalmenu.service
 | Attribute | Value |
 |---|---|
 | **Package Name** | `steam-globalmenu` |
-| **Current Version** | `1.0.0-1` |
+| **Current Version** | `1.1.0-1` |
 | **Package Type** | **Modified (KDE Global Menu Bridge)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [kud3n013/archrepo](https://github.com/kud3n013/archrepo) |
@@ -156,17 +156,52 @@ div[class*="DragArea_"] {
 
 ---
 
-## ⚙️ Service Management
+---
 
-The bridge runs as a systemd user unit:
+## ⚙️ Execution & Autostart (No Desktop File Clutter)
+
+`steam-globalmenu` is designed as a headless background daemon. It deliberately does **not** install a `.desktop` file to avoid cluttering your application launcher (KDE Kickoff, KRunner, Rofi, etc.) with non-GUI entries.
+
+### Option A: Systemd User Service (Recommended)
+Automatically starts on graphical login, restarts if interrupted, and manages logs cleanly via journald:
 
 ```bash
+# Enable and start immediately
+systemctl --user enable --now steam-globalmenu.service
+
 # Check service status
 systemctl --user status steam-globalmenu.service
 
-# Restart service
-systemctl --user restart steam-globalmenu.service
-
-# View live daemon logs
+# View daemon logs
 journalctl --user -u steam-globalmenu.service -f
 ```
+
+### Option B: Direct CLI Execution / Shell Autostart
+You can launch the daemon directly in background mode (e.g., inside `~/.xprofile`, `~/.config/plasma-workspace/env/`, or a custom startup script):
+
+```bash
+# Run silently in background
+steam-globalmenu --silent &
+```
+
+---
+
+## 💻 CLI Flags & Options
+
+```text
+Usage: steam-globalmenu [OPTIONS]
+
+Options:
+  -s, --silent, -q, --quiet   Suppress all terminal log messages (silent mode)
+  -v, --version               Show version and exit
+  -h, --help                  Show help options and exit
+```
+
+---
+
+## ⚡ Performance & Memory Efficiency
+
+- **Written in Pure C**: Eliminates the Python runtime overhead (~38 MB RSS), reducing heap memory footprint down to **~2.2 MB anonymous RSS**.
+- **Native X11 API**: Interacts directly with the X11 server using `XChangeProperty()` without spawning shell subprocesses (`xprop`).
+- **Event-Driven**: Sleeps idle on the GLib main loop until Steam window events or D-Bus menu activation events occur.
+
