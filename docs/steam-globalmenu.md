@@ -55,24 +55,102 @@ To hide the redundant horizontal in-window menu bar and native window controls i
 Open Steam, navigate to **Millennium → Quick CSS**, and paste:
 
 ```css
-/* 1. Hide native window controls (Minimize, Maximize, Close) */
+/* ==========================================================================
+   1. HIDE NATIVE WINDOW CONTROLS (Minimize, Maximize, Close)
+   ========================================================================== */
 .title-area .title-bar-actions.window-controls,
 .title-bar-actions.window-controls,
-div.qP17eBPXkfezFfexZ4hC3 {
+div.qP17eBPXkfezFfexZ4hC3,
+div[class*="WindowControls"] {
     display: none !important;
 }
 
-/* 2. Hide native horizontal menu bar (Steam, View, Friends, Games, Help) */
+/* ==========================================================================
+   2. HIDE NATIVE MENU BAR (Steam, View, Friends, Games, Help)
+   ========================================================================== */
 div._3s0lkohH8wU2do0K1il28Y,
 div._2UyOBeiSdBayaFdRa39N2O,
+div[class*="RootMenuBar_"],
+div[class*="RootMenuButton_"],
 div._39oUCO1OuizVPwcnnv88no > div:first-child:not([class*="DragArea"]) {
     display: none !important;
 }
 
-/* 3. Ensure header drag region remains responsive across the entire top bar */
-div._30vB9DdsPK7VrZAbb5Q1Av {
+/* ==========================================================================
+   3. CONSOLIDATE HEADER INTO A SINGLE 40PX BAR
+   ========================================================================== */
+/* Outer header container: single compact bar height */
+div._3Z7VQ1IMk4E3HsHvrkLNgo,
+body.DesktopUI div:has(> div._39oUCO1OuizVPwcnnv88no) {
+    height: 40px !important;
+    min-height: 40px !important;
+    position: relative !important;
+}
+
+/* TitleBar: spans full width behind as the base drag canvas */
+div._39oUCO1OuizVPwcnnv88no,
+div[class*="TitleBar_"]:not([class*="Settings"]) {
+    height: 40px !important;
+    min-height: 40px !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    z-index: 1 !important;
     -webkit-app-region: drag !important;
-    min-height: 38px !important;
+}
+
+/* ==========================================================================
+   4. KEEP NAVIGATION (LEFT) & STATUS CONTROLS (RIGHT) SEPARATED
+   ========================================================================== */
+/* SuperNavBar: overlay into the same row */
+div._3Z3ohQ8-1NKnCZkbS6fvy,
+div[class*="SuperNavBar_"] {
+    position: relative !important;
+    top: 0 !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+}
+
+/* LEFT SIDE: Navigation buttons & tabs (Back/Forward, Store, Library, Community, User) */
+div._2D64jIEK7wpUR_NlObDW76,
+div[class*="SuperNav_"] {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    gap: 4px !important;
+    pointer-events: auto !important;
+    -webkit-app-region: no-drag !important;
+    max-width: calc(100% - 250px) !important;
+}
+
+/* RIGHT SIDE: User profile avatar, wallet, bell, announcements */
+div._1-9sir4j_KQiMqdkZjQN0u,
+div[class*="TitleBarControls_"] {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    margin-left: auto !important;
+    padding-right: 8px !important;
+    pointer-events: auto !important;
+    -webkit-app-region: no-drag !important;
+    z-index: 3 !important;
+}
+
+/* CENTER / DRAG AREA: Allow window dragging in the empty space between left & right */
+div._30vB9DdsPK7VrZAbb5Q1Av,
+div[class*="DragArea_"] {
+    flex-grow: 1 !important;
+    height: 100% !important;
+    -webkit-app-region: drag !important;
 }
 ```
 
