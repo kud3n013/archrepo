@@ -13,6 +13,7 @@ import struct
 import json
 import shutil
 import subprocess
+import tempfile
 
 def unpack_asar(asar_file, dest_dir):
     # Try system asar first if available
@@ -109,10 +110,7 @@ def patch_app_asar(squashfs_root):
         print(f"Error: {asar_path} not found", file=sys.stderr)
         sys.exit(1)
 
-    extract_dir = os.path.join(squashfs_root, "resources", "app.asar.extracted")
-    if os.path.exists(extract_dir):
-        shutil.rmtree(extract_dir)
-
+    extract_dir = tempfile.mkdtemp(prefix="zalo-asar-")
     print("==> Extracting resources/app.asar...")
     unpack_asar(asar_path, extract_dir)
 
@@ -268,8 +266,10 @@ function buildZaloAppMenu(targetWin) {
         r"win\.autoHideMenuBar\s*=\s*true;",
         re.MULTILINE
     )
-    win_menu_new = """win.autoHideMenuBar = true;
-    try {
+    win_menu_new = """try {
+      if (win.setAutoHideMenuBar) win.setAutoHideMenuBar(true);
+      win.autoHideMenuBar = true;
+      if (win.setMenuBarVisibility) win.setMenuBarVisibility(false);
       const appMenu = buildZaloAppMenu(win);
       Menu.setApplicationMenu(appMenu);
       if (win.setMenu) win.setMenu(appMenu);
@@ -297,7 +297,7 @@ function buildZaloAppMenu(targetWin) {
 
     print("==> Repacking resources/app.asar...")
     pack_asar(extract_dir, asar_path)
-    shutil.rmtree(extract_dir)
+    shutil.rmtree(extract_dir, ignore_errors=True)
 
 def patch_main_dist(squashfs_root):
     main_js_path = os.path.join(squashfs_root, "app", "main-dist", "main.js")
