@@ -10,6 +10,10 @@ REPO_NAME="${GITHUB_REPOSITORY:-kud3n013/archrepo}"
 
 mkdir -p "$(dirname "$OUTPUT_HTML")"
 
+html_escape() {
+  printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' -e 's/"/\&quot;/g' -e "s/'/\&#39;/g"
+}
+
 PKG_LIST=""
 for d in "${SRC_DIR}/packages"/*/; do
   pkg_dir="${d%/}"
@@ -17,7 +21,9 @@ for d in "${SRC_DIR}/packages"/*/; do
   if [ -f "${pkg_dir}/PKGBUILD" ]; then
     name=$(grep -oP '^pkgname=\K.*' "${pkg_dir}/PKGBUILD" | tr -d '"'\' | head -1)
     desc=$(grep -oP '^pkgdesc=\K.*' "${pkg_dir}/PKGBUILD" | tr -d '"'\' | head -1)
-    PKG_LIST+="${name}:::<li><code>${name}</code> - ${desc}</li>"$'\n'
+    safe_name=$(html_escape "$name")
+    safe_desc=$(html_escape "$desc")
+    PKG_LIST+="${name}:::<li><code>${safe_name}</code> - ${safe_desc}</li>"$'\n'
   fi
 done
 

@@ -152,10 +152,10 @@ case "$CHECK" in
 
   millennium-github-prerelease)
     # Millennium uses pre-release tags (e.g. v3.5.0-beta.3) which /releases/latest skips.
-    # Fetch the first (most recent) release of any kind and convert hyphens to underscores.
+    # Fetch the most recent release with linux archive and convert hyphens to underscores.
     if [ -n "$UPSTREAM" ]; then
       TAG=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases" | \
-        jq -r '.[0].tag_name // empty' 2>/dev/null || true)
+        jq -r '[.[] | select(.draft == false and (.assets[].name | test("linux-x86_64.*tar\\.gz")) )][0].tag_name // empty' 2>/dev/null || true)
       TAG="${TAG#v}"
       TAG="${TAG//-/_}"
       [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
@@ -178,18 +178,23 @@ case "$CHECK" in
 esac
 
 if [ "$LATEST" != "$CURRENT" ]; then
-  UPDATE_NEEDED=true
+  if [[ "$LATEST" =~ ^[0-9A-Za-z._+]+$ ]]; then
+    UPDATE_NEEDED=true
+  else
+    echo "Warning: Rejected upstream version with invalid characters: '${LATEST}'" >&2
+    UPDATE_NEEDED=false
+  fi
 fi
 
 if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
-  if [ "$LATEST" != "$CURRENT" ]; then
+  if [ "$LATEST" != "$CURRENT" ] && [[ "$LATEST" =~ ^[0-9A-Za-z._+]+$ ]]; then
     sed -i "s/^pkgver=.*/pkgver=${LATEST}/" "${PKG_DIR}/PKGBUILD"
     sed -i "s/^pkgrel=.*/pkgrel=1/" "${PKG_DIR}/PKGBUILD"
   fi
-  if [ -n "$NEW_BUILD" ]; then
+  if [ -n "$NEW_BUILD" ] && [[ "$NEW_BUILD" =~ ^[0-9A-Za-z._+]+$ ]]; then
     sed -i "s/^_build=.*/_build=${NEW_BUILD}/" "${PKG_DIR}/PKGBUILD"
   fi
-  if [ -n "$NEW_COMMIT" ]; then
+  if [ -n "$NEW_COMMIT" ] && [[ "$NEW_COMMIT" =~ ^[0-9a-fA-F]+$ ]]; then
     sed -i "s/^_commithash=.*/_commithash=${NEW_COMMIT}/" "${PKG_DIR}/PKGBUILD"
   fi
 fi

@@ -16,58 +16,169 @@ _remove_deprecated_patches() {
     fi
 }
 
-# Link millennium bootstrap into Steam runtime for all local users
-_link_millennium() {
+# Run a callback for each user with a Steam directory
+_for_each_steam_user() {
+    local callback="$1"
+    declare -A visited_homes=()
+
+    # 1. Active sudo user when running via sudo
+    if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
+        local sudo_home
+        sudo_home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
+        if [ -n "$sudo_home" ] && [ -d "$sudo_home" ]; then
+            visited_homes["$sudo_home"]=1
+            "$callback" "$sudo_home"
+        fi
+    fi
+
+    # 2. System user accounts from getent passwd (UID >= 1000)
+    while IFS=: read -r _ _ uid _ _ home _; do
+        [ "$uid" -ge 1000 ] || continue
+        [ -d "$home" ] || continue
+        if [ -z "${visited_homes["$home"]:-}" ]; then
+            visited_homes["$home"]=1
+            "$callback" "$home"
+        fi
+    done < <(getent passwd 2>/dev/null || true)
+
+    # 3. Fallback scan of /home/* directories
     for user_home in /home/*; do
-        local steam_dir="${user_home}/.local/share/Steam"
-        local target_dir="${steam_dir}/ubuntu12_32"
-
-        if [ -d "${target_dir}" ]; then
-            rm -f "${target_dir}/libXtst.so.6"
-            ln -s /usr/lib/millennium/libmillennium_bootstrap_x86.so "${target_dir}/libXtst.so.6"
-
-            # Enable Steam CEF remote debugging (required by Millennium)
-            touch "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+        [ -d "$user_home" ] || continue
+        if [ -z "${visited_homes["$user_home"]:-}" ]; then
+            visited_homes["$user_home"]=1
+            "$callback" "$user_home"
         fi
     done
 }
 
-# Remove millennium symlinks and debugging flags for all local users
-_unlink_millennium() {
-    for user_home in /home/*; do
-        local steam_dir="${user_home}/.local/share/Steam"
-        local target_dir="${steam_dir}/ubuntu12_32"
+# Safely link a Millennium hook, backing up any original non-Millennium file if found
+_link_hook() {
+    local target="$1"
+    local source="$2"
+    local user_uid="${3:-}"
+    local user_gid="${4:-}"
 
-        if [ -d "${target_dir}" ]; then
-            # Only remove if it's our symlink
-            if [ -L "${target_dir}/libXtst.so.6" ]; then
-                local link_target
-                link_target=$(readlink -f "${target_dir}/libXtst.so.6" 2>/dev/null || true)
-                if [ "$link_target" = "/usr/lib/millennium/libmillennium_bootstrap_x86.so" ]; then
-                    rm -f "${target_dir}/libXtst.so.6"
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        local current_link
+        current_link=$(readlink "$target" 2>/dev/null || true)
+        case "$current_link" in
+            /usr/lib/millennium/*)
+                # Already a Millennium symlink, safe to update
+                ;;
+            *)
+                # Foreign file or symlink: backup before replacing
+                if [ ! -e "${target}.orig" ]; then
+                    cp -a "$target" "${target}.orig" 2>/dev/null || true
                 fi
-            fi
+                ;;
+        esac
+    fi
 
-            # Remove CEF remote debugging flag
-            rm -f "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+    ln -sf "$source" "$target"
+    if [ -n "$user_uid" ] && [ "$user_uid" -ne 0 ]; then
+        chown -h "$user_uid:$user_gid" "$target" 2>/dev/null || true
+    fi
+}
+
+# Safely remove a Millennium hook, restoring the original file if a backup exists
+_unlink_hook() {
+    local target="$1"
+
+    if [ -L "$target" ]; then
+        local current_link
+        current_link=$(readlink "$target" 2>/dev/null || true)
+        case "$current_link" in
+            /usr/lib/millennium/*)
+                rm -f "$target"
+                if [ -e "${target}.orig" ]; then
+                    mv "${target}.orig" "$target" 2>/dev/null || true
+                fi
+                ;;
+        esac
+    fi
+}
+
+# Link Millennium bootstrap hooks into Steam runtime directories
+_link_user_steam() {
+    local home="$1"
+    local user_uid user_gid
+    user_uid=$(stat -c '%u' "$home" 2>/dev/null || true)
+    user_gid=$(stat -c '%g' "$home" 2>/dev/null || true)
+
+    declare -A visited_steam_dirs=()
+
+    for steam_dir in "$home/.local/share/Steam" "$home/.steam/steam"; do
+        [ -d "$steam_dir" ] || continue
+
+        local canonical_steam
+        canonical_steam=$(readlink -f "$steam_dir" 2>/dev/null || echo "$steam_dir")
+        if [ -n "${visited_steam_dirs["$canonical_steam"]:-}" ]; then
+            continue
         fi
+        visited_steam_dirs["$canonical_steam"]=1
+
+        mkdir -p "${steam_dir}/ubuntu12_32" "${steam_dir}/ubuntu12_64"
+
+        # Preload bootstraps for Steam 32-bit & 64-bit CEF runtimes with backup preservation
+        _link_hook "${steam_dir}/ubuntu12_32/libXtst.so.6" \
+                   "/usr/lib/millennium/libmillennium_bootstrap_x86.so" "$user_uid" "$user_gid"
+        _link_hook "${steam_dir}/ubuntu12_64/libXtst.so.6" \
+                   "/usr/lib/millennium/libmillennium_bootstrap_hhx64.so" "$user_uid" "$user_gid"
+        _link_hook "${steam_dir}/ubuntu12_64/libmillennium_hhx64.so" \
+                   "/usr/lib/millennium/libmillennium_hhx64.so" "$user_uid" "$user_gid"
+
+        # Enable Steam CEF remote debugging (required by Millennium for theme/plugin injection)
+        touch "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+
+        # Ensure correct directory and flag ownership
+        if [ -n "$user_uid" ] && [ "$user_uid" -ne 0 ]; then
+            chown "$user_uid:$user_gid" "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
+            chown "$user_uid:$user_gid" "${steam_dir}/ubuntu12_32" "${steam_dir}/ubuntu12_64" 2>/dev/null || true
+        fi
+    done
+}
+
+# Safely unlink Millennium hooks on removal
+_unlink_user_steam() {
+    local home="$1"
+    declare -A visited_steam_dirs=()
+
+    for steam_dir in "$home/.local/share/Steam" "$home/.steam/steam"; do
+        [ -d "$steam_dir" ] || continue
+
+        local canonical_steam
+        canonical_steam=$(readlink -f "$steam_dir" 2>/dev/null || echo "$steam_dir")
+        if [ -n "${visited_steam_dirs["$canonical_steam"]:-}" ]; then
+            continue
+        fi
+        visited_steam_dirs["$canonical_steam"]=1
+
+        # Safely remove Millennium symlinks and restore original files if backed up
+        _unlink_hook "${steam_dir}/ubuntu12_32/libXtst.so.6"
+        _unlink_hook "${steam_dir}/ubuntu12_64/libXtst.so.6"
+        _unlink_hook "${steam_dir}/ubuntu12_64/libmillennium_hhx64.so"
+
+        # Remove CEF remote debugging flag if present
+        rm -f "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
     done
 }
 
 post_install() {
     _remove_deprecated_patches
-    _link_millennium
-    echo ">> Millennium installed. Restart Steam for changes to take effect."
+    _for_each_steam_user _link_user_steam
+    echo ">> Millennium installed successfully."
+    echo ">> Restart Steam for changes to take effect."
     echo ">> Browse themes and plugins at https://steambrew.app"
+    echo ">> Note: Millennium works best with the stable Steam client branch."
 }
 
 post_upgrade() {
     _remove_deprecated_patches
-    _link_millennium
-    echo ">> Millennium upgraded. Restart Steam for changes to take effect."
+    _for_each_steam_user _link_user_steam
+    echo ">> Millennium upgraded successfully. Restart Steam for changes to take effect."
 }
 
 post_remove() {
-    _unlink_millennium
-    echo ">> Millennium removed. Restart Steam for changes to take effect."
+    _for_each_steam_user _unlink_user_steam
+    echo ">> Millennium removed successfully. Restart Steam to return to standard mode."
 }
