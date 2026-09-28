@@ -57,9 +57,10 @@ case "$CHECK" in
 
       # Special handling for zalo-for-linux
       if [ "$PKG" = "zalo-for-linux" ]; then
-        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null | grep -E '^Zalo-[0-9.]+-([0-9a-fA-F]+)\.AppImage$' | head -1 || true)
+        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null | grep -E '^Zalo-.*-([0-9a-fA-F]+)-x86_64\.AppImage$' | head -1 || true)
         if [ -n "$ASSET" ]; then
-          NEW_COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=\.AppImage)' || true)
+          NEW_COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=-x86_64\.AppImage)' || true)
+          NEW_ZADARK=$(echo "$ASSET" | grep -oP '\+ZaDark-\K[0-9.]+(?=-)' || true)
           CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
           if [ -n "$NEW_COMMIT" ] && [ "$NEW_COMMIT" != "$CURRENT_COMMIT" ]; then
             UPDATE_NEEDED=true
@@ -196,6 +197,9 @@ if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
   fi
   if [ -n "$NEW_COMMIT" ] && [[ "$NEW_COMMIT" =~ ^[0-9a-fA-F]+$ ]]; then
     sed -i "s/^_commithash=.*/_commithash=${NEW_COMMIT}/" "${PKG_DIR}/PKGBUILD"
+  fi
+  if [ -n "${NEW_ZADARK:-}" ] && [[ "$NEW_ZADARK" =~ ^[0-9.]+$ ]]; then
+    sed -i "s/^_zadarkver=.*/_zadarkver=${NEW_ZADARK}/" "${PKG_DIR}/PKGBUILD"
   fi
 fi
 
