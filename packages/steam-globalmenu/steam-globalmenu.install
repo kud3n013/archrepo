@@ -1,0 +1,19 @@
+post_install() {
+    echo "==> Steam KDE Plasma Global Menu Bridge installed successfully!"
+    echo "==> To activate the service for your current user session:"
+    echo "==>   systemctl --user daemon-reload"
+    echo "==>   systemctl --user enable --now steam-globalmenu.service"
+    echo "==>"
+    echo "==> To hide the redundant in-window menu bar and window controls in Steam,"
+    echo "==> paste the Quick CSS snippet into Millennium:"
+    echo "==>   cat /usr/share/doc/steam-globalmenu/quickcss.css"
+}
+
+post_upgrade() {
+    post_install
+}
+
+post_remove() {
+    echo "==> Disabling steam-globalmenu user service..."
+    systemctl --user disable --now steam-globalmenu.service 2>/dev/null || true
+}

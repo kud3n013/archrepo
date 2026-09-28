@@ -1,0 +1,52 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+
+pkgname=steam-globalmenu
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Exports Steam client menu bar and recent games to KDE Plasma Global Menu via DBusMenu"
+arch=('any')
+url="https://github.com/kud3n013/archrepo"
+license=('MIT')
+depends=(
+  'python>=3.10'
+  'python-gobject'
+  'libdbusmenu-glib'
+  'xorg-xprop'
+)
+optdepends=(
+  'steam: Valve Steam game client'
+  'millennium: Steam Client modding framework for custom CSS theme injection'
+)
+provides=('steam-globalmenu')
+conflicts=('steam-globalmenu')
+install=steam-globalmenu.install
+source=(
+  "steam-globalmenu.py"
+  "steam-globalmenu.sh"
+  "steam-globalmenu.service"
+  "steam-globalmenu.desktop"
+  "quickcss.css"
+)
+sha256sums=('ca2f250fcc624e1266f9206e81e2e5f2ee99c88b84ab9a618495d17cb0178c85'
+            '1e4d8d487a629611480a88df0821241f0076bc1e5bf4dbb614b315e602b777e9'
+            'c2989af4ddaa6c0617bf5c9282caf14eb17ea39538fa07e15f0a2607c6b3c44f'
+            'd6a7c50f5b981634d1f74eabbb4495de4171906c54ae70a57fe6b79a4fd7d034'
+            'cdedf0063c0d47e2139a840b75cb2cdc9887f8be031a477ca66864cf6a04027d')
+
+package() {
+  # Binary executable and script
+  install -Dm755 "${srcdir}/steam-globalmenu.sh" "${pkgdir}/usr/bin/steam-globalmenu"
+  install -Dm755 "${srcdir}/steam-globalmenu.py" "${pkgdir}/usr/lib/steam-globalmenu/steam-globalmenu.py"
+
+  # Systemd user service
+  install -Dm644 "${srcdir}/steam-globalmenu.service" "${pkgdir}/usr/lib/systemd/user/steam-globalmenu.service"
+
+  # XDG autostart
+  install -Dm644 "${srcdir}/steam-globalmenu.desktop" "${pkgdir}/etc/xdg/autostart/steam-globalmenu.desktop"
+
+  # Documentation / Companion Quick CSS
+  install -Dm644 "${srcdir}/quickcss.css" "${pkgdir}/usr/share/doc/steam-globalmenu/quickcss.css"
+
+  # License
+  install -Dm644 "${startdir}/../../LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

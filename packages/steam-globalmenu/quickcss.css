@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Steam KDE Global Menu Companion Quick CSS (for Millennium / CSSLoader)
+   Hides the redundant in-window menu bar and window control buttons so
+   Steam seamlessly integrates with KDE Plasma's Global Menu panel.
+   ========================================================================== */
+
+/* 1. Hide native window controls (Minimize, Maximize, Close) */
+.title-area .title-bar-actions.window-controls,
+.title-bar-actions.window-controls,
+div.qP17eBPXkfezFfexZ4hC3 {
+    display: none !important;
+}
+
+/* 2. Hide native horizontal menu bar (Steam, View, Friends, Games, Help) */
+div._3s0lkohH8wU2do0K1il28Y,
+div._2UyOBeiSdBayaFdRa39N2O,
+div._39oUCO1OuizVPwcnnv88no > div:first-child:not([class*="DragArea"]) {
+    display: none !important;
+}
+
+/* 3. Ensure header drag region remains responsive across the entire top bar */
+div._30vB9DdsPK7VrZAbb5Q1Av {
+    -webkit-app-region: drag !important;
+    min-height: 38px !important;
+}

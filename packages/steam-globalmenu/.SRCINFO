@@ -1,0 +1,28 @@
+pkgbase = steam-globalmenu
+	pkgdesc = Exports Steam client menu bar and recent games to KDE Plasma Global Menu via DBusMenu
+	pkgver = 1.0.0
+	pkgrel = 1
+	url = https://github.com/kud3n013/archrepo
+	install = steam-globalmenu.install
+	arch = any
+	license = MIT
+	depends = python>=3.10
+	depends = python-gobject
+	depends = libdbusmenu-glib
+	depends = xorg-xprop
+	optdepends = steam: Valve Steam game client
+	optdepends = millennium: Steam Client modding framework for custom CSS theme injection
+	provides = steam-globalmenu
+	conflicts = steam-globalmenu
+	source = steam-globalmenu.py
+	source = steam-globalmenu.sh
+	source = steam-globalmenu.service
+	source = steam-globalmenu.desktop
+	source = quickcss.css
+	sha256sums = ca2f250fcc624e1266f9206e81e2e5f2ee99c88b84ab9a618495d17cb0178c85
+	sha256sums = 1e4d8d487a629611480a88df0821241f0076bc1e5bf4dbb614b315e602b777e9
+	sha256sums = c2989af4ddaa6c0617bf5c9282caf14eb17ea39538fa07e15f0a2607c6b3c44f
+	sha256sums = d6a7c50f5b981634d1f74eabbb4495de4171906c54ae70a57fe6b79a4fd7d034
+	sha256sums = cdedf0063c0d47e2139a840b75cb2cdc9887f8be031a477ca66864cf6a04027d
+
+pkgname = steam-globalmenu
