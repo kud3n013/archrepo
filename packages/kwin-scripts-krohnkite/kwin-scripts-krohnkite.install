@@ -1,0 +1,13 @@
+post_install() {
+  echo ":: To enable Krohnkite, go to:"
+  echo "   System Settings -> Window Management -> KWin Scripts"
+  echo "   and enable 'Krohnkite', then click Apply."
+  echo "   Alternatively, enable it via command line:"
+  echo "   kwriteconfig6 --file kwinrc --group Plugins --key krohnkiteEnabled true"
+  echo "   qdbus6 org.kde.KWin /KWin reconfigure"
+}
+
+post_upgrade() {
+  echo ":: If Krohnkite is currently active, reload KWin configuration with:"
+  echo "   qdbus6 org.kde.KWin /KWin reconfigure"
+}

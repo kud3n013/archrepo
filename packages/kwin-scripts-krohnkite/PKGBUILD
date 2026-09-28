@@ -1,0 +1,35 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=kwin-scripts-krohnkite
+_pkgname=krohnkite
+pkgver=0.9.9.2
+pkgrel=1
+pkgdesc="A dynamic tiling extension for KWin (KDE Plasma 6)"
+arch=('any')
+url="https://codeberg.org/anametologin/krohnkite"
+license=('MIT')
+depends=('kwin')
+provides=("${_pkgname}")
+conflicts=("${_pkgname}" "${pkgname}-git")
+options=('!strip' '!debug')
+install="${pkgname}.install"
+noextract=("${pkgname}-${pkgver}.kwinscript")
+source=(
+  "${pkgname}-${pkgver}.kwinscript::https://codeberg.org/anametologin/Krohnkite/releases/download/${pkgver}/${_pkgname}.kwinscript"
+  "LICENSE-${pkgver}::https://codeberg.org/anametologin/krohnkite/raw/tag/${pkgver}/LICENSE"
+)
+sha256sums=(
+  '42f7f66531d366c74b5fc860381da3517ccb4cdccd1f80c122fcab6e9a8fcf7e'
+  '78db30bbf93af90846d93f470bb7c754be5307477c2c99270bb76ac4b14aa609'
+)
+
+package() {
+  install -dm755 "${pkgdir}/usr/share/kwin/scripts/${_pkgname}"
+  bsdtar --no-same-owner -xf "${srcdir}/${pkgname}-${pkgver}.kwinscript" \
+    -C "${pkgdir}/usr/share/kwin/scripts/${_pkgname}"
+
+  install -Dm644 "${srcdir}/LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+  # Ensure consistent directory and file permissions
+  chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-23%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-24%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -77,6 +77,8 @@ Each package entry below provides direct links to its dedicated documentation in
 
 - [**`freedownloadmanager-elephant`**](docs/freedownloadmanager-elephant.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.3.8--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/freedownloadmanager-elephant.md) `sudo pacman -S freedownloadmanager-elephant`
   - Free Download Manager add-on for downloading online videos powered by `yt-dlp`. Upstream: [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant)
+- [**`kwin-scripts-krohnkite`**](docs/kwin-scripts-krohnkite.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.9.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kwin-scripts-krohnkite.md) `sudo pacman -S kwin-scripts-krohnkite`
+  - Dynamic tiling extension for KWin (KDE Plasma 6) ported from Krohnkite. Upstream: [anametologin/krohnkite](https://codeberg.org/anametologin/krohnkite)
 - [**`zotero-better-bibtex`**](docs/zotero-better-bibtex.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-9.0.64--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-better-bibtex.md) `sudo pacman -S zotero-better-bibtex`
   - Better BibTeX LaTeX bibliography and citation key management extension for Zotero. Upstream: [retorquere/zotero-better-bibtex](https://github.com/retorquere/zotero-better-bibtex)
 - [**`zotero-better-notes`**](docs/zotero-better-notes.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.3.3--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-better-notes.md) `sudo pacman -S zotero-better-notes`

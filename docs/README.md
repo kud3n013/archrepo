@@ -35,6 +35,7 @@ This directory contains individual documentation pages for all active packages a
 | Plugin / Add-on | Version | Type | Status | Target Application / Description |
 |---|---|---|---|---|
 | [**`freedownloadmanager-elephant`**](freedownloadmanager-elephant.md) | `1.3.8-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | FDM add-on for downloading video/audio streams via yt-dlp |
+| [**`kwin-scripts-krohnkite`**](kwin-scripts-krohnkite.md) | `0.9.9.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Dynamic tiling extension for KWin (KDE Plasma 6) |
 | [**`zotero-better-bibtex`**](zotero-better-bibtex.md) | `9.0.64-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Better BibTeX LaTeX citation key generator and exporter for Zotero |
 | [**`zotero-better-notes`**](zotero-better-notes.md) | `3.3.3-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Advanced note management, markdown tree, and linking for Zotero |
 | [**`zotero-mcp`**](zotero-mcp.md) | `0.13.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Model Context Protocol server and CLI connecting AI models to Zotero |
