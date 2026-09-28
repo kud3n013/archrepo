@@ -24,7 +24,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Pass CLI with persistent D-Bus Secret Service integration |
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
-| [**`steam-globalmenu`**](steam-globalmenu.md) | `1.1.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
+| [**`steam-globalmenu`**](steam-globalmenu.md) | `1.2.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
 | [**`zalo-for-linux`**](zalo-for-linux.md) | `26.9.10-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zalo client with patched async call deadlocks and Wayland support |
 | [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zed code editor with KDE Plasma Global Menu, server-side title bar & menu suppression |
 | [**`zotero`**](zotero.md) | `10.0.3-11` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Reference manager with native title bar, KDE Global Menu & Hyprland theming |

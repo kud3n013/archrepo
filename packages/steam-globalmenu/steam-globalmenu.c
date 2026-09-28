@@ -28,7 +28,7 @@
 #include <libdbusmenu-glib/client.h>
 #include <libdbusmenu-glib/menuitem.h>
 
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 #define DBUS_SERVICE_NAME "org.kde.steam.AppMenu"
 #define DBUS_OBJECT_PATH "/MenuBar"
 #define REGISTRAR_NAME "com.canonical.AppMenu.Registrar"
@@ -371,6 +371,29 @@ static void refresh_dynamic_menus(AppContext *ctx) {
     g_free(root);
 }
 
+static gboolean is_millennium_present(void) {
+    if (g_getenv("STEAM_GLOBALMENU_ENABLE_MILLENNIUM") != NULL) return TRUE;
+    if (g_file_test("/usr/lib/millennium", G_FILE_TEST_IS_DIR)) return TRUE;
+
+    const char *home = g_get_home_dir();
+    if (home) {
+        char *p1 = g_build_filename(home, ".local/share/Steam/millennium", NULL);
+        char *p2 = g_build_filename(home, ".local/share/Steam/ubuntu12_64/libmillennium_hhx64.so", NULL);
+        char *p3 = g_build_filename(home, ".millennium", NULL);
+        char *p4 = g_build_filename(home, ".var/app/com.valvesoftware.Steam/.local/share/Steam/millennium", NULL);
+        gboolean present = (g_file_test(p1, G_FILE_TEST_IS_DIR) || 
+                            g_file_test(p2, G_FILE_TEST_EXISTS) ||
+                            g_file_test(p3, G_FILE_TEST_IS_DIR) ||
+                            g_file_test(p4, G_FILE_TEST_IS_DIR));
+        g_free(p1);
+        g_free(p2);
+        g_free(p3);
+        g_free(p4);
+        if (present) return TRUE;
+    }
+    return FALSE;
+}
+
 static void build_menu_hierarchy(AppContext *ctx) {
     ctx->server = dbusmenu_server_new(DBUS_OBJECT_PATH);
     ctx->root_item = dbusmenu_menuitem_new();
@@ -381,12 +404,23 @@ static void build_menu_hierarchy(AppContext *ctx) {
     dbusmenu_menuitem_property_set(top_steam, DBUSMENU_MENUITEM_PROP_LABEL, "Steam");
     dbusmenu_menuitem_child_append(ctx->root_item, top_steam);
 
-    add_action(top_steam, "Settings", "steam://open/settings");
+    add_action(top_steam, "Change Account...", "steam://open/settings");
+    add_action(top_steam, "Sign Out...", "steam://open/settings");
+    add_action(top_steam, "Go Online", "steam://friends/status/online");
+    add_action(top_steam, "Go Offline", "steam://friends/status/offline");
+    add_separator(top_steam);
     add_action(top_steam, "Check for Steam Client Updates...", "steam://open/console");
     add_action(top_steam, "Backup and Restore Games...", "steam://backup/");
     add_separator(top_steam);
-    add_action(top_steam, "Go Online", "steam://friends/status/online");
-    add_action(top_steam, "Go Offline", "steam://friends/status/offline");
+    add_action(top_steam, "Settings", "steam://open/settings");
+
+    if (is_millennium_present()) {
+        LOG_INFO("Millennium modding framework detected: exporting Millennium menu options");
+        add_separator(top_steam);
+        add_action(top_steam, "Millennium", "steam://millennium/settings");
+        add_action(top_steam, "Millennium Library Manager", "steam://millennium/sidebar");
+    }
+
     add_separator(top_steam);
     add_action(top_steam, "Restart Steam", "RESTART");
     add_action(top_steam, "Exit Steam", "EXIT");

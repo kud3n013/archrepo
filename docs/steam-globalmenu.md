@@ -1,11 +1,11 @@
 # Steam Global Menu (`steam-globalmenu`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.1.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-1.2.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-archrepo-informational)](https://github.com/kud3n013/archrepo)
 
-High-performance, lightweight C daemon bridge exporting the Steam client menu bar, navigation shortcuts, and dynamically parsed recent games to the KDE Plasma Global Menu widget via the DBusMenu protocol.
+High-performance, lightweight C daemon bridge exporting the Steam client menu bar, navigation shortcuts, dynamically parsed recent games, and Millennium modding settings to the KDE Plasma Global Menu widget via the DBusMenu protocol.
 
 ---
 
@@ -28,7 +28,7 @@ systemctl --user enable --now steam-globalmenu.service
 | Attribute | Value |
 |---|---|
 | **Package Name** | `steam-globalmenu` |
-| **Current Version** | `1.1.0-1` |
+| **Current Version** | `1.2.0-1` |
 | **Package Type** | **Modified (KDE Global Menu Bridge)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [kud3n013/archrepo](https://github.com/kud3n013/archrepo) |
@@ -41,6 +41,7 @@ Because the modern Steam client uses a custom Chromium Embedded Framework (CEF) 
 
 `steam-globalmenu` bridges this gap:
 - **KDE Plasma Global Menu Export**: Runs a lightweight D-Bus daemon implementing `com.canonical.dbusmenu` (`org.kde.steam.AppMenu` on `/MenuBar`).
+- **Millennium Framework Integration**: Automatically detects active Millennium installations and exports the native **Millennium** (`steam://millennium/settings`) and **Millennium Library Manager** (`steam://millennium/sidebar`) entries right under the `Steam` menu.
 - **Automatic Window Binding**: Detects active Steam client windows via X11 / XWayland and dynamically attaches the `_KDE_NET_WM_APPMENU_SERVICE_NAME` and `_KDE_NET_WM_APPMENU_OBJECT_PATH` properties.
 - **AppMenu Registrar Integration**: Automatically registers and unregisters window IDs with `com.canonical.AppMenu.Registrar` as Steam opens and closes.
 - **Dynamic Recent Games Submenu**: Discovers local Steam library paths (`libraryfolders.vdf`) and user configs (`localconfig.vdf`) to populate a live **Recent Games** and **Installed Games** launcher submenu directly inside your KDE Plasma top panel.
