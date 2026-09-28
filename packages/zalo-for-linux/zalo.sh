@@ -37,7 +37,7 @@ ALL_ARGS=("${FLAGS[@]}" "$@")
 # Check if user specified ozone platform explicitly
 HAS_OZONE=false
 for arg in "${ALL_ARGS[@]}"; do
-    if [[ "$arg" =~ ^--ozone-platform ]]; then
+    if [[ "$arg" =~ ^--ozone-platform= ]]; then
         HAS_OZONE=true
         break
     fi
