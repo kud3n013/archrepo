@@ -16,6 +16,7 @@ Packages in this directory:
 | Package | Original Upstream | Reason for Archiving |
 |---|---|---|
 | [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
+| [`stirling-pdf-desktop`](./stirling-pdf-desktop/) | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | Archived per maintainer request. |
 | [`zed`](./zed/) | [Zed](https://zed.dev) | Archived per maintainer request. |
 | [`zen-browser`](./zen-browser/) | [zen-browser/desktop](https://github.com/zen-browser/desktop) | Archived per maintainer request. |
 

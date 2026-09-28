@@ -1,19 +1,23 @@
-# Stirling-PDF Desktop (`stirling-pdf-desktop`)
+# Stirling-PDF Desktop (Archived) (`stirling-pdf-desktop`)
 
-[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![status](https://img.shields.io/badge/status-archived-lightgrey)](../archive/README.md)
 [![version](https://img.shields.io/badge/version-3.0.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-github-informational)](https://github.com/Stirling-Tools/Stirling-PDF)
+
+> [!NOTE]
+> This package is archived and no longer actively distributed in `archrepo`.
+> Build recipes are preserved in [`archive/stirling-pdf-desktop/`](../archive/stirling-pdf-desktop/).
 
 Locally hosted, web-based PDF manipulation tool packaged as an official Tauri desktop application with KDE Plasma Qt title bar integration, Wayland / X11 compatibility, and crash mitigations.
 
 ---
 
-## 📥 Installation
+## 🗄️ Archive Status
 
-```bash
-sudo pacman -S stirling-pdf-desktop
-```
+- **Status**: Archived
+- **Reason**: Archived per maintainer request.
+- **Archive Directory**: [`archive/stirling-pdf-desktop/`](../archive/stirling-pdf-desktop/)
+- **Upstream**: [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF)
 
 ---
 
@@ -22,9 +26,8 @@ sudo pacman -S stirling-pdf-desktop
 | Attribute | Value |
 |---|---|
 | **Package Name** | `stirling-pdf-desktop` |
-| **Current Version** | `3.0.1-1` |
+| **Last Version** | `3.0.1-1` |
 | **Package Type** | **Modified** |
-| **Build Status** | `passing` |
 | **Upstream Project** | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) |
 | **Category** | Office / Graphics / Utility |
 
@@ -74,4 +77,5 @@ __NV_DISABLE_EXPLICIT_SYNC=1
 
 - [Upstream Repository](https://github.com/Stirling-Tools/Stirling-PDF)
 - [Official Releases](https://github.com/Stirling-Tools/Stirling-PDF/releases)
-- [AUR Package: stirling-pdf-desktop](https://aur.archlinux.org/packages/stirling-pdf-desktop)
+- [Archive Documentation](../archive/README.md)
+- [Back to archrepo README](../README.md)
