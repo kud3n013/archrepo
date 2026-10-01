@@ -3,7 +3,7 @@
 pkgname=zotero-better-bibtex
 _pkgname=zotero-better-bibtex
 _ext_id="better-bibtex@iris-advies.com"
-pkgver=9.0.64
+pkgver=9.0.68
 pkgrel=1
 pkgdesc="Make Zotero useful for us LaTeX holdouts (Better BibTeX for Zotero)"
 arch=('any')
@@ -15,10 +15,8 @@ source=(
   "${pkgname}-${pkgver}.xpi::https://github.com/retorquere/${_pkgname}/releases/download/v${pkgver}/${_pkgname}-${pkgver}.xpi"
   "LICENSE-${pkgver}::https://raw.githubusercontent.com/retorquere/${_pkgname}/v${pkgver}/LICENSE"
 )
-sha256sums=(
-  '84c4b5b05ffac9a9c7e2ff79663612486f7781690dd59b12a1e62aecdcfa7c27'
-  '829c0a6fa9ab50eadd02f0696cd3a2deb6906bdbb4b1eb78cec09fa99ce29603'
-)
+sha256sums=('d3699a348f00125f390b5a69e5a2633340442cac778a7e0c8f09beafe1cae8b8'
+            '829c0a6fa9ab50eadd02f0696cd3a2deb6906bdbb4b1eb78cec09fa99ce29603')
 
 package() {
   # Install into Zotero distribution extensions directory for automatic profile deployment
