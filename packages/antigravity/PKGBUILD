@@ -3,8 +3,8 @@
 
 _pkgname=antigravity
 pkgname=antigravity
-pkgver=2.18.1
-_build=4945794252537856
+pkgver=2.19.1
+_build=6046815158665216
 pkgrel=1
 pkgdesc="Google Antigravity 2.0 multi-agent orchestration platform"
 arch=('x86_64')
@@ -57,7 +57,7 @@ source=(
     "${_pkgname}.png"
     "patch-window-controls.js"
 )
-sha256sums=('46b82fa34a32a39c498bd745aa6c8273881492eaea45b660ce489e776f743daf'
+sha256sums=('7068fa471c3e5a1225e24e4f683497748b849d08ec702313d49c518cd45fa4af'
             'd774eac7c44eeffe4236d79a90b0acfed658200325fa206e57bd5491f7e4930e'
             '5db883a9e0270182eec9fba2ee8777eee37691345992c8b126ad039ac16b2692'
             'd7dda12f69d1e9708a54193223039ed1e07eae4cf4bd2d2f1b8ee69ed153a594'
