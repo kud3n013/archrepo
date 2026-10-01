@@ -1,6 +1,6 @@
 pkgbase = proton-pass-cli
 	pkgdesc = A command-line interface for managing your Proton Pass vaults, items, and secrets
-	pkgver = 2.4.1
+	pkgver = 2.4.2
 	pkgrel = 1
 	url = https://protonpass.github.io/pass-cli
 	arch = x86_64
@@ -9,9 +9,9 @@ pkgbase = proton-pass-cli
 	depends = libgcc
 	optdepends = org.freedesktop.secrets: for persistent session credentials across reboots (e.g. gnome-keyring, keepassxc)
 	optdepends = xdg-utils: for web-based browser login integration
-	provides = protonpass-cli=2.4.1
-	provides = proton-pass-cli-bin=2.4.1
-	provides = pass-cli=2.4.1
+	provides = protonpass-cli=2.4.2
+	provides = proton-pass-cli-bin=2.4.2
+	provides = pass-cli=2.4.2
 	conflicts = protonpass-cli
 	conflicts = proton-pass-cli-bin
 	conflicts = pass-cli
@@ -19,11 +19,11 @@ pkgbase = proton-pass-cli
 	options = !strip
 	options = !debug
 	backup = etc/proton-pass-cli.conf
-	source = pass-cli-2.4.1::https://github.com/protonpass/pass-cli/releases/download/2.4.1/pass-cli-linux-x86_64
-	source = LICENSE-2.4.1::https://raw.githubusercontent.com/protonpass/pass-cli/2.4.1/LICENSE
+	source = pass-cli-2.4.2::https://github.com/protonpass/pass-cli/releases/download/2.4.2/pass-cli-linux-x86_64
+	source = LICENSE-2.4.2::https://raw.githubusercontent.com/protonpass/pass-cli/2.4.2/LICENSE
 	source = proton-pass-cli.sh
 	source = proton-pass-cli.conf
-	sha256sums = f4188430466e0a3d668b56791a8b430162cb20ceb108fed4fdbfcfe77d3080e6
+	sha256sums = 4089bdf5981140ac5bee65d2d79bf98767537f54d33197b79e5f86c630714842
 	sha256sums = c7900f97f653a7f70ff78acd49d25078807c60eec1cc860df23b9f44043977ba
 	sha256sums = 49a8dbd624b82a20cfd4b128a40db6f565048503e78b676aeb01ee4dc9b94e16
 	sha256sums = 03eeb8a893acaf215d909595b354fb823195223edd4702cc1a0807f1a40a7d1e
