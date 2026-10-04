@@ -3,7 +3,7 @@
 pkgname=zotero-pdf-translate
 _pkgname=zotero-pdf-translate
 _ext_id="zoteropdftranslate@euclpts.com"
-pkgver=2.4.7
+pkgver=2.4.8
 pkgrel=1
 pkgdesc="Translate PDF, EPub, webpage, metadata, annotations, notes in Zotero (Translate for Zotero)"
 arch=('any')
@@ -14,9 +14,7 @@ options=('!strip' '!debug')
 source=(
   "${pkgname}-${pkgver}.xpi::https://github.com/windingwind/${_pkgname}/releases/download/v${pkgver}/translate-for-zotero.xpi"
 )
-sha256sums=(
-  '0cb267eecff04d2ce39401e5458e31312422d77ac460f6958c9a2e2da1092dd2'
-)
+sha256sums=('8145e9972c507f6baee93b93d2c2e8e7fe24388c58f2cebe0a37e29db5de26e6')
 
 package() {
   # Install into Zotero distribution extensions directory for automatic profile deployment
