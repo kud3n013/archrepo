@@ -2,7 +2,7 @@
 
 pkgname=zotero-mcp
 _pkgname=zotero-mcp
-pkgver=0.13.1
+pkgver=0.13.2
 pkgrel=1
 pkgdesc="Model Context Protocol (MCP) server and standalone CLI for Zotero"
 arch=('x86_64')
@@ -17,7 +17,7 @@ options=('!strip' '!debug')
 source=(
   "${pkgname}-${pkgver}.tar.gz::https://github.com/54yyyu/${_pkgname}/archive/refs/tags/v${pkgver}.tar.gz"
 )
-sha256sums=('4e224ad4ba7c9b4a5e0ca5b2ed6aa67db479d9977b4a3dacb9b797038aba2b9c')
+sha256sums=('a9073226cea6f6c4bbd8f3d7750591595dd86885706508f1b592f95a57acac27')
 
 package() {
   export UV_LINK_MODE=copy

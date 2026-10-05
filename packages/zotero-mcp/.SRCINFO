@@ -1,6 +1,6 @@
 pkgbase = zotero-mcp
 	pkgdesc = Model Context Protocol (MCP) server and standalone CLI for Zotero
-	pkgver = 0.13.1
+	pkgver = 0.13.2
 	pkgrel = 1
 	url = https://github.com/54yyyu/zotero-mcp
 	arch = x86_64
@@ -12,7 +12,7 @@ pkgbase = zotero-mcp
 	conflicts = zotero-mcp-server
 	options = !strip
 	options = !debug
-	source = zotero-mcp-0.13.1.tar.gz::https://github.com/54yyyu/zotero-mcp/archive/refs/tags/v0.13.1.tar.gz
-	sha256sums = 4e224ad4ba7c9b4a5e0ca5b2ed6aa67db479d9977b4a3dacb9b797038aba2b9c
+	source = zotero-mcp-0.13.2.tar.gz::https://github.com/54yyyu/zotero-mcp/archive/refs/tags/v0.13.2.tar.gz
+	sha256sums = a9073226cea6f6c4bbd8f3d7750591595dd86885706508f1b592f95a57acac27
 
 pkgname = zotero-mcp
