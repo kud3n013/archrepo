@@ -4,8 +4,8 @@
 
 _pkgname=obsidian
 pkgname=obsidian
-pkgver=1.13.7
-pkgrel=3
+pkgver=1.14.4
+pkgrel=1
 pkgdesc="A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)"
 arch=('x86_64')
 url="https://obsidian.md"
@@ -54,7 +54,7 @@ source=(
     "patch-globalmenu.js"
 )
 
-sha256sums=('17dc33b49cb3e785ecc27edd2ea0c79e40207798b554fd2886e36ebee7af9ae0'
+sha256sums=('85b10dcba6edfc1c0460a6d18260cf31c30447a444bd858a6440b9c9c8806d25'
             'd41ca0fc089e33cdcb088d4a37a21babc19cf7a8862d4746a163002ec28c5ef0'
             '2d34e72032d0ffd1bb9a93e8cce80dfc2ff23c88ed2f95206e27c18c1cbdb5bd'
             '37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d'
