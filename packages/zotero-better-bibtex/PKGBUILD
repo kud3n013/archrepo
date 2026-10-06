@@ -3,7 +3,7 @@
 pkgname=zotero-better-bibtex
 _pkgname=zotero-better-bibtex
 _ext_id="better-bibtex@iris-advies.com"
-pkgver=9.0.68
+pkgver=9.0.70
 pkgrel=1
 pkgdesc="Make Zotero useful for us LaTeX holdouts (Better BibTeX for Zotero)"
 arch=('any')
@@ -15,7 +15,7 @@ source=(
   "${pkgname}-${pkgver}.xpi::https://github.com/retorquere/${_pkgname}/releases/download/v${pkgver}/${_pkgname}-${pkgver}.xpi"
   "LICENSE-${pkgver}::https://raw.githubusercontent.com/retorquere/${_pkgname}/v${pkgver}/LICENSE"
 )
-sha256sums=('d3699a348f00125f390b5a69e5a2633340442cac778a7e0c8f09beafe1cae8b8'
+sha256sums=('daffb786c6280892e9fa83270858f3b3faba7bf5d8383af850a43d3fd4d486ad'
             '829c0a6fa9ab50eadd02f0696cd3a2deb6906bdbb4b1eb78cec09fa99ce29603')
 
 package() {

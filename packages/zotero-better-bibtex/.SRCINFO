@@ -1,6 +1,6 @@
 pkgbase = zotero-better-bibtex
 	pkgdesc = Make Zotero useful for us LaTeX holdouts (Better BibTeX for Zotero)
-	pkgver = 9.0.68
+	pkgver = 9.0.70
 	pkgrel = 1
 	url = https://github.com/retorquere/zotero-better-bibtex
 	arch = any
@@ -8,9 +8,9 @@ pkgbase = zotero-better-bibtex
 	depends = zotero
 	options = !strip
 	options = !debug
-	source = zotero-better-bibtex-9.0.68.xpi::https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.68/zotero-better-bibtex-9.0.68.xpi
-	source = LICENSE-9.0.68::https://raw.githubusercontent.com/retorquere/zotero-better-bibtex/v9.0.68/LICENSE
-	sha256sums = d3699a348f00125f390b5a69e5a2633340442cac778a7e0c8f09beafe1cae8b8
+	source = zotero-better-bibtex-9.0.70.xpi::https://github.com/retorquere/zotero-better-bibtex/releases/download/v9.0.70/zotero-better-bibtex-9.0.70.xpi
+	source = LICENSE-9.0.70::https://raw.githubusercontent.com/retorquere/zotero-better-bibtex/v9.0.70/LICENSE
+	sha256sums = daffb786c6280892e9fa83270858f3b3faba7bf5d8383af850a43d3fd4d486ad
 	sha256sums = 829c0a6fa9ab50eadd02f0696cd3a2deb6906bdbb4b1eb78cec09fa99ce29603
 
 pkgname = zotero-better-bibtex
