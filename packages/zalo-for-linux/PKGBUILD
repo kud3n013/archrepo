@@ -5,7 +5,7 @@ _pkgname=zalo
 pkgname=zalo-for-linux
 pkgver=26.10.10
 _zadarkver=26.2.1
-_commithash=0144208
+_commithash=e80931a
 pkgrel=1
 pkgdesc="Zalo for Linux — unofficial port for Linux systems with ZaDark, Wayland & KDE integration"
 arch=('x86_64')
@@ -65,7 +65,7 @@ source=(
     "zalo-globalmenu.c"
 )
 options=(!strip !debug)
-sha256sums=('8e5bdf0db5f6a306562270585bbead12630576cb7286a99c64c97adee8cdfcc4'
+sha256sums=('99b5eab7dbe5100b9e7c4aafb2f003514fbc0f08d3e779fb9451a0ba77d33fa7'
             '80df0c5d4118036af1d73df1c29a546c9a70d6327a5bcca1155f4d93f8244769'
             '6003f1ded1519a8a9be21a91f231bd59f5341efc20858fcf84f4f401b12b0ec2'
             '54556414e921d2e72db65cdace024251c05e31ce2e1aa3db82aa330436815445'
