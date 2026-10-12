@@ -9,6 +9,15 @@
  set_target_properties(howdy_compare PROPERTIES OUTPUT_NAME "howdy-compare")
  howdy_install(
   TARGETS howdy_compare
+@@ -335,7 +335,7 @@
+ 
+ add_executable(howdy src/bin/howdy_main.cpp)
+ howdy_configure_native_target(howdy)
+-target_link_libraries(howdy PRIVATE howdy_cli)
++target_link_libraries(howdy PRIVATE howdy_cli howdy_opencv)
+ howdy_install(TARGETS howdy RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+ 
+ include(cmake/docs.cmake)
 --- a/howdy/src/bin/compare.cpp
 +++ b/howdy/src/bin/compare.cpp
 @@ -1,7 +1,9 @@
