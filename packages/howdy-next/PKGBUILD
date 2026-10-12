@@ -3,8 +3,8 @@
 
 pkgname=howdy-next
 _pkgname=howdy-next
-pkgver=3.4.1
-pkgrel=3
+pkgver=3.4.2
+pkgrel=1
 pkgdesc="C++ rewrite of Howdy facial-recognition authentication on Linux (patched: no OpenCV WARN spam)"
 arch=('x86_64')
 url="https://codeberg.org/nathawat/howdy-next"
@@ -45,9 +45,9 @@ source=(
 	"polkit-agent-helper-howdy.conf"
 	"0001-fix-opencv-suppress-noisy-dnn-warnings.patch"
 )
-sha512sums=('37840eab169b7b52d5aeaba2d53fca0a10de1ec87dd68f8aaa36b9abc9bf36ec8308adfb9fdc6e5bd5c6c4f9be18c6e237d7afd377dfecda103cd7034497765f'
+sha512sums=('91ea24436d2a769989cfe8931ada8974f10395ee752e07678f9f2f9a9815989435a75977076cf24883254a2c32a34550b1fefb27592f0ecd05880a90b7fcafaa'
             '620bcf9d14c499e34245681218d91e64b12951b6fca1bd4288654d560530dc1a167e6de768152c3c34bb6de5af9970c9837ec88d4ed6b5602e195476e55a18fc'
-            'b3668f764b29976fc2178965560e56b06786eb29b488cb58b99425f79b439c660d7e624abdf9083c523203cd369d01a93600dc6445f53862d5dbee2c90828614')
+            'b773006632d27d4cecf3c2d40edb0d5585ee0ff8b280b0742e851bb8f90735a818228c3828254496465697dbb41998d2e8d29112d5b3f1e42cf593f64eb28492')
 
 prepare() {
 	cd "$srcdir/howdy-next"
