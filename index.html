@@ -16,15 +16,18 @@
   <h1>📦 archrepo</h1>
   <p>Automated Arch Linux package repository hosted on GitHub.</p>
   <h2>Installation</h2>
+  <p>Import and locally sign the repository signing key:</p>
+  <pre><code>curl -sSfL -o /tmp/archrepo.asc https://github.com/kud3n013/archrepo/releases/download/packages/archrepo.asc
+sudo pacman-key --add /tmp/archrepo.asc
+sudo pacman-key --lsign-key CFB791543B4B2D2821E9127AC012A9476C170A37</code></pre>
   <p>Add the repository to <code>/etc/pacman.conf</code>:</p>
   <pre><code>[archrepo]
-SigLevel = Optional TrustAll
+SigLevel = Required
 Server = https://github.com/kud3n013/archrepo/releases/download/packages</code></pre>
   <p>Then synchronize package databases:</p>
   <pre><code>sudo pacman -Syy</code></pre>
   <h2>Available Packages</h2>
   <ul>
-      <li><code>antigravity</code> - Google Antigravity 2.0 multi-agent orchestration platform</li>
       <li><code>beeper</code> - The ultimate messaging app (formerly Beeper v4)</li>
       <li><code>cursor</code> - AI-first code editor built for pair programming with artificial intelligence (official binary release with KDE Global Menu integration)</li>
       <li><code>freedownloadmanager</code> - Fast and powerful modern download accelerator and organizer (binary release)</li>
@@ -35,13 +38,9 @@ Server = https://github.com/kud3n013/archrepo/releases/download/packages</code><
       <li><code>kwin-scripts-krohnkite</code> - A dynamic tiling extension for KWin (KDE Plasma 6)</li>
       <li><code>millennium</code> - Open-source modding framework for creating and managing Steam Client themes and plugins</li>
       <li><code>obsidian</code> - A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron &amp; CLI)</li>
-      <li><code>proton-mail</code> - Proton official desktop application for Proton Mail and Proton Calendar (with system tray &amp; close-to-tray)</li>
-      <li><code>proton-pass</code> - Official desktop application for Proton Pass: end-to-end encrypted password and identity manager (responsive layout &amp; unconstrained resizing)</li>
-      <li><code>proton-pass-cli</code> - A command-line interface for managing your Proton Pass vaults, items, and secrets</li>
       <li><code>searxng</code> - A privacy-respecting, hackable metasearch engine</li>
       <li><code>sine</code> - The ultimate mod and theme manager for Firefox-based browsers</li>
       <li><code>steam-globalmenu</code> - High-performance, lightweight C daemon exporting Steam client menu bar to KDE Plasma Global Menu via DBusMenu</li>
-      <li><code>zalo-for-linux</code> - Zalo for Linux — unofficial port for Linux systems with ZaDark, Wayland &amp; KDE integration</li>
       <li><code>zed-globalmenu</code> - A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter (with KDE Global Menu patch)</li>
       <li><code>zotero</code> - A free, easy-to-use tool to help you collect, organize, cite, and share your research sources</li>
       <li><code>zotero-better-bibtex</code> - Make Zotero useful for us LaTeX holdouts (Better BibTeX for Zotero)</li>
