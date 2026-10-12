@@ -27,7 +27,7 @@ _for_each_steam_user() {
         sudo_home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
         if [ -n "$sudo_home" ] && [ -d "$sudo_home" ]; then
             visited_homes["$sudo_home"]=1
-            "$callback" "$sudo_home"
+            _as_home_owner "$sudo_home" "$callback"
         fi
     fi
 
@@ -37,7 +37,7 @@ _for_each_steam_user() {
         [ -d "$home" ] || continue
         if [ -z "${visited_homes["$home"]:-}" ]; then
             visited_homes["$home"]=1
-            "$callback" "$home"
+            _as_home_owner "$home" "$callback"
         fi
     done < <(getent passwd 2>/dev/null || true)
 
@@ -46,17 +46,30 @@ _for_each_steam_user() {
         [ -d "$user_home" ] || continue
         if [ -z "${visited_homes["$user_home"]:-}" ]; then
             visited_homes["$user_home"]=1
-            "$callback" "$user_home"
+            _as_home_owner "$user_home" "$callback"
         fi
     done
+}
+
+# Run a per-user callback as the owner of that home directory. Everything under
+# a home is user-controlled, so doing this work as root would let a planted
+# symlink redirect root's mkdir/touch/cp onto arbitrary system files.
+_as_home_owner() {
+    local home="$1"
+    local callback="$2"
+    local uid gid
+    uid=$(stat -c '%u' "$home" 2>/dev/null) || return 0
+    gid=$(stat -c '%g' "$home" 2>/dev/null) || return 0
+
+    setpriv --reuid="$uid" --regid="$gid" --clear-groups \
+        /usr/bin/bash -c "$(declare -f _link_hook _unlink_hook _link_user_steam _unlink_user_steam); ${callback} \"\$1\"" \
+        _ "$home" || true
 }
 
 # Safely link a Millennium hook, backing up any original non-Millennium file if found
 _link_hook() {
     local target="$1"
     local source="$2"
-    local user_uid="${3:-}"
-    local user_gid="${4:-}"
 
     if [ -e "$target" ] || [ -L "$target" ]; then
         local current_link
@@ -75,9 +88,6 @@ _link_hook() {
     fi
 
     ln -sf "$source" "$target"
-    if [ -n "$user_uid" ] && [ "$user_uid" -ne 0 ]; then
-        chown -h "$user_uid:$user_gid" "$target" 2>/dev/null || true
-    fi
 }
 
 # Safely remove a Millennium hook, restoring the original file if a backup exists
@@ -101,10 +111,6 @@ _unlink_hook() {
 # Link Millennium bootstrap hooks into Steam runtime directories
 _link_user_steam() {
     local home="$1"
-    local user_uid user_gid
-    user_uid=$(stat -c '%u' "$home" 2>/dev/null || true)
-    user_gid=$(stat -c '%g' "$home" 2>/dev/null || true)
-
     declare -A visited_steam_dirs=()
 
     for steam_dir in "$home/.local/share/Steam" "$home/.steam/steam"; do
@@ -121,20 +127,14 @@ _link_user_steam() {
 
         # Preload bootstraps for Steam 32-bit & 64-bit CEF runtimes with backup preservation
         _link_hook "${steam_dir}/ubuntu12_32/libXtst.so.6" \
-                   "/usr/lib/millennium/libmillennium_bootstrap_x86.so" "$user_uid" "$user_gid"
+                   "/usr/lib/millennium/libmillennium_bootstrap_x86.so"
         _link_hook "${steam_dir}/ubuntu12_64/libXtst.so.6" \
-                   "/usr/lib/millennium/libmillennium_bootstrap_hhx64.so" "$user_uid" "$user_gid"
+                   "/usr/lib/millennium/libmillennium_bootstrap_hhx64.so"
         _link_hook "${steam_dir}/ubuntu12_64/libmillennium_hhx64.so" \
-                   "/usr/lib/millennium/libmillennium_hhx64.so" "$user_uid" "$user_gid"
+                   "/usr/lib/millennium/libmillennium_hhx64.so"
 
         # Enable Steam CEF remote debugging (required by Millennium for theme/plugin injection)
         touch "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
-
-        # Ensure correct directory and flag ownership
-        if [ -n "$user_uid" ] && [ "$user_uid" -ne 0 ]; then
-            chown "$user_uid:$user_gid" "${steam_dir}/.cef-enable-remote-debugging" 2>/dev/null || true
-            chown "$user_uid:$user_gid" "${steam_dir}/ubuntu12_32" "${steam_dir}/ubuntu12_64" 2>/dev/null || true
-        fi
     done
 }
 

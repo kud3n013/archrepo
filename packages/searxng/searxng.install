@@ -1,11 +1,17 @@
-post_install() {
-    # Generate a random secret key if the default placeholder is detected
+# Replace the placeholder secret key with a random per-machine key.
+# Runs on upgrade too: pacman replaces an unmodified settings.yml with the
+# new placeholder version, which must not be left in place.
+_generate_secret_key() {
     if [ -f /etc/searxng/settings.yml ]; then
         if grep -q 'secret_key: "ultrasecretkey"' /etc/searxng/settings.yml 2>/dev/null; then
             _secret="$(openssl rand -hex 32)"
             sed -i "s/secret_key: \"ultrasecretkey\"/secret_key: \"${_secret}\"/" /etc/searxng/settings.yml
         fi
     fi
+}
+
+post_install() {
+    _generate_secret_key
 
     echo ":: SearXNG installed successfully!"
     echo ":: Configuration: /etc/searxng/settings.yml"
@@ -15,5 +21,15 @@ post_install() {
 }
 
 post_upgrade() {
+    _generate_secret_key
+
+    # Packages up to r9822.ad46ebd-1 shipped a secret_key generated at build
+    # time, so it was identical for every user and publicly readable.
+    if [ "$(vercmp "$2" 'r9822.ad46ebd-2')" -lt 0 ]; then
+        echo ":: WARNING: earlier searxng packages shipped a shared, public secret_key."
+        echo ":: If you edited /etc/searxng/settings.yml, set a new key yourself:"
+        echo "::   sudo sed -i \"s/^\(\s*secret_key:\).*/\1 \\\"\$(openssl rand -hex 32)\\\"/\" /etc/searxng/settings.yml"
+    fi
+
     echo ":: SearXNG upgraded. Restart service if running: systemctl restart searxng"
 }

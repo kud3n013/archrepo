@@ -3,7 +3,7 @@
 
 pkgname=freedownloadmanager-elephant
 pkgver=1.3.9
-pkgrel=1
+pkgrel=2
 pkgdesc="Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp)"
 arch=('any')
 url="https://github.com/meowcateatrat/elephant"

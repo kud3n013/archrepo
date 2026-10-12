@@ -23,17 +23,32 @@ on:
         type: boolean
 
 permissions:
-  contents: write                 # push commits to main + gh-pages, manage releases
+  contents: read                  # only the publish job gets write access
+
+# Runs share one repository database; overlapping runs would overwrite each
+# other's archrepo.db uploads. Queue them instead.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   # ── 1. Discover packages to build ─────────────────────────────────────
   discover:
     runs-on: ubuntu-latest
+    # Arch container so check-upstream.sh can compare versions with vercmp
+    container:
+      image: archlinux:base-devel
+    defaults:
+      run:
+        shell: bash
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
       has_packages: ${{ steps.discover.outputs.has_packages }}
       count: ${{ steps.discover.outputs.count }}
     steps:
+      - name: Install dependencies
+        run: pacman -Syu --noconfirm git jq curl github-cli
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -50,6 +65,7 @@ jobs:
           FORCE_REBUILD: ${{ github.event.inputs.force_rebuild || 'false' }}
           CHECK_UPSTREAM: ${{ github.event.inputs.check_upstream || (github.event_name == 'schedule' && 'true') || 'false' }}
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           chmod +x .github/scripts/discover.sh .github/scripts/check-upstream.sh
           .github/scripts/discover.sh
 
@@ -82,6 +98,9 @@ jobs:
           ref: main
           path: src
           fetch-depth: 0
+          # makepkg runs upstream build code as builder, who owns src/; never
+          # leave a token in src/.git/config for it to read.
+          persist-credentials: false
 
       # ── Create unprivileged builder user ────────────────────────────
       - name: Create builder user
@@ -142,11 +161,21 @@ jobs:
         if: steps.cache_check.outputs.skip_build != 'true'
         run: |
           cd "src/packages/${{ matrix.name }}"
-          if ! sudo -u builder makepkg -s --noconfirm; then
-            echo "makepkg -s failed (likely external/AUR runtime dependencies). Installing makedepends and retrying with -d..."
-            MAKEDEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /makedepends/ {print $2}')
-            if [ -n "$MAKEDEPS" ]; then
-              pacman -S --needed --noconfirm $MAKEDEPS
+          # makepkg -s cannot install dependencies missing from the sync repos
+          # (e.g. AUR-only). Only in that case install what is available and build
+          # with -d; any other failure, including compile errors, fails the step.
+          DEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /^\t(make|check)?depends$/ {print $2}')
+          UNAVAILABLE=()
+          for dep in $DEPS; do
+            pacman -Sp --print-format '%n' "$dep" &>/dev/null || UNAVAILABLE+=("$dep")
+          done
+          if [ ${#UNAVAILABLE[@]} -eq 0 ]; then
+            sudo -u builder makepkg -s --noconfirm
+          else
+            echo "::warning::Not in sync repos, building ${{ matrix.name }} without dependency checks: ${UNAVAILABLE[*]}"
+            AVAILABLE=$(printf '%s\n' $DEPS | grep -vxF -f <(printf '%s\n' "${UNAVAILABLE[@]}") || true)
+            if [ -n "$AVAILABLE" ]; then
+              pacman -S --needed --noconfirm $AVAILABLE
             fi
             sudo -u builder makepkg -d --noconfirm
           fi
@@ -160,30 +189,26 @@ jobs:
           path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
           if-no-files-found: error
 
-      # ── Commit & push upstream update to main (only after successful build) ──
-      - name: Push upstream update to main
+      # ── Hand the upstream update to the publish job (only after successful build) ──
+      # This job has no write token; the publish job commits these files to main.
+      - name: Upload upstream update
         if: matrix.update_needed == true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PKG="${{ matrix.name }}"
-          cd "${GITHUB_WORKSPACE:-$(pwd)/../../..}/src"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
-          if ! git diff --cached --quiet; then
-            git commit -m "bump: ${PKG} automated update"
-            for i in 1 2 3 4 5; do
-              git pull --rebase origin main && git push origin main && break
-              sleep 3
-            done
-          fi
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-bump
+          path: |
+            src/packages/${{ matrix.name }}/PKGBUILD
+            src/packages/${{ matrix.name }}/.SRCINFO
+          include-hidden-files: true
+          if-no-files-found: error
 
   # ── 3. Publish newly built packages & update repository ───────────────
   publish:
     needs: [discover, build]
     if: ${{ !cancelled() && needs.discover.outputs.has_packages == 'true' && (needs.build.result == 'success' || needs.build.result == 'failure') }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write             # push commits to main + gh-pages, manage releases
     container:
       image: archlinux:base-devel
     defaults:
@@ -202,18 +227,55 @@ jobs:
           path: repo
           fetch-depth: 0
 
-      - name: Checkout main (for index generation & archive detection)
+      - name: Checkout main (for upstream updates, index generation & archive detection)
         uses: actions/checkout@v4
         with:
           ref: main
           path: main_src
+          fetch-depth: 0
 
       - name: Download built package artifacts
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
+          pattern: '*-pkg'
           path: new-pkgs
           merge-multiple: true
+
+      - name: Download upstream updates
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: '*-bump'
+          path: bumps
+
+      # Build jobs run upstream code, so they only get a read-only token;
+      # the PKGBUILD/.SRCINFO updates they produced are committed from here.
+      - name: Commit upstream updates to main
+        run: |
+          [ -d bumps ] || { echo "No upstream updates."; exit 0; }
+          cd main_src
+          git config --global --add safe.directory "$(pwd)"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for bump_dir in ../bumps/*-bump; do
+            PKG=$(basename "$bump_dir" -bump)
+            [ -d "packages/${PKG}" ] || { echo "::warning::Unknown package ${PKG}, skipping"; continue; }
+            cp "${bump_dir}/PKGBUILD" "${bump_dir}/.SRCINFO" "packages/${PKG}/"
+            git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
+            if ! git diff --cached --quiet; then
+              git commit -m "bump: ${PKG} automated update"
+            fi
+          done
+          pushed=false
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin main; then
+              pushed=true
+              break
+            fi
+            sleep 3
+          done
+          [ "$pushed" = true ] || { echo "::error::Failed to push upstream updates to main"; exit 1; }
 
       - name: Update repository database
         env:
@@ -274,9 +336,11 @@ jobs:
             ALL_RELEASE_ASSETS=$(gh release view packages --repo ${{ github.repository }} --json assets --jq '.assets[].name' || true)
             for new_pkg in ../../new-pkgs/*.pkg.tar.zst; do
               pkg_base=$(basename "$new_pkg")
-              pkg_name=$(echo "$pkg_base" | sed -E 's/-[0-9].*//')
+              # <name>-<ver>-<rel>-<arch>.pkg.tar.zst: strip the last three fields,
+              # since names and versions may both contain '-<digit>'
+              pkg_name="${pkg_base%-*-*-*}"
               for asset in $ALL_RELEASE_ASSETS; do
-                if [[ "$asset" == ${pkg_name}-[0-9]*.pkg.tar.zst ]] && [ "$asset" != "$pkg_base" ]; then
+                if [[ "$asset" == *.pkg.tar.zst ]] && [ "${asset%-*-*-*}" = "$pkg_name" ] && [ "$asset" != "$pkg_base" ]; then
                   echo "Removing superseded release asset: $asset"
                   gh release delete-asset packages "$asset" --yes --repo ${{ github.repository }} || true
                 fi
@@ -301,7 +365,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "repo: update repository database and packages" || echo "Nothing to commit"
+          pushed=false
           for i in 1 2 3 4 5; do
-            git pull --rebase origin gh-pages && git push origin gh-pages && break
+            if git pull --rebase origin gh-pages && git push origin gh-pages; then
+              pushed=true
+              break
+            fi
             sleep 3
           done
+          [ "$pushed" = true ] || { echo "::error::Failed to push to gh-pages"; exit 1; }

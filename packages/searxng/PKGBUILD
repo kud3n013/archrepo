@@ -4,13 +4,13 @@
 pkgname=searxng
 _pkgname=searxng
 pkgver=r9822.ad46ebd
-pkgrel=1
+pkgrel=2
 pkgdesc="A privacy-respecting, hackable metasearch engine"
 arch=('any')
 url="https://searxng.github.io/searxng/"
 license=('AGPL-3.0-or-later')
-makedepends=('openssl' 'git' 'python-build' 'python-wheel' 'python-setuptools' 'python-msgspec' 'python-yaml')
-depends=('valkey' 'python')
+makedepends=('git' 'python-build' 'python-wheel' 'python-setuptools' 'python-msgspec' 'python-yaml')
+depends=('valkey' 'python' 'openssl')
 optdepends=(
     'nginx: reverse proxy'
     'caddy: reverse proxy'
@@ -45,8 +45,8 @@ pkgver() {
 build() {
   cd "$_pkgname"
 
-  # generate a random secret key
-  sed -i -e "s/ultrasecretkey\"  # change this\!/$(openssl rand -hex 32)\"/g" "$srcdir/settings.yml"
+  # The secret key is generated per machine in searxng.install. Generating it
+  # here would bake one key into the public package and share it with every user.
 
   export SEARXNG_SETTINGS_PATH="$srcdir/settings.yml"
   python -m searx.version freeze

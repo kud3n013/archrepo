@@ -23,8 +23,9 @@ if [ -f "$CONFIG_FILE" ]; then
   UPSTREAM=$(jq -r '.repo // ""' "$CONFIG_FILE")
 fi
 
-# Fallback: if no upstream.json, check if PKGBUILD URL is a GitHub repo
-if [ "$CHECK" = "none" ]; then
+# Fallback: if no upstream.json, check if PKGBUILD URL is a GitHub repo.
+# An explicit "check": "none" must stay disabled (e.g. packages whose url is this repo).
+if [ ! -f "$CONFIG_FILE" ]; then
   URL=$(grep -oP '^url=["\x27]?\K[^"\x27]+' "${PKG_DIR}/PKGBUILD" || true)
   if [[ "$URL" =~ github\.com/([^/]+/[^/]+) ]]; then
     CHECK="github-release"
@@ -85,7 +86,8 @@ case "$CHECK" in
 
   cursor-redirect)
     HEADERS=$(curl -sI "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/latest" || true)
-    [ -z "$(echo "$HEADERS" | grep -i '^location:')" ] && HEADERS=$(curl -sI "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/3.22" || true)
+    # Fall back to the current major.minor channel (e.g. 3.24.12 -> 3.24), never a hard-coded older one
+    [ -z "$(echo "$HEADERS" | grep -i '^location:')" ] && HEADERS=$(curl -sI "https://api2.cursor.sh/updates/download/golden/linux-x64-deb/cursor/${CURRENT%.*}" || true)
     VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'cursor_\K[0-9.]+(?=_amd64\.deb)' | head -1 || true)
     NEW_COMMIT=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'production/\K[0-9a-fA-F]+(?=/linux)' | head -1 || true)
     [ -n "$VER" ] && LATEST="$VER"
@@ -153,12 +155,13 @@ case "$CHECK" in
 
   millennium-github-prerelease)
     # Millennium uses pre-release tags (e.g. v3.5.0-beta.3) which /releases/latest skips.
-    # Fetch the most recent release with linux archive and convert hyphens to underscores.
+    # Fetch the most recent release with linux archive and drop hyphens (3.6.0-beta.1 -> 3.6.0beta.1)
+    # so vercmp orders the prerelease before the final 3.6.0.
     if [ -n "$UPSTREAM" ]; then
       TAG=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases" | \
         jq -r '[.[] | select(.draft == false and (.assets[].name | test("linux-x86_64.*tar\\.gz")) )][0].tag_name // empty' 2>/dev/null || true)
       TAG="${TAG#v}"
-      TAG="${TAG//-/_}"
+      TAG="${TAG//-/}"
       [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
     fi
     ;;
@@ -179,18 +182,34 @@ case "$CHECK" in
 esac
 
 if [ "$LATEST" != "$CURRENT" ]; then
-  if [[ "$LATEST" =~ ^[0-9A-Za-z._+]+$ ]]; then
-    UPDATE_NEEDED=true
-  else
+  if ! [[ "$LATEST" =~ ^[0-9A-Za-z._+]+$ ]]; then
     echo "Warning: Rejected upstream version with invalid characters: '${LATEST}'" >&2
     UPDATE_NEEDED=false
+  elif ! command -v vercmp &>/dev/null; then
+    echo "Error: vercmp (pacman) is required to compare versions" >&2
+    exit 1
+  elif [ "$(vercmp "$LATEST" "$CURRENT")" -lt 0 ]; then
+    # A stale CDN redirect or a mis-sorted release list must never downgrade the
+    # package; build/commit ids reported alongside belong to that older release.
+    echo "Warning: Rejected upstream version older than current: '${LATEST}' < '${CURRENT}'" >&2
+    UPDATE_NEEDED=false
+    NEW_BUILD=""
+    NEW_COMMIT=""
+    NEW_ZADARK=""
+  else
+    UPDATE_NEEDED=true
   fi
 fi
 
 if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
-  if [ "$LATEST" != "$CURRENT" ] && [[ "$LATEST" =~ ^[0-9A-Za-z._+]+$ ]]; then
+  if [ "$LATEST" != "$CURRENT" ]; then
     sed -i "s/^pkgver=.*/pkgver=${LATEST}/" "${PKG_DIR}/PKGBUILD"
     sed -i "s/^pkgrel=.*/pkgrel=1/" "${PKG_DIR}/PKGBUILD"
+  else
+    # Same pkgver but a new upstream build/commit: bump pkgrel so the package
+    # filename changes, otherwise CI sees it as already published and skips it.
+    CURRENT_REL=$(grep -oP '^pkgrel=\K[0-9]+' "${PKG_DIR}/PKGBUILD" | head -1)
+    sed -i "s/^pkgrel=.*/pkgrel=$((CURRENT_REL + 1))/" "${PKG_DIR}/PKGBUILD"
   fi
   if [ -n "$NEW_BUILD" ] && [[ "$NEW_BUILD" =~ ^[0-9A-Za-z._+]+$ ]]; then
     sed -i "s/^_build=.*/_build=${NEW_BUILD}/" "${PKG_DIR}/PKGBUILD"

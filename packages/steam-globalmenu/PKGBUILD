@@ -1,8 +1,8 @@
 # Maintainer: kud3n013 <kud3n.013@proton.me>
 
 pkgname=steam-globalmenu
-pkgver=packages
-pkgrel=1
+pkgver=1.2.0
+pkgrel=2
 pkgdesc="High-performance, lightweight C daemon exporting Steam client menu bar to KDE Plasma Global Menu via DBusMenu"
 arch=('x86_64')
 url="https://github.com/kud3n013/archrepo"
@@ -22,6 +22,7 @@ optdepends=(
 )
 provides=('steam-globalmenu')
 conflicts=('steam-globalmenu')
+options=(!debug)
 install=steam-globalmenu.install
 source=(
   "steam-globalmenu.c"

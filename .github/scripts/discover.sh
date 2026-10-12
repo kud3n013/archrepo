@@ -54,10 +54,11 @@ is_binary_missing() {
   local ver rel
   ver=$(grep -oP '^pkgver=\K.*' "packages/${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
   rel=$(grep -oP '^pkgrel=\K.*' "packages/${pkg}/PKGBUILD" | tr -d '"'\' | head -1)
-  # Check if any asset starts with pkg-ver-rel
-  if echo "$RELEASE_ASSETS" | grep -qE "^${pkg}-${ver}-${rel}-"; then
-    return 1 # not missing
-  fi
+  # Check if any asset starts with pkg-ver-rel (literal match: versions contain '.')
+  local asset
+  while IFS= read -r asset; do
+    [[ "$asset" == "${pkg}-${ver}-${rel}-"* ]] && return 1 # not missing
+  done <<< "$RELEASE_ASSETS"
   return 0 # missing
 }
 

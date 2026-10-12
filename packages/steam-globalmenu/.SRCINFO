@@ -1,7 +1,7 @@
 pkgbase = steam-globalmenu
 	pkgdesc = High-performance, lightweight C daemon exporting Steam client menu bar to KDE Plasma Global Menu via DBusMenu
-	pkgver = packages
-	pkgrel = 1
+	pkgver = 1.2.0
+	pkgrel = 2
 	url = https://github.com/kud3n013/archrepo
 	install = steam-globalmenu.install
 	arch = x86_64
@@ -15,6 +15,7 @@ pkgbase = steam-globalmenu
 	optdepends = millennium: Steam Client modding framework for custom CSS theme injection
 	provides = steam-globalmenu
 	conflicts = steam-globalmenu
+	options = !debug
 	source = steam-globalmenu.c
 	source = steam-globalmenu.service
 	source = quickcss.css

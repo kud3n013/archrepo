@@ -1,25 +1,48 @@
+# Link the plugin into one user's FDM profile. Runs as that user (see
+# _as_home_owner) because every path below their home is user-controlled.
+_link_user_plugin() {
+    local user_home="$1"
+    local target="/usr/share/freedownloadmanager/plugins/elephant"
+    local user_fdm_dir="$user_home/.local/share/Softdeluxe/Free Download Manager"
+    local user_plugins="$user_fdm_dir/plugins"
+
+    [ -d "$user_fdm_dir" ] || return 0
+    mkdir -p "$user_plugins"
+    # If an unmanaged manual directory exists, remove it so the symlink can take its place
+    if [ -d "$user_plugins/elephant" ] && [ ! -L "$user_plugins/elephant" ]; then
+        rm -rf "$user_plugins/elephant"
+    fi
+    ln -sfn "$target" "$user_plugins/elephant"
+}
+
+_unlink_user_plugin() {
+    local link="$1/.local/share/Softdeluxe/Free Download Manager/plugins/elephant"
+    if [ -L "$link" ]; then
+        rm -f "$link"
+    fi
+}
+
+# Run a per-user callback as the owner of that home directory, so a planted
+# symlink cannot redirect root's mkdir/rm/ln onto system paths.
+_as_home_owner() {
+    local home="$1"
+    local callback="$2"
+    local uid gid
+    uid=$(stat -c '%u' "$home" 2>/dev/null) || return 0
+    gid=$(stat -c '%g' "$home" 2>/dev/null) || return 0
+
+    setpriv --reuid="$uid" --regid="$gid" --clear-groups \
+        /usr/bin/bash -c "$(declare -f _link_user_plugin _unlink_user_plugin); ${callback} \"\$1\"" \
+        _ "$home" || true
+}
+
 _setup_elephant_plugin() {
     local target="/usr/share/freedownloadmanager/plugins/elephant"
 
     # Set up symlink for each user with an existing FDM directory
     for user_home in /home/*; do
         [ -d "$user_home" ] || continue
-        local user_fdm_dir="$user_home/.local/share/Softdeluxe/Free Download Manager"
-        local user_plugins="$user_fdm_dir/plugins"
-
-        if [ -d "$user_fdm_dir" ]; then
-            mkdir -p "$user_plugins"
-            # If an unmanaged manual directory exists, remove it so the symlink can take its place
-            if [ -d "$user_plugins/elephant" ] && [ ! -L "$user_plugins/elephant" ]; then
-                rm -rf "$user_plugins/elephant"
-            fi
-            ln -sfn "$target" "$user_plugins/elephant"
-            local user_name
-            local user_group
-            user_name=$(stat -c '%U' "$user_home")
-            user_group=$(stat -c '%G' "$user_home")
-            chown -h "$user_name:$user_group" "$user_plugins/elephant" 2>/dev/null || true
-        fi
+        _as_home_owner "$user_home" _link_user_plugin
     done
 
     # Also prepare in /etc/skel for newly created user profiles
@@ -40,10 +63,7 @@ _setup_elephant_plugin() {
 _remove_elephant_plugin() {
     for user_home in /home/*; do
         [ -d "$user_home" ] || continue
-        local link="$user_home/.local/share/Softdeluxe/Free Download Manager/plugins/elephant"
-        if [ -L "$link" ]; then
-            rm -f "$link"
-        fi
+        _as_home_owner "$user_home" _unlink_user_plugin
     done
 
     if [ -L "/etc/skel/.local/share/Softdeluxe/Free Download Manager/plugins/elephant" ]; then
