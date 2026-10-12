@@ -31,6 +31,10 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
+env:
+  # Repository signing key; the public half is keys/archrepo.asc
+  ARCHREPO_KEY_FPR: CFB791543B4B2D2821E9127AC012A9476C170A37
+
 jobs:
   # ── 1. Discover packages to build ─────────────────────────────────────
   discover:
@@ -45,6 +49,7 @@ jobs:
       matrix: ${{ steps.discover.outputs.matrix }}
       has_packages: ${{ steps.discover.outputs.has_packages }}
       count: ${{ steps.discover.outputs.count }}
+      repo_maintenance: ${{ steps.discover.outputs.repo_maintenance }}
     steps:
       - name: Install dependencies
         run: pacman -Syu --noconfirm git jq curl github-cli
@@ -88,7 +93,6 @@ jobs:
       # ── Install build dependencies inside container ─────────────────
       - name: Install dependencies
         run: |
-          echo -e "\n[archrepo]\nSigLevel = Optional TrustAll\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
           pacman -Syu --noconfirm git sudo jq curl pacman-contrib github-cli
 
       # ── Checkout main branch ────────────────────────────────────────
@@ -101,6 +105,14 @@ jobs:
           # makepkg runs upstream build code as builder, who owns src/; never
           # leave a token in src/.git/config for it to read.
           persist-credentials: false
+
+      # ── Use archrepo itself for dependencies, signature-checked ─────
+      - name: Enable archrepo
+        run: |
+          pacman-key --add src/keys/archrepo.asc
+          pacman-key --lsign-key "$ARCHREPO_KEY_FPR"
+          echo -e "\n[archrepo]\nSigLevel = Required\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
+          pacman -Sy
 
       # ── Create unprivileged builder user ────────────────────────────
       - name: Create builder user
@@ -119,7 +131,7 @@ jobs:
         run: |
           PKG="${{ matrix.name }}"
           chmod +x src/.github/scripts/check-upstream.sh
-          
+
           # Run check-upstream with --apply
           src/.github/scripts/check-upstream.sh "src/packages/${PKG}" --apply
 
@@ -189,10 +201,11 @@ jobs:
           path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
           if-no-files-found: error
 
-      # ── Hand the upstream update to the publish job (only after successful build) ──
-      # This job has no write token; the publish job commits these files to main.
+      # ── Hand the upstream update to the publish job ─────────────────
+      # This job has no write token; the publish job opens a pull request with
+      # these files and merges it only if the build succeeded.
       - name: Upload upstream update
-        if: matrix.update_needed == true
+        if: success() && matrix.update_needed == true
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-bump
@@ -202,23 +215,49 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
 
+      - name: Upload failed upstream update
+        if: failure() && matrix.update_needed == true
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-bump-failed
+          path: |
+            src/packages/${{ matrix.name }}/PKGBUILD
+            src/packages/${{ matrix.name }}/.SRCINFO
+          include-hidden-files: true
+          if-no-files-found: warn
+
   # ── 3. Publish newly built packages & update repository ───────────────
   publish:
     needs: [discover, build]
-    if: ${{ !cancelled() && needs.discover.outputs.has_packages == 'true' && (needs.build.result == 'success' || needs.build.result == 'failure') }}
+    if: ${{ !cancelled() && ((needs.discover.outputs.has_packages == 'true' && (needs.build.result == 'success' || needs.build.result == 'failure')) || needs.discover.outputs.repo_maintenance == 'true') }}
     runs-on: ubuntu-latest
     permissions:
-      contents: write             # push commits to main + gh-pages, manage releases
+      contents: write             # push gh-pages and bump branches, manage releases
+      pull-requests: write        # open and merge upstream update pull requests
     container:
       image: archlinux:base-devel
     defaults:
       run:
         shell: bash
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
 
     steps:
       - name: Install dependencies
         run: |
           pacman -Syu --noconfirm git pacman-contrib github-cli jq
+
+      - name: Import signing key
+        env:
+          ARCHREPO_SIGNING_KEY: ${{ secrets.ARCHREPO_SIGNING_KEY }}
+        run: |
+          if [ -z "$ARCHREPO_SIGNING_KEY" ]; then
+            echo "::error::The ARCHREPO_SIGNING_KEY secret is not set"
+            exit 1
+          fi
+          printf '%s\n' "$ARCHREPO_SIGNING_KEY" | gpg --batch --import
+          gpg --batch --list-secret-keys "$ARCHREPO_KEY_FPR"
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -246,113 +285,194 @@ jobs:
         uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          pattern: '*-bump'
+          pattern: '*-bump*'
           path: bumps
 
-      # Build jobs run upstream code, so they only get a read-only token;
-      # the PKGBUILD/.SRCINFO updates they produced are committed from here.
-      - name: Commit upstream updates to main
+      # Each upstream update goes through a pull request on bump/<pkg>: merged
+      # when its build succeeded, otherwise left open (and updated by later runs)
+      # so a failing update stays visible until it is fixed.
+      - name: Merge upstream updates via pull requests
         run: |
-          [ -d bumps ] || { echo "No upstream updates."; exit 0; }
+          compgen -G "bumps/*" > /dev/null || { echo "No upstream updates."; exit 0; }
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           cd main_src
           git config --global --add safe.directory "$(pwd)"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          for bump_dir in ../bumps/*-bump; do
-            PKG=$(basename "$bump_dir" -bump)
+
+          NOT_MERGED=()
+          for bump_dir in ../bumps/*; do
+            name=$(basename "$bump_dir")
+            case "$name" in
+              *-bump-failed) PKG="${name%-bump-failed}"; BUILD_OK=false ;;
+              *-bump)        PKG="${name%-bump}";        BUILD_OK=true ;;
+              *) continue ;;
+            esac
             [ -d "packages/${PKG}" ] || { echo "::warning::Unknown package ${PKG}, skipping"; continue; }
-            cp "${bump_dir}/PKGBUILD" "${bump_dir}/.SRCINFO" "packages/${PKG}/"
+            [ -f "${bump_dir}/PKGBUILD" ] || { echo "::warning::No PKGBUILD for ${PKG}, skipping"; continue; }
+
+            BRANCH="bump/${PKG}"
+            git checkout -q -B "$BRANCH" origin/main
+            cp "${bump_dir}/PKGBUILD" "packages/${PKG}/"
+            [ -f "${bump_dir}/.SRCINFO" ] && cp "${bump_dir}/.SRCINFO" "packages/${PKG}/"
             git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
-            if ! git diff --cached --quiet; then
-              git commit -m "bump: ${PKG} automated update"
+            if git diff --cached --quiet; then
+              echo "No changes for ${PKG}"
+              continue
+            fi
+            VER="$(grep -oP '^pkgver=\K.*' "packages/${PKG}/PKGBUILD")-$(grep -oP '^pkgrel=\K.*' "packages/${PKG}/PKGBUILD")"
+            git commit -q -m "bump: ${PKG} ${VER}"
+            git push -q -f origin "$BRANCH"
+
+            if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+              gh pr create --base main --head "$BRANCH" --title "bump: ${PKG} ${VER}" \
+                --body "Automated upstream update for \`${PKG}\` to \`${VER}\`, built in ${RUN_URL}."
+            fi
+
+            if [ "$BUILD_OK" = true ]; then
+              merged=false
+              # Mergeability is computed asynchronously right after the PR is created
+              for i in 1 2 3 4 5; do
+                if gh pr merge "$BRANCH" --squash --delete-branch; then
+                  merged=true
+                  break
+                fi
+                sleep 5
+              done
+              [ "$merged" = true ] || NOT_MERGED+=("$PKG")
+            else
+              gh pr comment "$BRANCH" --body "❌ Build of \`${PKG} ${VER}\` failed: ${RUN_URL}. This PR stays open until a build of the update succeeds."
+              NOT_MERGED+=("$PKG")
             fi
           done
-          pushed=false
-          for i in 1 2 3 4 5; do
-            if git pull --rebase origin main && git push origin main; then
-              pushed=true
-              break
-            fi
-            sleep 3
-          done
-          [ "$pushed" = true ] || { echo "::error::Failed to push upstream updates to main"; exit 1; }
+
+          git checkout -q main
+          git pull -q --ff-only origin main
+          if [ ${#NOT_MERGED[@]} -gt 0 ]; then
+            echo "::warning::Upstream updates left open as pull requests: ${NOT_MERGED[*]}"
+          fi
 
       - name: Update repository database
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p repo/x86_64
           cd repo/x86_64
 
+          # Sign every package in the current directory that has no signature yet
+          sign_missing() {
+            local pkg
+            for pkg in *.pkg.tar.zst; do
+              [ -e "$pkg" ] || continue
+              [ -f "${pkg}.sig" ] || gpg --batch --yes --detach-sign --local-user "$ARCHREPO_KEY_FPR" "$pkg"
+            done
+          }
+
           # 1. Fallback: if database file does not exist, fetch all existing packages
           if [ ! -f archrepo.db.tar.gz ]; then
             echo "archrepo.db.tar.gz not found on gh-pages. Fetching from release 'packages'..."
-            gh release download packages --pattern "*.pkg.tar.zst" --repo ${{ github.repository }} || true
-            repo-add archrepo.db.tar.gz *.pkg.tar.zst
+            gh release download packages --pattern "*.pkg.tar.zst" || true
+            gh release download packages --pattern "*.pkg.tar.zst.sig" || true
+            sign_missing
+            repo-add --sign --key "$ARCHREPO_KEY_FPR" archrepo.db.tar.gz *.pkg.tar.zst
           fi
 
-          # 2. Add newly built packages incrementally
+          # 2. Sign and add newly built packages incrementally
           if [ -d ../../new-pkgs ] && compgen -G "../../new-pkgs/*.pkg.tar.zst" > /dev/null; then
             echo "Adding newly built packages to database..."
             cp -f ../../new-pkgs/*.pkg.tar.zst .
-            repo-add archrepo.db.tar.gz *.pkg.tar.zst
+            sign_missing
+            repo-add --sign --key "$ARCHREPO_KEY_FPR" archrepo.db.tar.gz *.pkg.tar.zst
           fi
 
-          # 3. Purge archived packages if present in main_src/archive
-          if [ -d ../../main_src/archive ]; then
-            for arch_dir in ../../main_src/archive/*; do
-              if [ -d "$arch_dir" ]; then
-                arch_pkg=$(basename "$arch_dir")
-                echo "Archived package detected: ${arch_pkg}. Purging from database..."
-                repo-remove archrepo.db.tar.gz "$arch_pkg" || true
-                rm -f ${arch_pkg}-[0-9]*.pkg.tar.zst ${arch_pkg}-bin-[0-9]*.pkg.tar.zst
-              fi
-            done
-          fi
+          # 3. Purge packages that are no longer active (archived, stale debug packages).
+          #    Database entries are <name>-<ver>-<rel>; every pkgname matches its packages/ dir.
+          ACTIVE=$(ls ../../main_src/packages)
+          [ -n "$ACTIVE" ] || { echo "::error::No active packages found"; exit 1; }
+          for entry in $(tar -tzf archrepo.db.tar.gz | grep '/$' | tr -d '/'); do
+            name="${entry%-*-*}"
+            if ! grep -qxF "$name" <<< "$ACTIVE"; then
+              echo "Inactive package in database: ${name}. Purging..."
+              repo-remove --sign --key "$ARCHREPO_KEY_FPR" archrepo.db.tar.gz "$name"
+              rm -f "${entry}"-*.pkg.tar.zst "${entry}"-*.pkg.tar.zst.sig
+            fi
+          done
 
-          # 4. Replace symlinks with real files for GitHub Releases
-          rm -f archrepo.db archrepo.files
+          # 4. Backfill signatures for active packages published before signing was
+          #    enabled, re-adding them so the database carries their signatures too.
+          #    Release packages that aren't in the database are pruned after upload.
+          mkdir -p ../../backfill
+          ASSETS=$(gh release view packages --json assets --jq '.assets[].name')
+          DB_ENTRIES=$(tar -tzf archrepo.db.tar.gz | grep '/$' | tr -d '/')
+          for asset in $ASSETS; do
+            [[ "$asset" == *.pkg.tar.zst ]] || continue
+            grep -qxF "${asset}.sig" <<< "$ASSETS" && continue
+            [ -f "${asset}.sig" ] && continue
+            base="${asset%.pkg.tar.zst}"
+            grep -qxF "${base%-*-*-*}" <<< "$ACTIVE" || continue
+            grep -qxF "${base%-*}" <<< "$DB_ENTRIES" || continue
+            echo "Signing previously unsigned release asset: $asset"
+            gh release download packages --pattern "$asset" --dir ../../backfill --clobber
+            gpg --batch --yes --detach-sign --local-user "$ARCHREPO_KEY_FPR" "../../backfill/${asset}"
+            repo-add --sign --key "$ARCHREPO_KEY_FPR" archrepo.db.tar.gz "../../backfill/${asset}"
+            rm -f "../../backfill/${asset}"
+          done
+
+          # 5. Make sure the database is signed even when nothing above changed it
+          for db in archrepo.db.tar.gz archrepo.files.tar.gz; do
+            [ -f "${db}.sig" ] || gpg --batch --yes --detach-sign --local-user "$ARCHREPO_KEY_FPR" "$db"
+          done
+
+          # 6. Replace symlinks with real files for GitHub Releases
+          rm -f archrepo.db archrepo.files archrepo.db.sig archrepo.files.sig
           cp archrepo.db.tar.gz archrepo.db
           cp archrepo.files.tar.gz archrepo.files
+          cp archrepo.db.tar.gz.sig archrepo.db.sig
+          cp archrepo.files.tar.gz.sig archrepo.files.sig
 
       - name: Publish all packages to GitHub Releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view packages --repo ${{ github.repository }} || \
-            gh release create packages --title "Arch Repository Packages" --notes "Automated repository packages" --prerelease=false --repo ${{ github.repository }}
+          gh release view packages || \
+            gh release create packages --title "Arch Repository Packages" --notes "Automated repository packages" --prerelease=false
+
+          # Public signing key at a stable URL for users' pacman-key --add
+          gh release upload packages --clobber main_src/keys/archrepo.asc
+
+          # Signatures for previously unsigned packages
+          if compgen -G "backfill/*.sig" > /dev/null; then
+            gh release upload packages --clobber backfill/*.sig
+          fi
 
           cd repo/x86_64
 
-          # Upload newly built packages and updated database files
+          # Upload newly built packages, their signatures and updated database files
           if compgen -G "*.pkg.tar.zst" > /dev/null; then
-            gh release upload packages --clobber --repo ${{ github.repository }} *.pkg.tar.zst archrepo.db* archrepo.files*
+            gh release upload packages --clobber *.pkg.tar.zst *.pkg.tar.zst.sig archrepo.db* archrepo.files*
           else
-            gh release upload packages --clobber --repo ${{ github.repository }} archrepo.db* archrepo.files*
+            gh release upload packages --clobber archrepo.db* archrepo.files*
           fi
 
-          # Remove superseded versions of the packages that were updated
-          if [ -d ../../new-pkgs ] && compgen -G "../../new-pkgs/*.pkg.tar.zst" > /dev/null; then
-            ALL_RELEASE_ASSETS=$(gh release view packages --repo ${{ github.repository }} --json assets --jq '.assets[].name' || true)
-            for new_pkg in ../../new-pkgs/*.pkg.tar.zst; do
-              pkg_base=$(basename "$new_pkg")
-              # <name>-<ver>-<rel>-<arch>.pkg.tar.zst: strip the last three fields,
-              # since names and versions may both contain '-<digit>'
-              pkg_name="${pkg_base%-*-*-*}"
-              for asset in $ALL_RELEASE_ASSETS; do
-                if [[ "$asset" == *.pkg.tar.zst ]] && [ "${asset%-*-*-*}" = "$pkg_name" ] && [ "$asset" != "$pkg_base" ]; then
-                  echo "Removing superseded release asset: $asset"
-                  gh release delete-asset packages "$asset" --yes --repo ${{ github.repository }} || true
-                fi
-              done
-            done
+          # Prune release packages (and signatures) the database no longer references:
+          # superseded versions, archived packages, stale debug packages.
+          # An asset is <name>-<ver>-<rel>-<arch>.pkg.tar.zst; the database lists <name>-<ver>-<rel>.
+          DB_ENTRIES=$(tar -tzf archrepo.db.tar.gz | grep '/$' | tr -d '/')
+          if [ "$(grep -c . <<< "$DB_ENTRIES")" -lt 5 ]; then
+            echo "::error::Database lists fewer than 5 packages; refusing to prune release assets"
+            exit 1
           fi
+          for asset in $(gh release view packages --json assets --jq '.assets[].name'); do
+            [[ "$asset" == *.pkg.tar.zst || "$asset" == *.pkg.tar.zst.sig ]] || continue
+            base="${asset%.sig}"
+            base="${base%.pkg.tar.zst}"
+            if ! grep -qxF "${base%-*}" <<< "$DB_ENTRIES"; then
+              echo "Removing release asset not in database: $asset"
+              gh release delete-asset packages "$asset" --yes
+            fi
+          done
 
       - name: Update GitHub Pages landing page
         run: |
           cd repo/x86_64
           # Keep only database files in git repo
-          rm -f *.pkg.tar.zst
+          rm -f *.pkg.tar.zst *.pkg.tar.zst.sig
           cd ..
           chmod +x ../main_src/.github/scripts/generate-index.sh
           ../main_src/.github/scripts/generate-index.sh ../main_src index.html

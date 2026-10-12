@@ -7,6 +7,7 @@ set -euo pipefail
 SRC_DIR="${1:-.}"
 OUTPUT_HTML="${2:-index.html}"
 REPO_NAME="${GITHUB_REPOSITORY:-kud3n013/archrepo}"
+KEY_FPR="${ARCHREPO_KEY_FPR:-CFB791543B4B2D2821E9127AC012A9476C170A37}"
 
 mkdir -p "$(dirname "$OUTPUT_HTML")"
 
@@ -48,9 +49,13 @@ cat << EOF > "$OUTPUT_HTML"
   <h1>📦 archrepo</h1>
   <p>Automated Arch Linux package repository hosted on GitHub.</p>
   <h2>Installation</h2>
+  <p>Import and locally sign the repository signing key:</p>
+  <pre><code>curl -sSfL -o /tmp/archrepo.asc https://github.com/${REPO_NAME}/releases/download/packages/archrepo.asc
+sudo pacman-key --add /tmp/archrepo.asc
+sudo pacman-key --lsign-key ${KEY_FPR}</code></pre>
   <p>Add the repository to <code>/etc/pacman.conf</code>:</p>
   <pre><code>[archrepo]
-SigLevel = Optional TrustAll
+SigLevel = Required
 Server = https://github.com/${REPO_NAME}/releases/download/packages</code></pre>
   <p>Then synchronize package databases:</p>
   <pre><code>sudo pacman -Syy</code></pre>

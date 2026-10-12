@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-25%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-21%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -12,18 +12,26 @@ Automated, self-updating Arch Linux binary package repository. Packages are cont
 
 ## 🚀 Quick Setup
 
-Add the repository configuration to `/etc/pacman.conf`:
+Packages and the database are signed with the repository key
+`CFB7 9154 3B4B 2D28 21E9  127A C012 A947 6C17 0A37` ([`keys/archrepo.asc`](keys/archrepo.asc)).
 
-```ini
-[archrepo]
-SigLevel = Optional TrustAll
-Server = https://github.com/kud3n013/archrepo/releases/download/packages
-```
+1. Import and locally sign the key:
+   ```bash
+   curl -sSfL -o /tmp/archrepo.asc https://github.com/kud3n013/archrepo/releases/download/packages/archrepo.asc
+   sudo pacman-key --add /tmp/archrepo.asc
+   sudo pacman-key --lsign-key CFB791543B4B2D2821E9127AC012A9476C170A37
+   ```
 
-**One-liner quick install:**
-```bash
-echo -e '\n[archrepo]\nSigLevel = Optional TrustAll\nServer = https://github.com/kud3n013/archrepo/releases/download/packages' | sudo tee -a /etc/pacman.conf && sudo pacman -Syy
-```
+2. Add the repository configuration to `/etc/pacman.conf`:
+   ```ini
+   [archrepo]
+   SigLevel = Required
+   Server = https://github.com/kud3n013/archrepo/releases/download/packages
+   ```
+
+3. Synchronize: `sudo pacman -Syy`
+
+**Already using archrepo?** Import the key (step 1), then change `SigLevel = Optional TrustAll` to `SigLevel = Required` in your `[archrepo]` section.
 
 ---
 
@@ -36,8 +44,6 @@ Each package entry below provides direct links to its dedicated documentation in
 
 ### 🚀 Applications & Standalone Packages
 
-- [**`antigravity`**](docs/antigravity.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.17.0--5-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/antigravity.md) `sudo pacman -S antigravity`
-  - Google Antigravity 2.0 multi-agent orchestration platform with native Wayland window controls and KDE Plasma Global Menu export. Upstream: [Google Antigravity](https://antigravity.google)
 - [**`beeper`**](docs/beeper.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-4.3.152--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/beeper.md) `sudo pacman -S beeper`
   - Unified multi-network messaging client with XDG desktop portal dark theme sync and Wayland auto-hinting. Upstream: [Automattic / Beeper](https://www.beeper.com/changelog)
 - [**`cursor`**](docs/cursor.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.22.7--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/cursor.md) `sudo pacman -S cursor`
@@ -54,20 +60,12 @@ Each package entry below provides direct links to its dedicated documentation in
   - Steam Client modding framework for custom skins, themes, and community plugins. Upstream: [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium)
 - [**`obsidian`**](docs/obsidian.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.13.7--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/obsidian.md) `sudo pacman -S obsidian`
   - Powerful Markdown knowledge base patched with KDE Global Menu / AppMenu support and XDG portal dark/light theme switching. Upstream: [Obsidian](https://obsidian.md)
-- [**`proton-mail`**](docs/proton-mail.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.15.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/proton-mail.md) `sudo pacman -S proton-mail`
-  - Proton Mail & Calendar desktop application with restored system tray, close-to-tray, and unconstrained resizing. Upstream: [Proton Mail](https://proton.me/mail)
-- [**`proton-pass`**](docs/proton-pass.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.41.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/proton-pass.md) `sudo pacman -S proton-pass`
-  - Proton Pass password manager patched for unconstrained window bounds and responsive auto-collapsing item views. Upstream: [Proton Pass](https://proton.me/pass)
-- [**`proton-pass-cli`**](docs/proton-pass-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.4.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/proton-pass-cli.md) `sudo pacman -S proton-pass-cli`
-  - Proton Pass CLI with Freedesktop D-Bus Secret Service session persistence wrapper and shell completions. Upstream: [Proton Pass CLI](https://protonpass.github.io/pass-cli)
 - [**`searxng`**](docs/searxng.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-r9799.12f8b65--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/searxng.md) `sudo pacman -S searxng`
   - Privacy metasearch engine with systemd service unit, isolated venv, and auto-generated secret keys. Upstream: [searxng/searxng](https://searxng.github.io/searxng/)
 - [**`sine`**](docs/sine.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.3.3--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/sine.md) `sudo pacman -S sine`
   - Mod and theme manager for Firefox-based browsers (Zen Browser, Floorp, LibreWolf, Firefox). Upstream: [CosmoCreeper/Sine](https://github.com/CosmoCreeper/Sine)
 - [**`steam-globalmenu`**](docs/steam-globalmenu.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.2.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/steam-globalmenu.md) `sudo pacman -S steam-globalmenu`
   - Steam client menu bar and recent games bridge exporting to KDE Plasma Global Menu via DBusMenu. Upstream: [kud3n013/archrepo](https://github.com/kud3n013/archrepo)
-- [**`zalo-for-linux`**](docs/zalo-for-linux.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-26.9.10--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zalo-for-linux.md) `sudo pacman -S zalo-for-linux`
-  - Zalo desktop messaging client with ZaDark, dynamic KDE theme sync, top bar removal, and KDE Global Menu. Upstream: [VN-Linux-Family/zalo-for-linux](https://github.com/VN-Linux-Family/zalo-for-linux)
 - [**`zed-globalmenu`**](docs/zed-globalmenu.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zed-globalmenu.md) `sudo pacman -S zed-globalmenu`
   - High-performance code editor patched with KDE Plasma Global Menu export, server-side decorations, and in-app menu suppression. Upstream: [Zed](https://zed.dev)
 - [**`zotero`**](docs/zotero.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-10.0.3--11-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zotero.md) `sudo pacman -S zotero`
@@ -97,12 +95,17 @@ Each package entry below provides direct links to its dedicated documentation in
 ---
 
 <details>
-<summary><b>🗄️ Archived Packages (4)</b></summary>
+<summary><b>🗄️ Archived Packages (9)</b></summary>
 
 The following packages have been retired from active distribution and their binary packages pruned from the database:
 
+- [**`antigravity`**](docs/antigravity.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-2.22.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/antigravity/`](archive/antigravity/) &bull; Upstream: [Google Antigravity](https://antigravity.google) (Archived per maintainer request)
 - [**`hyprmod`**](docs/hyprmod.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-0.4.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/hyprmod/`](archive/hyprmod/) &bull; Upstream: [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) (Retired per maintainer request)
+- [**`proton-mail`**](docs/proton-mail.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.15.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-mail/`](archive/proton-mail/) &bull; Upstream: [Proton Mail](https://proton.me/mail) (Archived per maintainer request)
+- [**`proton-pass`**](docs/proton-pass.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.42.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-pass/`](archive/proton-pass/) &bull; Upstream: [Proton Pass](https://proton.me/pass) (Archived per maintainer request)
+- [**`proton-pass-cli`**](docs/proton-pass-cli.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-2.4.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-pass-cli/`](archive/proton-pass-cli/) &bull; Upstream: [Proton Pass CLI](https://protonpass.github.io/pass-cli) (Archived per maintainer request)
 - [**`stirling-pdf-desktop`**](docs/stirling-pdf-desktop.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-3.0.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/stirling-pdf-desktop/`](archive/stirling-pdf-desktop/) &bull; Upstream: [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) (Archived per maintainer request)
+- [**`zalo-for-linux`**](docs/zalo-for-linux.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-26.10.11--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zalo-for-linux/`](archive/zalo-for-linux/) &bull; Upstream: [VN-Linux-Family/zalo-for-linux](https://github.com/VN-Linux-Family/zalo-for-linux) (Archived per maintainer request)
 - [**`zed`**](docs/zed.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zed/`](archive/zed/) &bull; Upstream: [Zed](https://zed.dev) (Archived per maintainer request)
 - [**`zen-browser`**](docs/zen-browser.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.22.2b--4-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/zen-browser/`](archive/zen-browser/) &bull; Upstream: [zen-browser/desktop](https://github.com/zen-browser/desktop) (Archived per maintainer request)
 
@@ -119,6 +122,7 @@ archrepo/
 ├── docs/              # Comprehensive package documentation & customization guides
 ├── packages/          # Active package build recipes (PKGBUILD, scripts, flags)
 ├── archive/           # Retired package recipes (excluded from builds & database)
+├── keys/              # Public repository signing key (archrepo.asc)
 ├── tools/             # Maintainer developer utilities (clean.sh, scaffold.sh)
 ├── templates/         # Package creation prompt template for AI assistants
 └── .github/           # CI/CD workflows and automated release scripts
@@ -172,8 +176,9 @@ Users can easily customize Wayland options, HiDPI scaling factors, and environme
 
 - **Dual-Tier Storage:** GitHub Releases (`packages` tag) stores `.pkg.tar.zst` binaries and databases (`archrepo.db`, `archrepo.files`), bypassing repository size limits. GitHub Pages hosts the web index.
 - **Smart Build Caching:** If a target `${pkgver}-${pkgrel}` binary is already published in Releases, compilation is skipped.
-- **Automatic Upstream Tracking:** A daily cron job (`0 4 * * *`) checks upstream GitHub/Codeberg releases and redirects, auto-bumps versions, updates checksums (`updpkgsums`), and triggers new builds.
-- **Release Pruning:** Older superseded package archives are automatically pruned upon upgrade.
+- **Signed Packages:** Build jobs run with a read-only token and no secrets; the publish job signs every package and the database with the repository key (`ARCHREPO_SIGNING_KEY` secret).
+- **Automatic Upstream Tracking:** A daily cron job (`0 4 * * *`) checks upstream GitHub/Codeberg releases and redirects, bumps versions and checksums (`updpkgsums`), and builds the update. Each update goes through a pull request on `bump/<pkg>`; a failed build leaves that pull request open until a later build succeeds.
+- **Release Pruning:** Release packages the database no longer references (superseded versions, archived packages) are pruned automatically.
 
 ---
 

@@ -39,6 +39,7 @@ for d in packages/*/; do
 done
 
 declare -A PACKAGES_TO_BUILD=()  # pkg -> update_needed (true/false)
+REPO_MAINTENANCE=false           # run publish even when nothing is built
 
 # Helper: fetch release assets once if needed
 RELEASE_ASSETS=""
@@ -69,6 +70,7 @@ echo "Force Rebuild: ${FORCE_REBUILD}"
 echo "Check Upstream: ${CHECK_UPSTREAM}"
 
 if [ "$EVENT" = "workflow_dispatch" ]; then
+  REPO_MAINTENANCE=true
   if [ "$INPUT_PKG" != "all" ] && [ -n "$INPUT_PKG" ]; then
     INPUT_PKG="$(basename "$INPUT_PKG")"
     if [ -d "packages/$INPUT_PKG" ] && [ -f "packages/$INPUT_PKG/PKGBUILD" ]; then
@@ -135,6 +137,12 @@ else
     WORKFLOW_OR_CI_CHANGED=true
   fi
 
+  # Archiving a package, rotating the signing key or changing the workflow
+  # needs a publish run (database purge, signature backfill) even with no builds
+  if echo "$CHANGED_FILES" | grep -qE '^(archive/|keys/|\.github/workflows/)'; then
+    REPO_MAINTENANCE=true
+  fi
+
   for pkg in "${ALL_PACKAGES[@]}"; do
     if echo "$CHANGED_FILES" | grep -q "^packages/${pkg}/"; then
       PKG_FILES=$(echo "$CHANGED_FILES" | grep "^packages/${pkg}/" || true)
@@ -187,4 +195,5 @@ echo "Matrix JSON: ${FULL_MATRIX}"
   echo "matrix=${FULL_MATRIX}"
   echo "has_packages=${HAS_PACKAGES}"
   echo "count=${COUNT}"
+  echo "repo_maintenance=${REPO_MAINTENANCE}"
 } >> "$OUTPUT_FILE"
