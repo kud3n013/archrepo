@@ -109,6 +109,9 @@ jobs:
       # ── Use archrepo itself for dependencies, signature-checked ─────
       - name: Enable archrepo
         run: |
+          # --lsign-key needs a local keyring key, which a fresh container lacks
+          pacman-key --init
+          pacman-key --populate archlinux
           pacman-key --add src/keys/archrepo.asc
           pacman-key --lsign-key "$ARCHREPO_KEY_FPR"
           echo -e "\n[archrepo]\nSigLevel = Required\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
