@@ -341,6 +341,10 @@ jobs:
 
             BRANCH="bump/${PKG}"
             git checkout -q -B "$BRANCH" origin/main
+            # The artifact comes from a job that ran upstream code: only version
+            # and checksum lines may change, anything else waits for a human
+            SAFE=true
+            bash .github/scripts/validate-bump.sh "packages/${PKG}/PKGBUILD" "${bump_dir}/PKGBUILD" || SAFE=false
             cp "${bump_dir}/PKGBUILD" "packages/${PKG}/"
             [ -f "${bump_dir}/.SRCINFO" ] && cp "${bump_dir}/.SRCINFO" "packages/${PKG}/"
             git add "packages/${PKG}/PKGBUILD" "packages/${PKG}/.SRCINFO"
@@ -357,7 +361,10 @@ jobs:
                 --body "Automated upstream update for \`${PKG}\` to \`${VER}\`, built in ${RUN_URL}."
             fi
 
-            if [ "$BUILD_OK" = true ]; then
+            if [ "$SAFE" != true ]; then
+              gh pr comment "$BRANCH" --body "⚠️ The built PKGBUILD changes more than version and checksum lines (see ${RUN_URL}). Not merged automatically; review the diff."
+              NOT_MERGED+=("$PKG")
+            elif [ "$BUILD_OK" = true ]; then
               merged=false
               # Mergeability is computed asynchronously right after the PR is created
               for i in 1 2 3 4 5; do
