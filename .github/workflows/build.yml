@@ -55,7 +55,7 @@ jobs:
         run: pacman -Syu --noconfirm git jq curl github-cli
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
@@ -97,7 +97,7 @@ jobs:
 
       # ── Checkout main branch ────────────────────────────────────────
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: main
           path: src
@@ -109,6 +109,9 @@ jobs:
       # ── Use archrepo itself for dependencies, signature-checked ─────
       - name: Enable archrepo
         run: |
+          # --lsign-key needs a local keyring key, which a fresh container lacks
+          pacman-key --init
+          pacman-key --populate archlinux
           pacman-key --add src/keys/archrepo.asc
           pacman-key --lsign-key "$ARCHREPO_KEY_FPR"
           echo -e "\n[archrepo]\nSigLevel = Required\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
@@ -117,8 +120,8 @@ jobs:
       # ── Create unprivileged builder user ────────────────────────────
       - name: Create builder user
         run: |
+          # No sudo rights: upstream build code runs as builder and must not reach root
           id builder &>/dev/null || useradd -m builder
-          grep -q '^builder' /etc/sudoers || echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown -R builder:builder src
           git config --global --add safe.directory "$(pwd)/src"
 
@@ -173,29 +176,34 @@ jobs:
         if: steps.cache_check.outputs.skip_build != 'true'
         run: |
           cd "src/packages/${{ matrix.name }}"
-          # makepkg -s cannot install dependencies missing from the sync repos
-          # (e.g. AUR-only). Only in that case install what is available and build
-          # with -d; any other failure, including compile errors, fails the step.
-          DEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /^\t(make|check)?depends$/ {print $2}')
+          # Dependencies are installed here as root; makepkg itself runs as
+          # builder with no sudo rights, so it cannot use -s. Dependencies missing
+          # from the sync repos (e.g. AUR-only) are skipped and makepkg runs with
+          # -d; any other failure, including compile errors, fails the step.
+          DEPS=$(sudo -u builder makepkg --printsrcinfo | awk -F' = ' '$1 ~ /^\t(make|check)?depends(_x86_64)?$/ {print $2}')
           UNAVAILABLE=()
+          AVAILABLE=()
           for dep in $DEPS; do
-            pacman -Sp --print-format '%n' "$dep" &>/dev/null || UNAVAILABLE+=("$dep")
+            if pacman -Sp --print-format '%n' "$dep" &>/dev/null; then
+              AVAILABLE+=("$dep")
+            else
+              UNAVAILABLE+=("$dep")
+            fi
           done
+          if [ ${#AVAILABLE[@]} -gt 0 ]; then
+            pacman -S --needed --noconfirm "${AVAILABLE[@]}"
+          fi
           if [ ${#UNAVAILABLE[@]} -eq 0 ]; then
-            sudo -u builder makepkg -s --noconfirm
+            sudo -u builder makepkg --noconfirm
           else
             echo "::warning::Not in sync repos, building ${{ matrix.name }} without dependency checks: ${UNAVAILABLE[*]}"
-            AVAILABLE=$(printf '%s\n' $DEPS | grep -vxF -f <(printf '%s\n' "${UNAVAILABLE[@]}") || true)
-            if [ -n "$AVAILABLE" ]; then
-              pacman -S --needed --noconfirm $AVAILABLE
-            fi
             sudo -u builder makepkg -d --noconfirm
           fi
 
       # ── Upload package artifact ─────────────────────────────────────
       - name: Upload package artifact
         if: steps.cache_check.outputs.skip_build != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.name }}-pkg
           path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
@@ -206,7 +214,7 @@ jobs:
       # these files and merges it only if the build succeeded.
       - name: Upload upstream update
         if: success() && matrix.update_needed == true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.name }}-bump
           path: |
@@ -217,7 +225,7 @@ jobs:
 
       - name: Upload failed upstream update
         if: failure() && matrix.update_needed == true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.name }}-bump-failed
           path: |
@@ -260,29 +268,49 @@ jobs:
           gpg --batch --list-secret-keys "$ARCHREPO_KEY_FPR"
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: gh-pages
           path: repo
           fetch-depth: 0
 
       - name: Checkout main (for upstream updates, index generation & archive detection)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: main
           path: main_src
           fetch-depth: 0
 
+      # Not merged: each package keeps its own directory so the next step can
+      # check that an artifact only contains the package it was built for.
       - name: Download built package artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         continue-on-error: true
         with:
           pattern: '*-pkg'
-          path: new-pkgs
-          merge-multiple: true
+          path: new-pkgs-raw
+
+      - name: Verify package artifacts
+        run: |
+          mkdir -p new-pkgs
+          compgen -G "new-pkgs-raw/*" > /dev/null || { echo "No built packages."; exit 0; }
+          for dir in new-pkgs-raw/*-pkg; do
+            [ -d "$dir" ] || continue
+            expected=$(basename "$dir"); expected="${expected%-pkg}"
+            [ -d "main_src/packages/${expected}" ] || { echo "::error::Artifact for unknown package ${expected}"; exit 1; }
+            for f in "$dir"/*; do
+              [[ "$f" == *.pkg.tar.zst ]] || { echo "::error::Unexpected file in ${expected} artifact: $f"; exit 1; }
+              base=$(bsdtar -xOf "$f" .PKGINFO | sed -n 's/^pkgbase = //p')
+              if [ "$base" != "$expected" ]; then
+                echo "::error::$(basename "$f") has pkgbase '${base}' but was uploaded by the ${expected} build"
+                exit 1
+              fi
+              cp "$f" new-pkgs/
+            done
+          done
 
       - name: Download upstream updates
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         continue-on-error: true
         with:
           pattern: '*-bump*'
