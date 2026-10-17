@@ -153,6 +153,12 @@ case "$CHECK" in
     [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
     ;;
 
+  proton-drive-cli-html)
+    # Proton publishes no JSON feed for the Drive CLI; the download index page carries "Proton Drive CLI <ver>".
+    VER=$(curl -s "https://proton.me/download/drive/cli/index.html" | grep -oP '<h1>Proton Drive CLI \K[0-9.]+' | head -1 || true)
+    [ -n "$VER" ] && LATEST="$VER"
+    ;;
+
   millennium-github-prerelease)
     # Millennium uses pre-release tags (e.g. v3.5.0-beta.3) which /releases/latest skips.
     # Fetch the most recent release with linux archive and drop hyphens (3.6.0-beta.1 -> 3.6.0beta.1)
