@@ -1,0 +1,30 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://proton.me/download/drive/cli/index.html
+# AUR Reference: https://aur.archlinux.org/packages/proton-drive-cli-bin
+# Contributor: imnaK <yama@tyrem-envalura.de>
+
+pkgname=proton-drive-cli
+pkgver=0.9.0
+pkgrel=1
+pkgdesc="Official Proton Drive command-line client"
+arch=('x86_64')
+url="https://proton.me/download/drive/cli/index.html"
+license=('MIT')
+# The binary only links glibc, but dlopens libsecret at runtime and hard-fails
+# without a Secret Service provider (ERR_SECRETS_PLATFORM_ERROR).
+depends=('glibc' 'libsecret' 'org.freedesktop.secrets')
+provides=('proton-drive-cli-bin' 'proton-drive')
+conflicts=('proton-drive-cli-bin')
+replaces=('proton-drive-cli-bin')
+options=(!strip !debug !lto)
+source=("proton-drive-${pkgver}::https://proton.me/download/drive/cli/${pkgver}/linux-x64/proton-drive"
+        "LICENSE-${pkgver}.md::https://raw.githubusercontent.com/ProtonDriveApps/sdk/cli/v${pkgver}/LICENSE.md")
+sha512sums=('3533025ba69ae112b64e3e01fbcc1ad0688136a4043f6cf6a72886967d85fdcd9ec235479c2e113171614be5225bfba93427509a05ca5aa6071d924fa7e91ca8'
+            'b568865e91743da34047bae278273cd3950826e940ec7ff15033dd35f5f4687f097a425b8cc5679e9a201524c1e45ec043e292cda6fa0ad1c6c480055afef2ad')
+
+package() {
+    install -Dm755 "${srcdir}/proton-drive-${pkgver}" "${pkgdir}/usr/bin/proton-drive"
+    install -Dm644 "${srcdir}/LICENSE-${pkgver}.md" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
