@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-21%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-22%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -60,6 +60,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Steam Client modding framework for custom skins, themes, and community plugins. Upstream: [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium)
 - [**`obsidian`**](docs/obsidian.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.13.7--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/obsidian.md) `sudo pacman -S obsidian`
   - Powerful Markdown knowledge base patched with KDE Global Menu / AppMenu support and XDG portal dark/light theme switching. Upstream: [Obsidian](https://obsidian.md)
+- [**`proton-drive-cli`**](docs/proton-drive-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/proton-drive-cli.md) `sudo pacman -S proton-drive-cli`
+  - Official Proton Drive command-line client for browsing, uploading, downloading and sharing files. Upstream: [Proton Drive CLI](https://proton.me/download/drive/cli/index.html)
 - [**`searxng`**](docs/searxng.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-r9799.12f8b65--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/searxng.md) `sudo pacman -S searxng`
   - Privacy metasearch engine with systemd service unit, isolated venv, and auto-generated secret keys. Upstream: [searxng/searxng](https://searxng.github.io/searxng/)
 - [**`sine`**](docs/sine.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.3.3--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/sine.md) `sudo pacman -S sine`
