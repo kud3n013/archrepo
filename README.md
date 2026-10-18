@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-23%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-24%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -56,6 +56,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Powerful Minecraft custom launcher with modern UI, Wayland support, and clean uninstallation scriptlet. Upstream: [GDLauncher](https://gdlauncher.com)
 - [**`howdy-next`**](docs/howdy-next.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.4.1--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/howdy-next.md) `sudo pacman -S howdy-next`
   - C++ rewrite of Howdy facial-recognition authentication for Linux PAM, patched to eliminate OpenCV 5 DNN warning spam. Upstream: [nathawat/howdy-next](https://codeberg.org/nathawat/howdy-next)
+- [**`kast`**](docs/kast.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.6.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kast.md) `sudo pacman -S kast`
+  - Arch/CachyOS setup TUI with an App Vault backup engine and Proton Drive backups. Upstream: [kud3n013/kast](https://github.com/kud3n013/kast)
 - [**`millennium`**](docs/millennium.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.5.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/millennium.md) `sudo pacman -S millennium`
   - Steam Client modding framework for custom skins, themes, and community plugins. Upstream: [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium)
 - [**`obsidian`**](docs/obsidian.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.13.7--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/obsidian.md) `sudo pacman -S obsidian`
