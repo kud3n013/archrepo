@@ -203,7 +203,7 @@ jobs:
       # ── Upload package artifact ─────────────────────────────────────
       - name: Upload package artifact
         if: steps.cache_check.outputs.skip_build != 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.name }}-pkg
           path: src/packages/${{ matrix.name }}/*.pkg.tar.zst
@@ -214,7 +214,7 @@ jobs:
       # these files and merges it only if the build succeeded.
       - name: Upload upstream update
         if: success() && matrix.update_needed == true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.name }}-bump
           path: |
@@ -225,7 +225,7 @@ jobs:
 
       - name: Upload failed upstream update
         if: failure() && matrix.update_needed == true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.name }}-bump-failed
           path: |
