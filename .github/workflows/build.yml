@@ -55,7 +55,7 @@ jobs:
         run: pacman -Syu --noconfirm git jq curl github-cli
 
       - name: Checkout repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -97,7 +97,7 @@ jobs:
 
       # ── Checkout main branch ────────────────────────────────────────
       - name: Checkout main
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           path: src
@@ -268,14 +268,14 @@ jobs:
           gpg --batch --list-secret-keys "$ARCHREPO_KEY_FPR"
 
       - name: Checkout gh-pages
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: gh-pages
           path: repo
           fetch-depth: 0
 
       - name: Checkout main (for upstream updates, index generation & archive detection)
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           path: main_src
