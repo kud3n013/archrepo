@@ -5,7 +5,7 @@
 _pkgname=obsidian
 pkgname=obsidian
 pkgver=1.14.4
-pkgrel=1
+pkgrel=2
 pkgdesc="A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)"
 arch=('x86_64')
 url="https://obsidian.md"
@@ -21,6 +21,7 @@ depends=(
     'alsa-lib'
     'at-spi2-core'
     'cairo'
+    'dbusmenu-shortcut-shim'
     'gtk3'
     'hicolor-icon-theme'
     'libnotify'
@@ -34,7 +35,6 @@ depends=(
 
 makedepends=(
     'asar'
-    'glib2'
 )
 
 optdepends=(
@@ -50,17 +50,15 @@ source=(
     "${pkgname}.desktop"
     "${pkgname}.png"
     "patch-portal-theme.js"
-    "${pkgname}-globalmenu.c"
     "patch-globalmenu.js"
 )
 
 sha256sums=('85b10dcba6edfc1c0460a6d18260cf31c30447a444bd858a6440b9c9c8806d25'
-            'd41ca0fc089e33cdcb088d4a37a21babc19cf7a8862d4746a163002ec28c5ef0'
+            '439c0a1450e2fa6bd4e493c84df2f85bc9767a482429b4864af7bdb91be59442'
             '2d34e72032d0ffd1bb9a93e8cce80dfc2ff23c88ed2f95206e27c18c1cbdb5bd'
             '37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d'
             '0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40'
             '5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a'
-            '8cb8d012c74481c26696c02c25aeed1dacf3da7fcec596aa4172e85be18417c1'
             '019e90137432e215d09ac6c1edcf8be321a100ac4bae8f61dba66c61022803e7')
 
 prepare() {
@@ -99,13 +97,6 @@ prepare() {
     rm -rf "${srcdir}/app-extracted"
 }
 
-build() {
-    cd "${srcdir}"
-    gcc -shared -fPIC -O2 "${srcdir}/${_pkgname}-globalmenu.c" \
-        -o "${srcdir}/lib${_pkgname}-globalmenu.so" \
-        $(pkg-config --cflags --libs glib-2.0) -ldl
-}
-
 package() {
     cp -a "${srcdir}/deb-data/." "${pkgdir}/"
 
@@ -114,9 +105,6 @@ package() {
 
     # Install Obsidian CLI symlink in /usr/bin so it is globally available
     ln -sf "/opt/Obsidian/obsidian-cli" "${pkgdir}/usr/bin/obsidian-cli"
-
-    # Install Global Menu shortcut bridge for KDE Plasma / Qt
-    install -Dm755 "${srcdir}/lib${_pkgname}-globalmenu.so" "${pkgdir}/opt/Obsidian/lib${_pkgname}-globalmenu.so"
 
     # Update desktop entry to call the wrapper script and create standard symlink
     sed -i "s|/opt/Obsidian/obsidian|${_pkgname}|" "${pkgdir}/usr/share/applications/md.obsidian.Obsidian.desktop"

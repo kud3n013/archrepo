@@ -79,8 +79,8 @@ for _mod in /usr/lib/gtk-3.0/modules/*.so; do
 done
 
 # Enable Global Menu shortcut bridge for KDE Plasma / Qt appmenu (restores punctuation shortcut tips like Ctrl+,)
-if [[ -f "/opt/Obsidian/libobsidian-globalmenu.so" ]]; then
-    export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}/opt/Obsidian/libobsidian-globalmenu.so"
+if [[ -f "/usr/lib/dbusmenu-shortcut-shim/libdbusmenu-shortcut-shim.so" ]]; then
+    export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}/usr/lib/dbusmenu-shortcut-shim/libdbusmenu-shortcut-shim.so"
 fi
 
 exec /opt/Obsidian/obsidian "${DEFAULT_PLATFORM_FLAGS[@]}" "${ALL_ARGS[@]}"
