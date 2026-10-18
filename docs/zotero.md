@@ -35,7 +35,7 @@ Zotero is a free, open-source tool for collecting, organizing, annotating, citin
 
 ### Modifications in `archrepo`
 - **Native Title Bar & Theming Patch (`patch-omni.py`)**: Patches `omni.ja` inside Zotero to enable native window decorations, fixing blurry or missing title bars on Wayland compositors (Hyprland, Sway), and dynamically adapts to system themes.
-- **KDE Plasma Global Menu (`zotero-globalmenu.c`)**: Injects a custom LD_PRELOAD helper to expose Zotero's Mozilla-based menu hierarchy to KDE Plasma's Global Menu panel widget via D-Bus.
+- **KDE Plasma Global Menu**: Preloads the shared [`dbusmenu-shortcut-shim`](dbusmenu-shortcut-shim.md) library (restores punctuation shortcut tips) and exposes Zotero's Mozilla-based menu hierarchy to KDE Plasma's Global Menu panel widget via D-Bus.
 - **Wayland Integration**: Defaults to `MOZ_ENABLE_WAYLAND=1`.
 
 ---
