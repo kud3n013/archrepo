@@ -1,3 +1,4 @@
 {
-  "check": "none"
+  "check": "github-release",
+  "repo": "kud3n013/steam-dbusmenu-export"
 }

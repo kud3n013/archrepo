@@ -1,9 +1,9 @@
 # Steam Global Menu (`steam-globalmenu`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.2.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-1.2.0--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
-[![upstream](https://img.shields.io/badge/upstream-archrepo-informational)](https://github.com/kud3n013/archrepo)
+[![upstream](https://img.shields.io/badge/upstream-website-informational)](https://github.com/kud3n013/steam-dbusmenu-export)
 
 High-performance, lightweight C daemon bridge exporting the Steam client menu bar, navigation shortcuts, dynamically parsed recent games, and Millennium modding settings to the KDE Plasma Global Menu widget via the DBusMenu protocol.
 
@@ -28,15 +28,17 @@ systemctl --user enable --now steam-globalmenu.service
 | Attribute | Value |
 |---|---|
 | **Package Name** | `steam-globalmenu` |
-| **Current Version** | `1.2.0-1` |
+| **Current Version** | `1.2.0-3` |
 | **Package Type** | **Modified (KDE Global Menu Bridge)** |
 | **Build Status** | `passing` |
-| **Upstream Project** | [kud3n013/archrepo](https://github.com/kud3n013/archrepo) |
+| **Upstream Project** | [kud3n013/steam-dbusmenu-export](https://github.com/kud3n013/steam-dbusmenu-export) |
 | **Category** | Desktop Integration / Gaming |
 
 ---
 
 ### Overview
+The source lives in [kud3n013/steam-dbusmenu-export](https://github.com/kud3n013/steam-dbusmenu-export); this package builds from its release tarball.
+
 Because the modern Steam client uses a custom Chromium Embedded Framework (CEF) and React web interface, it does not natively export its application menu bar (`Steam`, `View`, `Friends`, `Games`, `Help`) to system-wide desktop panels. 
 
 `steam-globalmenu` bridges this gap:
