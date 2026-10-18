@@ -284,7 +284,7 @@ jobs:
       # Not merged: each package keeps its own directory so the next step can
       # check that an artifact only contains the package it was built for.
       - name: Download built package artifacts
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         continue-on-error: true
         with:
           pattern: '*-pkg'
@@ -310,7 +310,7 @@ jobs:
           done
 
       - name: Download upstream updates
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         continue-on-error: true
         with:
           pattern: '*-bump*'
