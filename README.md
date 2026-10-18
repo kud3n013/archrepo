@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-22%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-23%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -77,6 +77,8 @@ Each package entry below provides direct links to its dedicated documentation in
 
 ### 🧩 Plugins & Add-ons
 
+- [**`dbusmenu-shortcut-shim`**](docs/dbusmenu-shortcut-shim.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.0.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/dbusmenu-shortcut-shim.md) `sudo pacman -S dbusmenu-shortcut-shim`
+  - Shared LD_PRELOAD shim used by `cursor`, `obsidian` and `zotero` that restores punctuation shortcut tips (e.g. `Ctrl+,`) in KDE Plasma's Global Menu. Upstream: [kud3n013/dbusmenu-shortcut-shim](https://github.com/kud3n013/dbusmenu-shortcut-shim)
 - [**`freedownloadmanager-elephant`**](docs/freedownloadmanager-elephant.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.3.8--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/freedownloadmanager-elephant.md) `sudo pacman -S freedownloadmanager-elephant`
   - Free Download Manager add-on for downloading online videos powered by `yt-dlp`. Upstream: [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant)
 - [**`kwin-scripts-krohnkite`**](docs/kwin-scripts-krohnkite.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.9.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kwin-scripts-krohnkite.md) `sudo pacman -S kwin-scripts-krohnkite`
