@@ -1,0 +1,25 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/kud3n013/dbusmenu-shortcut-shim
+
+pkgname=dbusmenu-shortcut-shim
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="LD_PRELOAD shim that fixes punctuation shortcut names in DBusMenu for KDE Plasma's Global Menu"
+arch=('x86_64')
+url="https://github.com/kud3n013/dbusmenu-shortcut-shim"
+license=('MIT')
+depends=('glib2')
+makedepends=('gcc' 'make' 'pkgconf')
+options=('!debug')
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/kud3n013/dbusmenu-shortcut-shim/releases/download/v${pkgver}/dbusmenu-shortcut-shim-${pkgver}.tar.gz")
+sha256sums=('2cb510a2e18d5d1bb0c7e0d96b181358619c3be2503a3ef7e340998af55f0ba9')
+
+build() {
+  cd "${pkgname}-${pkgver}"
+  make
+}
+
+package() {
+  cd "${pkgname}-${pkgver}"
+  make DESTDIR="${pkgdir}" PREFIX=/usr install
+}
