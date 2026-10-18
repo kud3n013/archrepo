@@ -35,7 +35,7 @@ Obsidian is a private, extensible Markdown-based knowledge base and second brain
 
 ### Modifications in `archrepo`
 This package provides premier desktop environment enhancements:
-- **KDE Plasma Global Menu Integration**: Includes a custom compiled shared library (`obsidian-globalmenu.c`) loaded via LD_PRELOAD and JavaScript hooks (`patch-globalmenu.js`) that export Obsidian's menu bar directly to KDE Plasma's Global Menu / AppMenu widget over D-Bus.
+- **KDE Plasma Global Menu Integration**: Preloads the shared [`dbusmenu-shortcut-shim`](dbusmenu-shortcut-shim.md) library (restores punctuation shortcut tips) and applies JavaScript hooks (`patch-globalmenu.js`) that export Obsidian's menu bar directly to KDE Plasma's Global Menu / AppMenu widget over D-Bus.
 - **XDG Desktop Portal Theme Auto-Switching (`patch-portal-theme.js`)**: Automatically syncs Obsidian's internal theme between light and dark according to the desktop portal's system color scheme preference.
 - **Wayland Flags Loader**: Built-in support for Wayland flags via `~/.config/obsidian-flags.conf`.
 
