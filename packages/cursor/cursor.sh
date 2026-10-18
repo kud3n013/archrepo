@@ -51,8 +51,8 @@ if [[ "$IS_KDE" == true ]]; then
     for _mod in /usr/lib/gtk-3.0/modules/*.so; do
         [[ -f "$_mod" ]] && export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}$_mod"
     done
-    if [[ -f "/opt/cursor/libcursor-globalmenu.so" ]]; then
-        export LD_PRELOAD="/opt/cursor/libcursor-globalmenu.so${LD_PRELOAD:+:${LD_PRELOAD}}"
+    if [[ -f "/usr/lib/dbusmenu-shortcut-shim/libdbusmenu-shortcut-shim.so" ]]; then
+        export LD_PRELOAD="/usr/lib/dbusmenu-shortcut-shim/libdbusmenu-shortcut-shim.so${LD_PRELOAD:+:${LD_PRELOAD}}"
     fi
 fi
 
