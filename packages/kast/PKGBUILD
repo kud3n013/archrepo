@@ -2,7 +2,7 @@
 # Upstream: https://github.com/kud3n013/kast
 
 pkgname=kast
-pkgver=0.6.2
+pkgver=0.7.2
 pkgrel=1
 pkgdesc="Kud3n's Arch Setup Tool: Arch/CachyOS setup TUI with App Vault backups to Proton Drive"
 arch=('x86_64')
@@ -19,7 +19,7 @@ conflicts=('kast-bin')
 options=(!strip !debug !lto)
 source=("kast-${pkgver}::https://github.com/kud3n013/kast/releases/download/v${pkgver}/kast-${CARCH}-unknown-linux-musl"
         "LICENSE-${pkgver}::https://raw.githubusercontent.com/kud3n013/kast/v${pkgver}/LICENSE")
-sha256sums=('325df3ae59255381dba3cbd2f4e0a7b6f8f8a018505c704e1e11ff8e313a94a7'
+sha256sums=('300b4b666f32f03c5d7a8a8af8dbcf63105b9a2466bc165a91c7d309af174cbd'
             '3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986')
 
 package() {
