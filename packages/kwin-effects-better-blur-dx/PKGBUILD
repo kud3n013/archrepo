@@ -1,0 +1,65 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/xarblu/kwin-effects-better-blur-dx
+# AUR Reference: https://aur.archlinux.org/packages/kwin-effects-better-blur-dx
+
+pkgname=kwin-effects-better-blur-dx
+pkgver=2.6.0
+pkgrel=1
+# The Arch kwin version (pkgver-pkgrel) this build targets. The effect links
+# against KWin's private C++ API, so it only loads against the exact kwin it
+# was built for. CI bumps this together with pkgrel (see rebuild_on in
+# upstream.json) whenever Arch ships a new kwin.
+_kwinver=6.8.0-1
+pkgdesc="Fork of KWin's Blur effect with force blur, refraction and rounded corners (Wayland)"
+arch=('x86_64')
+url="https://github.com/xarblu/kwin-effects-better-blur-dx"
+license=('GPL-3.0-only')
+# Plain kwin on purpose: no exact pin, so pacman -Syu is never blocked while a
+# rebuild for a new kwin is pending.
+depends=('kwin')
+makedepends=(
+	'cmake'
+	'extra-cmake-modules'
+	'qt6-tools'
+)
+conflicts=(
+	'kwin-effects-better-blur-dx-git'
+	'kwin-effects-forceblur'
+)
+install="${pkgname}.install"
+# CI packages only the first entry of makepkg --packagelist; no -debug split package
+options=(!debug)
+source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('ab205ef7ca700cfe8cdb8201934b59a9d734ddf3a98afc5cdf65b153538fe497')
+
+prepare() {
+	# A build against a different kwin than the one targeted would produce an
+	# effect that silently fails to load. This also catches a CI mirror that
+	# has not synced the new kwin yet.
+	local _installed
+	_installed="$(pacman -Q kwin | cut -d' ' -f2)"
+	if [[ "${_installed}" != "${_kwinver}" ]]; then
+		echo "kwin ${_installed} is installed but this build targets ${_kwinver}" >&2
+		return 1
+	fi
+}
+
+build() {
+	# Wayland build only (BBDX_X11 would build the KWin X11 variant)
+	cmake \
+		-S "${srcdir}/${pkgname}-${pkgver}" \
+		-B "${srcdir}/build" \
+		-W no-dev \
+		-DCMAKE_BUILD_TYPE=None \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DBBDX_X11=OFF
+
+	cmake --build "${srcdir}/build"
+}
+
+package() {
+	DESTDIR="${pkgdir}" cmake --install "${srcdir}/build"
+
+	# Fix directory and file permissions
+	chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

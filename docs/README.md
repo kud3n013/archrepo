@@ -34,6 +34,7 @@ This directory contains individual documentation pages for all active packages a
 |---|---|---|---|---|
 | [**`dbusmenu-shortcut-shim`**](dbusmenu-shortcut-shim.md) | `1.0.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Shared LD_PRELOAD shim for punctuation shortcuts in KDE Plasma's Global Menu |
 | [**`freedownloadmanager-elephant`**](freedownloadmanager-elephant.md) | `1.3.8-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | FDM add-on for downloading video/audio streams via yt-dlp |
+| [**`kwin-effects-better-blur-dx`**](kwin-effects-better-blur-dx.md) | `2.6.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Better Blur DX KWin effect (Plasma 6), rebuilt automatically for every new Arch `kwin` |
 | [**`kwin-scripts-krohnkite`**](kwin-scripts-krohnkite.md) | `0.9.9.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Dynamic tiling extension for KWin (KDE Plasma 6) |
 | [**`zotero-better-bibtex`**](zotero-better-bibtex.md) | `9.0.64-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Better BibTeX LaTeX citation key generator and exporter for Zotero |
 | [**`zotero-better-notes`**](zotero-better-notes.md) | `3.3.3-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Advanced note management, markdown tree, and linking for Zotero |
