@@ -14,9 +14,22 @@ pkgdesc="Fork of KWin's Blur effect with force blur, refraction and rounded corn
 arch=('x86_64')
 url="https://github.com/xarblu/kwin-effects-better-blur-dx"
 license=('GPL-3.0-only')
-# Plain kwin on purpose: no exact pin, so pacman -Syu is never blocked while a
-# rebuild for a new kwin is pending.
-depends=('kwin')
+# kwin is unpinned on purpose: no exact version, so pacman -Syu is never blocked
+# while a rebuild for a new kwin is pending.
+depends=(
+	'glibc'
+	'kcmutils'
+	'kconfig'
+	'kcoreaddons'
+	'kdecoration'
+	'ki18n'
+	'kwidgetsaddons'
+	'kwin'
+	'libepoxy'
+	'libstdc++'
+	'libxcb'
+	'qt6-base'
+)
 makedepends=(
 	'cmake'
 	'extra-cmake-modules'
