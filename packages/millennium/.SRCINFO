@@ -1,6 +1,6 @@
 pkgbase = millennium
 	pkgdesc = Open-source modding framework for creating and managing Steam Client themes and plugins
-	pkgver = 3.6.1
+	pkgver = 3.6.2
 	pkgrel = 1
 	url = https://github.com/SteamClientHomebrew/Millennium
 	install = millennium.install
@@ -8,15 +8,15 @@ pkgbase = millennium
 	license = MIT
 	depends = steam
 	depends = lib32-openssl
-	provides = millennium-bin=3.6.1
+	provides = millennium-bin=3.6.2
 	conflicts = millennium-bin
 	conflicts = millennium-git
 	replaces = millennium-bin
 	options = !strip
 	options = !debug
-	source = millennium-3.6.1.tar.gz::https://github.com/SteamClientHomebrew/Millennium/releases/download/v3.6.1/millennium-v3.6.1-linux-x86_64.tar.gz
-	source = LICENSE-3.6.1.md::https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/v3.6.1/LICENSE.md
-	sha256sums = 0215a19779ad928a53c5e947773063692ad40ab5a179ba119686de5150fbb763
+	source = millennium-3.6.2.tar.gz::https://github.com/SteamClientHomebrew/Millennium/releases/download/v3.6.2/millennium-v3.6.2-linux-x86_64.tar.gz
+	source = LICENSE-3.6.2.md::https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/v3.6.2/LICENSE.md
+	sha256sums = 95bda40184dd6437da1668060ec5961c762f3c1e59923f53380e43d4e720f359
 	sha256sums = f01d1b8bce439ee29491817247a38611c41f7d1de4360b5577d4498d103fbf8b
 
 pkgname = millennium
