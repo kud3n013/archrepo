@@ -16,6 +16,7 @@ Packages in this directory:
 | Package | Original Upstream | Reason for Archiving |
 |---|---|---|
 | [`antigravity`](./antigravity/) | [Google Antigravity](https://antigravity.google) | Archived per maintainer request. |
+| [`cursor`](./cursor/) | [Cursor](https://www.cursor.com) | Archived per maintainer request. |
 | [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
 | [`proton-mail`](./proton-mail/) | [Proton Mail](https://proton.me/mail) | Archived per maintainer request. |
 | [`proton-pass`](./proton-pass/) | [Proton Pass](https://proton.me/pass) | Archived per maintainer request. |
