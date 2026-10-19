@@ -10,6 +10,9 @@ set -euo pipefail
 [ $# -eq 2 ] || { echo "Usage: $0 <current PKGBUILD> <bumped PKGBUILD>" >&2; exit 2; }
 
 VAR_RE='^(pkgver|pkgrel|_build|_commithash|_zadarkver)=["'\'']?[0-9A-Za-z._+]*["'\'']?$'
+# _kwinver is a full pacman version (e.g. 6.8.0-1 or 1:6.8.0-1), so unlike the
+# variables above it also needs '-' and ':'.
+KWIN_RE='^_kwinver=["'\'']?[0-9A-Za-z._+:-]+["'\'']?$'
 SUM_RE='^([a-z0-9]+sums(_[a-z0-9_]+)?=\()?([[:space:]]*["'\'']?([0-9a-fA-F]{32,128}|SKIP)["'\'']?)*[[:space:]]*\)?$'
 
 bad=0
@@ -17,7 +20,7 @@ bad=0
 # could imitate (a added line "++x" would otherwise look like a "+++" header)
 while IFS= read -r line; do
   content="${line:1}"
-  if [[ "$content" =~ $VAR_RE || "$content" =~ $SUM_RE ]]; then
+  if [[ "$content" =~ $VAR_RE || "$content" =~ $KWIN_RE || "$content" =~ $SUM_RE ]]; then
     continue
   fi
   echo "Unexpected PKGBUILD change: ${line}" >&2
