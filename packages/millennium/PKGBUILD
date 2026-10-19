@@ -4,7 +4,7 @@
 
 _pkgname=millennium
 pkgname=millennium
-pkgver=3.6.1
+pkgver=3.6.2
 pkgrel=1
 # Prereleases are stored without the hyphen (v3.6.0-beta.1 -> 3.6.0beta.1) so
 # pacman sorts them before the final release; restore it for the upstream tag.
@@ -25,7 +25,7 @@ source=(
     "${_pkgname}-${pkgver}.tar.gz::${url}/releases/download/${_tag}/millennium-${_tag}-linux-${arch}.tar.gz"
     "LICENSE-${pkgver}.md::https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/${_tag}/LICENSE.md"
 )
-sha256sums=('0215a19779ad928a53c5e947773063692ad40ab5a179ba119686de5150fbb763'
+sha256sums=('95bda40184dd6437da1668060ec5961c762f3c1e59923f53380e43d4e720f359'
             'f01d1b8bce439ee29491817247a38611c41f7d1de4360b5577d4498d103fbf8b')
 
 package() {
