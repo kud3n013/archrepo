@@ -34,6 +34,8 @@ makedepends=(
 	'cmake'
 	'extra-cmake-modules'
 	'qt6-tools'
+	# KWinConfig.cmake runs find_dependency(Vulkan)
+	'vulkan-headers'
 )
 conflicts=(
 	'kwin-effects-better-blur-dx-git'

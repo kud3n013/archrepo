@@ -9,6 +9,7 @@ pkgbase = kwin-effects-better-blur-dx
 	makedepends = cmake
 	makedepends = extra-cmake-modules
 	makedepends = qt6-tools
+	makedepends = vulkan-headers
 	depends = glibc
 	depends = kcmutils
 	depends = kconfig
