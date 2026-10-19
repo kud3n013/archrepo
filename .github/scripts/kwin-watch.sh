@@ -105,7 +105,10 @@ echo "Arch kwin: ${KWIN} (${USED}, ${STATUS})"
 run_in_flight() {
   local status n
   for status in queued in_progress waiting pending requested; do
-    n=$(gh run list --repo "$GH_REPO" --workflow build.yml --status "$status" --json databaseId --jq length 2>/dev/null || echo 0)
+    if ! n=$(gh run list --repo "$GH_REPO" --workflow build.yml --status "$status" --json databaseId --jq length 2>"$WORK/gh.err"); then
+      echo "::warning::Could not list ${status} build.yml runs ($(head -c 200 "$WORK/gh.err")); assuming none"
+      n=0
+    fi
     [ "${n:-0}" -gt 0 ] && return 0
   done
   return 1
@@ -136,7 +139,10 @@ for pkg in "${PACKAGES[@]}"; do
   # An open bump PR for this very kwin means a build was already tried and did not
   # merge (failed, or needs a review). Retry only after RETRY_HOURS without activity
   # so a persistent failure does not rebuild every poll.
-  pr=$(gh pr list --repo "$GH_REPO" --head "bump/${pkg}" --state open --json number,updatedAt --jq '.[0] // empty' 2>/dev/null || true)
+  if ! pr=$(gh pr list --repo "$GH_REPO" --head "bump/${pkg}" --state open --json number,updatedAt --jq '.[0] // empty' 2>"$WORK/gh.err"); then
+    echo "::warning::Could not list bump PRs ($(head -c 200 "$WORK/gh.err")); the failed-build backoff does not apply"
+    pr=""
+  fi
   if [ -n "$pr" ]; then
     pr_num=$(jq -r '.number' <<< "$pr")
     pr_updated=$(jq -r '.updatedAt' <<< "$pr")
