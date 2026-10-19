@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-24%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-25%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -83,6 +83,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Shared LD_PRELOAD shim used by `cursor`, `obsidian` and `zotero` that restores punctuation shortcut tips (e.g. `Ctrl+,`) in KDE Plasma's Global Menu. Upstream: [kud3n013/dbusmenu-shortcut-shim](https://github.com/kud3n013/dbusmenu-shortcut-shim)
 - [**`freedownloadmanager-elephant`**](docs/freedownloadmanager-elephant.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.3.8--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/freedownloadmanager-elephant.md) `sudo pacman -S freedownloadmanager-elephant`
   - Free Download Manager add-on for downloading online videos powered by `yt-dlp`. Upstream: [meowcateatrat/elephant](https://github.com/meowcateatrat/elephant)
+- [**`kwin-effects-better-blur-dx`**](docs/kwin-effects-better-blur-dx.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.6.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kwin-effects-better-blur-dx.md) `sudo pacman -S kwin-effects-better-blur-dx`
+  - KWin Blur fork for Plasma 6 with force blur, refraction and rounded corners, rebuilt automatically for every new Arch `kwin`. Upstream: [xarblu/kwin-effects-better-blur-dx](https://github.com/xarblu/kwin-effects-better-blur-dx)
 - [**`kwin-scripts-krohnkite`**](docs/kwin-scripts-krohnkite.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.9.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kwin-scripts-krohnkite.md) `sudo pacman -S kwin-scripts-krohnkite`
   - Dynamic tiling extension for KWin (KDE Plasma 6) ported from Krohnkite. Upstream: [anametologin/krohnkite](https://codeberg.org/anametologin/krohnkite)
 - [**`zotero-better-bibtex`**](docs/zotero-better-bibtex.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-9.0.64--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-better-bibtex.md) `sudo pacman -S zotero-better-bibtex`
@@ -163,6 +165,7 @@ Users can easily customize Wayland options, HiDPI scaling factors, and environme
    ./tools/scaffold.sh my-package owner/repo
    ```
 2. **Configure:** Edit `packages/my-package/PKGBUILD` and optional `upstream.json`.
+   `upstream.json` may also set `"rebuild_on": "kwin"` to rebuild the package whenever Arch's `kwin` version changes (for KWin plugins; the PKGBUILD then needs a literal `_kwinver=` line). The `kwin-watch` workflow dispatches those rebuilds.
 3. **Document:** Add `docs/my-package.md` and link it in `README.md` and `docs/README.md`.
 4. **Commit & Push:**
    ```bash
@@ -184,6 +187,7 @@ Users can easily customize Wayland options, HiDPI scaling factors, and environme
 - **Smart Build Caching:** If a target `${pkgver}-${pkgrel}` binary is already published in Releases, compilation is skipped.
 - **Signed Packages:** Build jobs run with a read-only token and no secrets; the publish job signs every package and the database with the repository key (`ARCHREPO_SIGNING_KEY` secret).
 - **Automatic Upstream Tracking:** A daily cron job (`0 4 * * *`) checks upstream GitHub/Codeberg releases and redirects, bumps versions and checksums (`updpkgsums`), and builds the update. Each update goes through a pull request on `bump/<pkg>`; a failed build leaves that pull request open until a later build succeeds.
+- **KWin Rebuilds:** Packages marked `"rebuild_on": "kwin"` in `upstream.json` (KWin effects link against its private API) are rebuilt when Arch ships a new `kwin`. The `kwin-watch` workflow polls Arch's `extra` database every 30 minutes and dispatches a build of just those packages, which goes through the same `bump/<pkg>` pull request.
 - **Release Pruning:** Release packages the database no longer references (superseded versions, archived packages) are pruned automatically.
 
 ---

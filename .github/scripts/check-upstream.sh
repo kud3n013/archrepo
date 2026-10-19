@@ -207,6 +207,39 @@ if [ "$LATEST" != "$CURRENT" ]; then
   fi
 fi
 
+# rebuild_on: a package built against another package's private ABI (e.g. a
+# KWin effect) must be rebuilt whenever that package changes in the sync
+# database, even if upstream has no new release. Only "kwin" is supported.
+NEW_KWIN=""
+REBUILD_ON=""
+if [ -f "$CONFIG_FILE" ]; then
+  REBUILD_ON=$(jq -r '.rebuild_on // ""' "$CONFIG_FILE")
+fi
+if [ "$REBUILD_ON" = "kwin" ]; then
+  # The container ran pacman -Sy(u), so the sync database is current
+  FETCHED_KWIN=""
+  if command -v pacman &>/dev/null; then
+    FETCHED_KWIN=$(pacman -Si kwin 2>/dev/null | awk -F' *: ' '/^Version/{print $2; exit}' || true)
+  fi
+  RECORDED_KWIN=$(grep -oP '^_kwinver=\K.*' "${PKG_DIR}/PKGBUILD" | tr -d '"'\' | head -1 || true)
+  if [ -z "$FETCHED_KWIN" ]; then
+    echo "Warning: Could not read the kwin version from the sync database; skipping kwin rebuild check" >&2
+  elif ! [[ "$FETCHED_KWIN" =~ ^[0-9A-Za-z._+:-]+$ ]]; then
+    echo "Warning: Rejected kwin version with invalid characters: '${FETCHED_KWIN}'" >&2
+  elif [ -z "$RECORDED_KWIN" ]; then
+    echo "Warning: PKGBUILD has no _kwinver= line; skipping kwin rebuild check" >&2
+  elif [ "$FETCHED_KWIN" != "$RECORDED_KWIN" ]; then
+    # A rejected (older or malformed) upstream version leaves LATEST unchanged;
+    # reset it so --apply only bumps pkgrel instead of downgrading pkgver.
+    [ "$UPDATE_NEEDED" = "true" ] || LATEST="$CURRENT"
+    UPDATE_NEEDED=true
+    NEW_KWIN="$FETCHED_KWIN"
+    EXTRA_INFO="${EXTRA_INFO:+${EXTRA_INFO}; }kwin: ${RECORDED_KWIN} -> ${FETCHED_KWIN}"
+  fi
+elif [ -n "$REBUILD_ON" ]; then
+  echo "Warning: Ignoring unsupported rebuild_on value '${REBUILD_ON}' (only 'kwin' is supported)" >&2
+fi
+
 if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
   if [ "$LATEST" != "$CURRENT" ]; then
     sed -i "s/^pkgver=.*/pkgver=${LATEST}/" "${PKG_DIR}/PKGBUILD"
@@ -225,6 +258,9 @@ if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
   fi
   if [ -n "${NEW_ZADARK:-}" ] && [[ "$NEW_ZADARK" =~ ^[0-9.]+$ ]]; then
     sed -i "s/^_zadarkver=.*/_zadarkver=${NEW_ZADARK}/" "${PKG_DIR}/PKGBUILD"
+  fi
+  if [ -n "$NEW_KWIN" ] && [[ "$NEW_KWIN" =~ ^[0-9A-Za-z._+:-]+$ ]]; then
+    sed -i "s/^_kwinver=.*/_kwinver=${NEW_KWIN}/" "${PKG_DIR}/PKGBUILD"
   fi
 fi
 

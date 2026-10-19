@@ -1,0 +1,9 @@
+post_install() {
+  echo ":: To use Better Blur DX, open System Settings -> Window Management -> Desktop Effects,"
+  echo "   disable the stock 'Blur' effect (and any other blur fork), then enable 'Better Blur DX'."
+}
+
+post_upgrade() {
+  echo ":: Better Blur DX is built against one exact KWin build. Log out and back in so KWin"
+  echo "   loads the effect that matches the updated 'kwin' package."
+}
