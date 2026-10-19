@@ -1,0 +1,50 @@
+name: KWin Watch
+
+# Packages built against KWin's private API (rebuild_on: kwin in upstream.json)
+# stop loading when Arch ships a new kwin. Poll Arch's package database and
+# dispatch a build of just those packages as soon as it changes, instead of
+# waiting for the nightly run.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write                  # dispatch build.yml
+
+concurrency:
+  group: kwin-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The database's Last-Modified lets most polls end in a 304
+      - name: Restore watcher state
+        id: cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .kwin-watch-state.json
+          key: kwin-watch-${{ github.run_id }}
+          restore-keys: kwin-watch-
+
+      - name: Check kwin and dispatch rebuilds
+        id: watch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: .github/scripts/kwin-watch.sh
+
+      # Only a freshly downloaded database is worth a new cache entry
+      - name: Save watcher state
+        if: always() && steps.watch.outputs.state_changed == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .kwin-watch-state.json
+          key: kwin-watch-${{ github.run_id }}
