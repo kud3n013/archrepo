@@ -1,0 +1,174 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://claude.ai/download
+# AUR Reference: https://aur.archlinux.org/packages/claude-desktop (repackages the same .deb)
+
+# Unofficial repackaging. Anthropic publishes this app as a .deb in its own apt
+# repository and does not ship an Arch package. This recipe takes the official
+# amd64 .deb and rearranges it for Arch. Nothing inside app.asar is patched.
+
+pkgname=claude-desktop
+pkgver=2.42304.2
+pkgrel=1
+pkgdesc="Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package"
+arch=('x86_64')
+url="https://claude.ai/download"
+license=('LicenseRef-Proprietary')
+
+# The .deb's Depends: field, translated to Arch names. Libraries the Electron
+# binary links directly (checked with objdump -p) are included as well. Debian's
+# Recommends: become optdepends, except the Cowork VM stack, which a Cowork
+# session needs.
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'cairo'
+    'dbus'
+    'desktop-file-utils'
+    'edk2-ovmf'
+    'expat'
+    'gcc-libs'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libdrm'
+    'libnotify'
+    'libpipewire'
+    'libsecret'
+    'libx11'
+    'libxcb'
+    'libxcomposite'
+    'libxdamage'
+    'libxext'
+    'libxfixes'
+    'libxkbcommon'
+    'libxrandr'
+    'libxtst'
+    'mesa'
+    'nspr'
+    'nss'
+    'pango'
+    'qemu-system-x86'
+    'systemd-libs'
+    'util-linux-libs'
+    'virtiofsd'
+    'xdg-desktop-portal'
+    'xdg-utils'
+)
+
+optdepends=(
+    'gnome-keyring: sign-in storage via Secret Service on GNOME (use only one keyring)'
+    'kwallet: sign-in storage via Secret Service on KDE Plasma (use only one keyring)'
+    'libayatana-appindicator: system tray icon'
+    'xdg-desktop-portal-gtk: portal backend on GTK desktops'
+    'xdg-desktop-portal-kde: portal backend on KDE Plasma'
+    'bubblewrap: sandboxed command execution in Claude Code'
+    'socat: sandboxed command execution in Claude Code'
+    'openssh: SSH sessions (system ssh client)'
+    'gjs: GNOME Shell search provider'
+)
+
+# claude-desktop-extra is a third-party patched build with the same launcher path.
+conflicts=('claude-desktop-extra')
+
+backup=("etc/${pkgname}-flags.conf")
+install=${pkgname}.install
+# Electron binaries break if stripped, and !debug is only meaningful for compiled packages.
+options=('!strip' '!debug')
+
+_deb="${pkgname}_${pkgver}_amd64.deb"
+source=(
+    "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/${_deb}"
+    "${pkgname}.sh"
+    "${pkgname}-flags.conf"
+)
+# makepkg would unpack the .deb into $srcdir, but only data.tar.xz is needed.
+noextract=("${_deb}")
+sha256sums=('38a7d58b58a976c88ca652eaa2f7ac02c87c4a388ae30f468d72b790e6b57f90'
+            '6e86dfbb618672b253cd75ad64f863cd7bf0b834627281659edbe54d6ec51c61'
+            'af4d23b3e1faf9159b75c5db9e8b1d64abae4e2c7ad01e0b2d21f7f221402bc3')
+
+prepare() {
+    cd "${srcdir}"
+
+    # A .deb is an ar archive. The file payload is data.tar.xz. control.tar.xz is
+    # skipped: its maintainer scripts add the apt repo, AppArmor profile and
+    # other Debian-only integration (see docs/claude-desktop.md).
+    bsdtar -xf "${_deb}" data.tar.xz
+    mkdir -p data
+    bsdtar -xf data.tar.xz -C data
+}
+
+package() {
+    cd "${srcdir}/data"
+
+    # 1. Application tree. The Electron binary finds its resources relative to
+    #    its own path, so the tree is kept whole under /opt.
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a usr/lib/claude-desktop/. "${pkgdir}/opt/${pkgname}/"
+
+    # 2. Compatibility path. The GNOME search provider's D-Bus service refers to
+    #    /usr/lib/claude-desktop, so that path has to resolve.
+    install -dm755 "${pkgdir}/usr/lib"
+    ln -s "../../opt/${pkgname}" "${pkgdir}/usr/lib/${pkgname}"
+
+    # 3. Launcher. This replaces upstream's bare symlink /usr/bin/claude-desktop,
+    #    which would start Electron without Wayland flags or a flags file.
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+
+    # 4. Cowork VM shims. The app hard-codes Debian paths for virtiofsd and OVMF
+    #    and never looks at /usr/lib/virtiofsd or the Arch firmware names. Its
+    #    probe list is /usr/libexec/virtiofsd, then /usr/bin/virtiofsd, and for
+    #    OVMF /usr/share/OVMF/OVMF_CODE_4M.fd, then OVMF_CODE.fd. The VARS path
+    #    is derived by replacing OVMF_CODE with OVMF_VARS in the code path it found.
+    #    /usr/share/OVMF is a compat symlink to /usr/share/edk2 owned by
+    #    edk2-ovmf, so the *_4M.fd links below resolve through it.
+    ln -s ../lib/virtiofsd "${pkgdir}/usr/bin/virtiofsd"
+    install -dm755 "${pkgdir}/usr/share/edk2"
+    ln -s x64/OVMF_CODE.4m.fd "${pkgdir}/usr/share/edk2/OVMF_CODE_4M.fd"
+    ln -s x64/OVMF_VARS.4m.fd "${pkgdir}/usr/share/edk2/OVMF_VARS_4M.fd"
+
+    # 5. Desktop entry. Upstream's file is used as-is: Exec=claude-desktop,
+    #    StartupWMClass=com.anthropic.Claude and the claude:// scheme handler are
+    #    already correct. The app looks for this exact file name at startup.
+    install -Dm644 usr/share/applications/com.anthropic.Claude.desktop \
+        "${pkgdir}/usr/share/applications/com.anthropic.Claude.desktop"
+
+    # 6. Icons. The hicolor set is installed as shipped, and the 256px icon is
+    #    also copied to pixmaps for launchers that look there.
+    for _icon in usr/share/icons/hicolor/*/apps/claude-desktop.png; do
+        install -Dm644 "${_icon}" "${pkgdir}/${_icon}"
+    done
+    install -Dm644 usr/share/icons/hicolor/256x256/apps/claude-desktop.png \
+        "${pkgdir}/usr/share/pixmaps/claude-desktop.png"
+
+    # 7. MIME types for .mcpb, .dxt and .skill. The shared-mime-info alpm hook
+    #    rebuilds the database, so the .install file doesn't need to.
+    install -Dm644 usr/lib/claude-desktop/resources/linux-mime/com.anthropic.Claude.xml \
+        "${pkgdir}/usr/share/mime/packages/com.anthropic.Claude.xml"
+
+    # 8. GNOME Shell search provider. Upstream's postinst copies these two files
+    #    into /usr/share on install, so they're shipped as package files instead.
+    install -Dm644 usr/lib/claude-desktop/resources/gnome-search-provider/com.anthropic.Claude.search-provider.ini \
+        "${pkgdir}/usr/share/gnome-shell/search-providers/com.anthropic.Claude.search-provider.ini"
+    install -Dm644 usr/lib/claude-desktop/resources/gnome-search-provider/com.anthropic.Claude.SearchProvider.service \
+        "${pkgdir}/usr/share/dbus-1/services/com.anthropic.Claude.SearchProvider.service"
+
+    # 9. Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+    # 10. Licenses. The copyright file names no other terms, and the
+    #     Chromium license list is shipped next to the binary.
+    install -Dm644 usr/share/doc/claude-desktop/copyright \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 usr/lib/claude-desktop/LICENSES.chromium.html \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSES.chromium.html"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+
+    # Chromium's setuid sandbox helper. The extraction above drops the setuid bit
+    # for an unprivileged build user, so set it explicitly after the chmod. It only
+    # matters when unprivileged user namespaces are unavailable.
+    chmod 4755 "${pkgdir}/opt/${pkgname}/chrome-sandbox"
+}

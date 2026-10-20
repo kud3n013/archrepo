@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-25%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-26%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -46,6 +46,8 @@ Each package entry below provides direct links to its dedicated documentation in
 
 - [**`beeper`**](docs/beeper.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-4.3.152--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/beeper.md) `sudo pacman -S beeper`
   - Unified multi-network messaging client with XDG desktop portal dark theme sync and Wayland auto-hinting. Upstream: [Automattic / Beeper](https://www.beeper.com/changelog)
+- [**`claude-desktop`**](docs/claude-desktop.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.42304.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/claude-desktop.md) `sudo pacman -S claude-desktop`
+  - Official Claude desktop app (Chat, Cowork and Claude Code) repackaged from Anthropic's Debian build, with a Wayland launcher and Cowork VM shims. Upstream: [Anthropic](https://claude.ai/download)
 - [**`cursor`**](docs/cursor.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.22.7--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/cursor.md) `sudo pacman -S cursor`
   - AI-first code editor with KDE Plasma Global Menu export, DBusMenu punctuation normalization, GTK3 crash prevention & Wayland flags loader. Upstream: [Cursor](https://www.cursor.com)
 - [**`freedownloadmanager`**](docs/freedownloadmanager.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-6.34.4.6974--4-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/freedownloadmanager.md) `sudo pacman -S freedownloadmanager`
