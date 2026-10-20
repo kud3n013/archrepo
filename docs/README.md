@@ -11,7 +11,7 @@ This directory contains individual documentation pages for all active packages a
 | Package | Version | Type | Status | Description |
 |---|---|---|---|---|
 | [**`beeper`**](beeper.md) | `4.3.152-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unified messaging client with portal theme sync & Wayland auto-hinting |
-| [**`claude-desktop`**](claude-desktop.md) | `2.42304.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Claude desktop app repackaged for Arch with Wayland launcher & Cowork VM shims |
+| [**`claude-desktop`**](claude-desktop.md) | `2.42304.2-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Claude desktop app repackaged for Arch with Wayland launcher, Cowork VM shims & native window title bar |
 | [**`cursor`**](cursor.md) | `3.22.7-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | AI-first code editor with KDE Global Menu, Wayland auto-hinting & flags |
 | [**`freedownloadmanager`**](freedownloadmanager.md) | `6.34.4.6974-4` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Download accelerator with injected dark mode & portal fix |
 | [**`galaxybudsclient`**](galaxybudsclient.md) | `5.2.1-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Galaxy Buds manager with dynamic Wayland HiDPI auto-scaling & persistent tray |
