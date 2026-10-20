@@ -1,0 +1,44 @@
+_cleanup_user_desktops() {
+    # The app writes its own copy of the packaged launcher entry to the user's
+    # ~/.local/share/applications at startup and marks it X-Claude-Generated=true.
+    # Remove only those copies, so a user's own file is left alone. The app writes
+    # a fresh copy on the next start.
+    for user_home in /home/*; do
+        _entry="$user_home/.local/share/applications/com.anthropic.Claude.desktop"
+        if [ -f "$_entry" ] && grep -q '^X-Claude-Generated=true' "$_entry"; then
+            rm -f "$_entry" 2>/dev/null || true
+        fi
+    done
+    update-desktop-database -q 2>/dev/null || true
+}
+
+post_install() {
+    _cleanup_user_desktops
+
+    echo ""
+    echo "==> Claude Desktop notes"
+    echo ""
+    echo "Cowork runs in a QEMU/KVM virtual machine. It needs virtualization enabled in firmware."
+    echo "Give your user access to /dev/kvm:"
+    echo "    sudo usermod -aG kvm \$USER"
+    echo "Then log out and back in."
+    echo ""
+    echo "Cowork also needs /dev/vhost-vsock. If Cowork reports it missing, run:"
+    echo "    sudo modprobe vhost_vsock"
+    echo "To load the module at every boot:"
+    echo "    echo vhost_vsock | sudo tee /etc/modules-load.d/vhost_vsock.conf"
+    echo ""
+    echo "Sign-in is stored in a Secret Service keyring: gnome-keyring or kwallet. Keep only one"
+    echo "installed and running. On KDE Plasma, having both can stop sign-in from being saved."
+    echo ""
+    echo "Command-line flags go in ~/.config/claude-desktop-flags.conf."
+    echo ""
+}
+
+post_upgrade() {
+    _cleanup_user_desktops
+}
+
+post_remove() {
+    _cleanup_user_desktops
+}
