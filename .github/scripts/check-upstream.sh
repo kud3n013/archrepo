@@ -183,6 +183,13 @@ case "$CHECK" in
     fi
     ;;
 
+  claude-desktop-apt)
+    # The apt index lists every published version; take the newest claude-desktop stanza.
+    VER=$(curl -s "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages" | \
+      awk '/^Package: /{p=($2=="claude-desktop")} p && /^Version: /{print $2}' | sort -V | tail -n 1 || true)
+    [ -n "$VER" ] && LATEST="$VER"
+    ;;
+
   none)
     ;;
 esac
