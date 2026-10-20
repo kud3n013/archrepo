@@ -4,15 +4,18 @@
 
 # Unofficial repackaging. Anthropic publishes this app as a .deb in its own apt
 # repository and does not ship an Arch package. This recipe takes the official
-# amd64 .deb and rearranges it for Arch. Nothing inside app.asar is patched.
+# amd64 .deb and rearranges it for Arch. The only change inside app.asar is a
+# bootstrap that makes the app use the window manager's title bar (see
+# titlebar-bootstrap.js).
 
 pkgname=claude-desktop
 pkgver=2.42304.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package"
 arch=('x86_64')
 url="https://claude.ai/download"
 license=('LicenseRef-Proprietary')
+makedepends=('asar' 'nodejs')
 
 # The .deb's Depends: field, translated to Arch names. Libraries the Electron
 # binary links directly (checked with objdump -p) are included as well. Debian's
@@ -82,12 +85,16 @@ source=(
     "https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/${_deb}"
     "${pkgname}.sh"
     "${pkgname}-flags.conf"
+    "patch-titlebar.js"
+    "titlebar-bootstrap.js"
 )
 # makepkg would unpack the .deb into $srcdir, but only data.tar.xz is needed.
 noextract=("${_deb}")
 sha256sums=('38a7d58b58a976c88ca652eaa2f7ac02c87c4a388ae30f468d72b790e6b57f90'
             '6e86dfbb618672b253cd75ad64f863cd7bf0b834627281659edbe54d6ec51c61'
-            'af4d23b3e1faf9159b75c5db9e8b1d64abae4e2c7ad01e0b2d21f7f221402bc3')
+            'dcccbdfe12b5e56d4e6a58bdb6b282fc4ce8255e4093b1e69629248bd9e3ae4f'
+            '26c60d1649895491488cff2347adfb9297eabda99695f18917cf3be854b978cc'
+            'e7ba3efcbc1ca6118da75ba360e5972d2b35d7f17e262e42f5430e39f0468459')
 
 prepare() {
     cd "${srcdir}"
@@ -98,6 +105,33 @@ prepare() {
     bsdtar -xf "${_deb}" data.tar.xz
     mkdir -p data
     bsdtar -xf data.tar.xz -C data
+
+    # Add the native title bar bootstrap to app.asar. Only the entry point in
+    # package.json changes. The app.asar.unpacked files must come out the same as
+    # upstream's, so the file list is compared before and after the repack.
+    local _resources="data/usr/lib/${pkgname}/resources"
+    local _unpacked="${_resources}/app.asar.unpacked"
+    (cd "${_unpacked}" && find . -type f | sort) > "${srcdir}/unpacked-before.txt"
+
+    rm -rf "${srcdir}/app-src"
+    asar extract "${_resources}/app.asar" "${srcdir}/app-src"
+    node "${srcdir}/patch-titlebar.js" "${srcdir}/app-src" "${srcdir}/titlebar-bootstrap.js"
+    node --check "${srcdir}/app-src/archrepo-bootstrap.js"
+
+    local _executables
+    _executables=$(cd "${_unpacked}" && find . -type f -perm -u+x | sort)
+    rm -rf "${_unpacked}"
+    # github-mcp-server is an extensionless native binary, so it is named explicitly.
+    asar pack "${srcdir}/app-src" "${_resources}/app.asar" --unpack '{*.node,*.mm,github-mcp-server}'
+    rm -rf "${srcdir}/app-src"
+
+    # asar writes the unpacked files without their modes. Restore the execute bits.
+    (cd "${_unpacked}" && while read -r _file; do chmod u+x "${_file}"; done) <<< "${_executables}"
+
+    if ! (cd "${_unpacked}" && find . -type f | sort) | diff "${srcdir}/unpacked-before.txt" - ; then
+        echo "app.asar.unpacked differs from upstream" >&2
+        return 1
+    fi
 }
 
 package() {

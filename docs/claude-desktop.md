@@ -1,8 +1,8 @@
 # Claude Desktop (`claude-desktop`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-2.42304.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![type](https://img.shields.io/badge/type-original-blue)](#overview)
+[![version](https://img.shields.io/badge/version-2.42304.2--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![type](https://img.shields.io/badge/type-modified-orange)](#native-title-bar)
 [![upstream](https://img.shields.io/badge/upstream-anthropic-informational)](https://claude.ai/download)
 
 Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged for Arch from Anthropic's official amd64 Debian package. The launcher selects native Wayland, and the Cowork virtual machine stack is installed and wired up for Arch's file layout.
@@ -24,8 +24,8 @@ sudo pacman -S claude-desktop
 | Attribute | Value |
 |---|---|
 | **Package Name** | `claude-desktop` |
-| **Current Version** | `2.42304.2-1` |
-| **Package Type** | **Original (repackaged upstream .deb)** |
+| **Current Version** | `2.42304.2-2` |
+| **Package Type** | **Modified (repackaged upstream .deb, native window title bar)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Claude Desktop](https://claude.ai/download) |
 | **Category** | Productivity / AI Assistant |
@@ -34,7 +34,7 @@ sudo pacman -S claude-desktop
 ---
 
 ### Overview
-The package takes the `amd64` `.deb` from `downloads.claude.ai/claude-desktop/apt/stable`, verified against the repository's signed index (SHA256 in the `Packages` stanza). It keeps the application tree and the Debian payload files it needs, and drops the Debian install scripts. Nothing inside `app.asar` is patched.
+The package takes the `amd64` `.deb` from `downloads.claude.ai/claude-desktop/apt/stable`, verified against the repository's signed index (SHA256 in the `Packages` stanza). It keeps the application tree and the Debian payload files it needs, and drops the Debian install scripts. The one change inside `app.asar` is a small bootstrap that asks for the window manager's title bar. See [Native title bar](#native-title-bar).
 
 Upstream's Linux app does not update itself. Anthropic's docs say updates arrive through the system package manager, which is why this package has a nightly upstream check against the apt index.
 
@@ -47,6 +47,7 @@ Upstream's Linux app does not update itself. Anthropic's docs say updates arrive
   - `/usr/share/edk2/OVMF_CODE_4M.fd` and `OVMF_VARS_4M.fd` → the `x64/*.4m.fd` firmware files from `edk2-ovmf`. The app reaches these through `/usr/share/OVMF`, which is a compat symlink owned by `edk2-ovmf`.
 - **GNOME search provider** and **MIME types** for `.mcpb`, `.dxt` and `.skill` are installed as package files. Upstream's `postinst` copies the same files into `/usr/share` on install.
 - **Licenses** are installed to `/usr/share/licenses/claude-desktop/`.
+- **Native title bar** (`titlebar-bootstrap.js`, added to `app.asar`). See the section below.
 
 ### Not shipped from the `.deb`
 - **Maintainer scripts** (`control.tar.xz`) are not used:
@@ -60,6 +61,34 @@ Upstream's Linux app does not update itself. Anthropic's docs say updates arrive
 - **Wayland**: the launcher adds `--ozone-platform-hint=auto --enable-wayland-ime` in a Wayland session, unless a `--ozone-platform` flag is already set. Quick Entry's GlobalShortcuts portal is enabled by the app itself at startup.
 - **Application menu**: the app builds an Electron application menu, but it hides the menu bar in each window. A KDE Global Menu export would be a separate change. It is not part of this package.
 - **App launcher entries**: the app copies its desktop entry to `~/.local/share/applications/` at startup, marked `X-Claude-Generated=true`. Uninstalling or upgrading the package removes only those marked copies. The app writes a fresh one on the next start.
+
+### Native title bar
+Upstream's Linux build creates its windows frameless (`titleBarStyle` `"hidden"` for the main window and `"hiddenInset"` for About) and draws its own title bar. The window manager's decoration theme, button layout and title bar actions therefore do not apply. This package changes that for the app's normal windows.
+
+What the bootstrap does on Linux:
+- `package.json` `main` points to `archrepo-bootstrap.js`, which runs first and then loads the app's original entry point. The patch is applied at build time by `patch-titlebar.js`, which fails the build if the entry point is missing or the tree is already patched.
+- Normal app windows (main, About, popouts and dialogs) request the window manager's frame. `titleBarStyle`, `titleBarOverlay` and `trafficLightPosition` are removed for them, and `autoHideMenuBar` is set so no Electron menu bar appears under the frame.
+- `setTitleBarOverlay()` becomes a no-op. It is a Windows-only call that the app makes on every window, and it throws on Linux.
+- Quick Entry, the Cowork glow and the small indicator window stay frameless. They set `frame: false`, `transparent` or `alwaysOnTop`, so the rule above does not match them.
+- Each framed window logs one line to stderr: `[archrepo] native frame for window "<title>"`.
+
+**Opt out:** start the app with `CLAUDE_DESKTOP_CSD=1` (for example `CLAUDE_DESKTOP_CSD=1 claude-desktop`) to get upstream's frameless window back.
+
+**Desktop behaviour:**
+- On KDE Plasma (Wayland or X11), the window manager draws the frame when the app requests one. This is the intended result, but it has not been checked on a live Plasma session.
+- On compositors without server-side decorations (GNOME), Electron draws its own fallback frame.
+
+**Upstream reports this addresses:**
+- [anthropics/claude-code#81497](https://github.com/anthropics/claude-code/issues/81497): untitled orphan windows and the Linux `titleBarOverlay` call. The issue is closed upstream. The overlay call is now a no-op in this package.
+- [anthropics/claude-code#90742](https://github.com/anthropics/claude-code/issues/90742): minimize bounces back on Plasma. Still open upstream. Not verified here: this package does not change how minimize is handled.
+- [anthropics/claude-code#96913](https://github.com/anthropics/claude-code/issues/96913): the window menu from the in-page title bar freezes input on Cinnamon X11. Still open upstream. The in-page bar is still drawn, so this is not fixed by this package.
+
+**Electron fuses:** the package does not change any fuse. `EnableEmbeddedAsarIntegrityValidation` is on in this build. In a test on Linux (Electron 44.7.2), a repacked `app.asar` still started, so the bootstrap loads on this platform.
+
+**Not verified:**
+- The in-page window buttons in the claude.ai view are not hidden. Their markup only appears when signed in, and no account was available to check it. If you see two sets of window buttons, use `CLAUDE_DESKTOP_CSD=1`.
+- Quick Entry staying frameless was checked by reading its window options, not by opening it.
+- Upgrading over the AUR `claude-desktop` 2.42304.0-1 package was not tested.
 
 ---
 
