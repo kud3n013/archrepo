@@ -1,7 +1,7 @@
 # Claude Desktop (`claude-desktop`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-3.1623.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-3.1623.0--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#native-title-bar)
 [![upstream](https://img.shields.io/badge/upstream-anthropic-informational)](https://claude.ai/download)
 
