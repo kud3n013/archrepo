@@ -1,11 +1,11 @@
 # Claude Desktop (`claude-desktop`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-2.42304.2--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-3.1623.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#native-title-bar)
 [![upstream](https://img.shields.io/badge/upstream-anthropic-informational)](https://claude.ai/download)
 
-Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged for Arch from Anthropic's official amd64 Debian package. The launcher selects native Wayland, and the Cowork virtual machine stack is installed and wired up for Arch's file layout.
+Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged for Arch from Anthropic's official amd64 Debian package. The launcher selects native Wayland (on KDE Plasma it uses XWayland for the Global Menu, see below), and the Cowork virtual machine stack is installed and wired up for Arch's file layout.
 
 > **Unofficial packaging.** Anthropic publishes this app as a `.deb` in its own apt repository and does not ship an Arch package. Its Linux docs cover Ubuntu 22.04+ and Debian 12+ and tell Arch users to run the CLI instead. This is an unsupported repackaging of that `.deb`.
 
@@ -48,6 +48,7 @@ Upstream's Linux app does not update itself. Anthropic's docs say updates arrive
 - **GNOME search provider** and **MIME types** for `.mcpb`, `.dxt` and `.skill` are installed as package files. Upstream's `postinst` copies the same files into `/usr/share` on install.
 - **Licenses** are installed to `/usr/share/licenses/claude-desktop/`.
 - **Native title bar** (`titlebar-bootstrap.js`, added to `app.asar`). See the section below.
+- **Global Menu** on KDE Plasma: the launcher uses XWayland, and the bootstrap hides the in-page menu button. See the Global Menu section below.
 
 ### Not shipped from the `.deb`
 - **Maintainer scripts** (`control.tar.xz`) are not used:
@@ -82,6 +83,18 @@ What the bootstrap does on Linux:
 - [anthropics/claude-code#81497](https://github.com/anthropics/claude-code/issues/81497): untitled orphan windows and the Linux `titleBarOverlay` call. The issue is closed upstream. The overlay call is now a no-op in this package.
 - [anthropics/claude-code#90742](https://github.com/anthropics/claude-code/issues/90742): minimize bounces back on Plasma. Still open upstream. Not verified here: this package does not change how minimize is handled.
 - [anthropics/claude-code#96913](https://github.com/anthropics/claude-code/issues/96913): the window menu from the in-page title bar freezes input on Cinnamon X11. Still open upstream. The in-page bar is still drawn, so this is not fixed by this package.
+
+### Global Menu
+On KDE Plasma the launcher runs the app under XWayland (`--ozone-platform=x11`), so the app menu appears in the Plasma Global Menu widget. Electron exports the menu over D-Bus on native Wayland too, but nothing binds it to the window there, so Plasma shows no menu. Upstream Electron PR [#54629](https://github.com/electron/electron/pull/54629) (fixes [#34335](https://github.com/electron/electron/issues/34335)) is open for that. Under XWayland the window has an X id that the Plasma registrar matches.
+
+- The launcher pins the GTK3 modules with `LD_PRELOAD`, the same way the `antigravity` and `beeper` packages do. Without it Electron's `dlclose()` of GTK crashes under XWayland.
+- The bootstrap injects a CSS rule that hides the in-page menu button (`aria-label="Menu"`, in claude.ai's top bar). It is injected only while the Global Menu path is active.
+- **Opt out:** `CLAUDE_DESKTOP_GLOBALMENU=0` keeps native Wayland and the in-page menu button.
+- **Trade-off:** XWayland is blurry on scaled displays. That is why native Wayland was the default before this change.
+
+**Not verified:**
+- The menu in the Plasma Global Menu widget on a live session. On a test instance on the real session, the Plasma registrar registered the window, and the exported menu returned File, Edit and the other top-level items over D-Bus. Seeing it in the widget itself was not checked.
+- The in-page button is hidden on the claude.ai login page only. Signed-in pages were not checked.
 
 **Electron fuses:** the package does not change any fuse. `EnableEmbeddedAsarIntegrityValidation` is on in this build. In a test on Linux (Electron 44.7.2), a repacked `app.asar` still started, so the bootstrap loads on this platform.
 
