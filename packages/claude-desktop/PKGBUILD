@@ -10,7 +10,7 @@
 
 pkgname=claude-desktop
 pkgver=3.1623.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package"
 arch=('x86_64')
 url="https://claude.ai/download"
@@ -94,7 +94,7 @@ sha256sums=('d39e1d9a570f1e517f158479f5a1d903b9a74d1ef3f279362002dcad375e33cf'
             '4198b7870de0aa52581d0269460b575212102796a1b720697062b02ebdc2475a'
             'dcccbdfe12b5e56d4e6a58bdb6b282fc4ce8255e4093b1e69629248bd9e3ae4f'
             '26c60d1649895491488cff2347adfb9297eabda99695f18917cf3be854b978cc'
-            '77a4d9f50a35bbd0cccdccb426c058ce21e57526e48ae142cc9610f2b5ca1db9')
+            '3ff8d9eb3abd42bd191de9b20eb19b6cad125681d4aee28a0aad82ba08ea1a29')
 
 prepare() {
     cd "${srcdir}"

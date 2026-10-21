@@ -24,9 +24,10 @@ function withNativeFrame(options) {
 
 // The in-page menu button (aria-label "Menu") opens the same menu that the KDE Global
 // Menu now shows, so it is hidden while the Global Menu is active. The button is part of
-// claude.ai's own fixed, draggable top bar (loaded from the network, not app.asar), so
-// the selector anchors on that bar and hides only the button, not the rest of the bar.
-const IN_PAGE_MENU_CSS = `div.draggable.fixed.top-0 button[aria-label="Menu"] { display: none !important; }`;
+// claude.ai's own top bar, not app.asar. The signed-in page puts it in a different
+// container and its aria-label is translated, so the selector uses the button's test id.
+// The aria-label form covers the login page's top bar if the test id ever changes.
+const IN_PAGE_MENU_CSS = `[data-testid="topbar-windows-menu"], div.draggable.fixed.top-0 button[aria-label="Menu"] { display: none !important; }`;
 
 // The launcher (claude-desktop.sh) runs the app under XWayland on KDE, which is the
 // only path where Electron exports the menu to the Plasma Global Menu.
