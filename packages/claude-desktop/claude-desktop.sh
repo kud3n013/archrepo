@@ -33,9 +33,10 @@ if [[ -n "$CONFIG_FILE" ]]; then
     done < "$CONFIG_FILE"
 fi
 
-# Default to native Wayland when no platform was chosen explicitly. Without this
-# Electron runs under XWayland, which is blurry on scaled displays. Quick Entry's
-# GlobalShortcuts portal is already enabled by the app itself, so it needs no flag.
+# Default to native Wayland when no platform was chosen explicitly (KDE is the
+# exception, see below). Without this Electron runs under XWayland, which is
+# blurry on scaled displays. Quick Entry's GlobalShortcuts portal is already
+# enabled by the app itself, so it needs no flag.
 HAS_OZONE=false
 for arg in "${FLAGS[@]}" "$@"; do
     if [[ "$arg" == --ozone-platform* ]]; then
@@ -44,9 +45,38 @@ for arg in "${FLAGS[@]}" "$@"; do
     fi
 done
 
+# KDE Plasma Global Menu. On native Wayland, Electron exports the menu over D-Bus
+# but nothing binds it to the window, so Plasma shows no menu (Electron PR #54629
+# is open for this). Under XWayland the window has an X id that the Plasma
+# registrar can match, so on KDE the app runs under XWayland. Set
+# CLAUDE_DESKTOP_GLOBALMENU=0 to keep native Wayland and lose the Global Menu.
+IS_KDE=false
+if [[ "$XDG_CURRENT_DESKTOP" =~ [Kk][Dd][Ee]|[Pp]lasma ]] || [[ "$KDE_FULL_SESSION" == "true" ]]; then
+    IS_KDE=true
+fi
+
+USE_GLOBALMENU_X11=false
 PLATFORM_FLAGS=()
 if [[ "$HAS_OZONE" == false && ( -n "$WAYLAND_DISPLAY" || "$XDG_SESSION_TYPE" == wayland ) ]]; then
-    PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
+    if [[ "$IS_KDE" == true && "${CLAUDE_DESKTOP_GLOBALMENU:-1}" != 0 ]]; then
+        USE_GLOBALMENU_X11=true
+        PLATFORM_FLAGS+=("--ozone-platform=x11")
+    else
+        PLATFORM_FLAGS+=("--ozone-platform-hint=auto" "--enable-wayland-ime")
+    fi
+fi
+
+# Under XWayland, GTK loads the modules set in XSETTINGS (appmenu-gtk-module,
+# colorreload-gtk-module, ...). Electron unloads GTK with dlclose(), which unmaps
+# those modules while their GIO monitors and D-Bus callbacks stay registered, and
+# the next GIO callback crashes (SIGSEGV, SEGV_ACCERR). Pin the GTK3 modules into
+# memory so dlclose() cannot unmap them.
+if [[ "$USE_GLOBALMENU_X11" == true ]]; then
+    for _mod in /usr/lib/gtk-3.0/modules/*.so; do
+        if [[ -f "$_mod" ]]; then
+            export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}$_mod"
+        fi
+    done
 fi
 
 exec /opt/claude-desktop/claude-desktop "${PLATFORM_FLAGS[@]}" "${FLAGS[@]}" "$@"

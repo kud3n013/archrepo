@@ -22,6 +22,22 @@ function withNativeFrame(options) {
   return { ...rest, frame: true, autoHideMenuBar: true };
 }
 
+// The in-page menu button (aria-label "Menu") opens the same menu that the KDE Global
+// Menu now shows, so it is hidden while the Global Menu is active. The button is part of
+// claude.ai's own fixed, draggable top bar (loaded from the network, not app.asar), so
+// the selector anchors on that bar and hides only the button, not the rest of the bar.
+const IN_PAGE_MENU_CSS = `div.draggable.fixed.top-0 button[aria-label="Menu"] { display: none !important; }`;
+
+// The launcher (claude-desktop.sh) runs the app under XWayland on KDE, which is the
+// only path where Electron exports the menu to the Plasma Global Menu.
+function globalMenuActive(electron) {
+  return (
+    process.env.CLAUDE_DESKTOP_GLOBALMENU !== "0" &&
+    /kde|plasma/i.test(process.env.XDG_CURRENT_DESKTOP ?? "") &&
+    electron.app.commandLine.getSwitchValue("ozone-platform") === "x11"
+  );
+}
+
 let patchedElectron = null;
 
 // A subclass, not a wrapper, so statics such as getAllWindows() and instanceof keep working.
@@ -30,10 +46,12 @@ function patchElectron(electron) {
     return patchedElectron;
   }
   const { BrowserWindow } = electron;
+  const hideInPageMenu = globalMenuActive(electron);
 
   class FramedBrowserWindow extends BrowserWindow {
     constructor(options = {}) {
-      if (isAppWindow(options)) {
+      const appWindow = isAppWindow(options);
+      if (appWindow) {
         // process.stdout and process.stderr writes did not reach the output in testing,
         // so write to fd 2 directly.
         require("fs").writeSync(2, `[archrepo] native frame for window "${options.title ?? ""}"\n`);
@@ -46,6 +64,19 @@ function patchElectron(electron) {
     // setTitleBarOverlay is Windows-only and throws on Linux. The app calls it on every
     // window and logs "Failed to set title bar overlay" when it fails.
     setTitleBarOverlay() {}
+  }
+
+  // The in-page title bar is a separate web contents (a view hosted by the window), so
+  // the CSS goes into every web contents, not only the window's own page. Navigation
+  // drops inserted CSS, so it is inserted again on every page load.
+  if (hideInPageMenu) {
+    electron.app.on("web-contents-created", (_event, contents) => {
+      contents.on("dom-ready", () => {
+        contents.insertCSS(IN_PAGE_MENU_CSS).catch((error) => {
+          require("fs").writeSync(2, `[archrepo] insertCSS failed: ${error}\n`);
+        });
+      });
+    });
   }
 
   patchedElectron = Object.create(electron, {
