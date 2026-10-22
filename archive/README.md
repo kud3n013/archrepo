@@ -15,7 +15,6 @@ Packages in this directory:
 
 | Package | Original Upstream | Reason for Archiving |
 |---|---|---|
-| [`antigravity`](./antigravity/) | [Google Antigravity](https://antigravity.google) | Archived per maintainer request. |
 | [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
 | [`proton-pass`](./proton-pass/) | [Proton Pass](https://proton.me/pass) | Archived per maintainer request. |
 | [`proton-pass-cli`](./proton-pass-cli/) | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Archived per maintainer request. |

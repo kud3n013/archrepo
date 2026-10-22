@@ -1,0 +1,137 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://antigravity.google
+
+# Google publishes Antigravity for Linux as a plain x64 tarball. This recipe
+# installs it under /opt and adds Linux desktop integration. The only change
+# inside app.asar is a bootstrap that runs before the app's entry point (see
+# antigravity-bootstrap.js); no upstream file is edited.
+
+pkgname=antigravity
+pkgver=2.22.0
+_build=5446056071266304
+pkgrel=2
+pkgdesc="Google Antigravity agentic development platform, with native title bar, KDE Global Menu and system theme sync"
+arch=('x86_64')
+url="https://antigravity.google"
+license=('LicenseRef-Google-Antigravity')
+makedepends=('asar' 'nodejs')
+
+# Libraries the Electron binary links directly (objdump -p), plus what it opens
+# at runtime. The bundled language_server and webm_encoder only need glibc.
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'cairo'
+    'dbus'
+    'dbusmenu-shortcut-shim'
+    'expat'
+    'gcc-libs'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libx11'
+    'libxcb'
+    'libxcomposite'
+    'libxdamage'
+    'libxext'
+    'libxfixes'
+    'libxkbcommon'
+    'libxrandr'
+    'mesa'
+    'nspr'
+    'nss'
+    'pango'
+    'systemd-libs'
+    'xdg-utils'
+)
+optdepends=(
+    'xdg-desktop-portal-kde: system light/dark theme on KDE Plasma'
+    'xdg-desktop-portal-gtk: system light/dark theme on GTK desktops'
+    'libayatana-appindicator: system tray icon'
+    'wl-clipboard: Wayland clipboard integration'
+    'xclip: X11 clipboard integration'
+)
+
+# The old AUR-style name. This package installs the same files.
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin")
+replaces=("${pkgname}-bin")
+
+backup=("etc/${pkgname}-flags.conf")
+# Electron binaries break if stripped, and !debug is only meaningful for compiled packages.
+options=('!strip' '!debug')
+
+source=(
+    "Antigravity-${pkgver}-${_build}-x86_64.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-hub/${pkgver}-${_build}/linux-x64/Antigravity.tar.gz"
+    "${pkgname}.sh"
+    "${pkgname}.desktop"
+    "${pkgname}-flags.conf"
+    "patch-asar.js"
+    "${pkgname}-bootstrap.js"
+)
+sha256sums=('ec09473e3b12be43538c19f9992960d7a2549cdecd31c8c35c69af77fe3aa4f1'
+            '75f731468b234cc7458228eb7b61f61cd356caeb0e6d803d7da76185db5ff259'
+            'e7d4c5037fc890f36d0f509082d9b37c23ee6d8736aee577916cd7b8db513dfe'
+            '6d4700082dfdde9f3db79aae9b0f7f9c7143f92c2fb89a2f55ae3f82f9ce3684'
+            '9316e553cf2a9ffa10c370d6c00c7246d37fffc3fb3a3711341d7711138259c2'
+            '8ebeaa562ce5d78b40e4f126658513e389a023e9ecd5ede631c05602f40d4777')
+
+prepare() {
+    cd "${srcdir}/Antigravity-x64"
+
+    # Add the bootstrap to app.asar. Only the entry point in package.json
+    # changes. The app.asar.unpacked files must come out the same as upstream's,
+    # so the file list is compared before and after the repack.
+    local _unpacked="resources/app.asar.unpacked"
+    (cd "${_unpacked}" && find . -type f | sort) > "${srcdir}/unpacked-before.txt"
+
+    rm -rf "${srcdir}/app-src"
+    asar extract resources/app.asar "${srcdir}/app-src"
+    node "${srcdir}/patch-asar.js" "${srcdir}/app-src" "${srcdir}/${pkgname}-bootstrap.js"
+    node --check "${srcdir}/app-src/archrepo-bootstrap.js"
+
+    # The app icon lives inside app.asar.
+    cp "${srcdir}/app-src/icon.png" "${srcdir}/${pkgname}.png"
+
+    local _executables
+    _executables=$(cd "${_unpacked}" && find . -type f -perm -u+x | sort)
+    rm -rf "${_unpacked}"
+    asar pack "${srcdir}/app-src" resources/app.asar --unpack-dir 'node_modules/chrome-devtools-mcp'
+    rm -rf "${srcdir}/app-src"
+
+    # asar writes the unpacked files without their modes. Restore the execute bits.
+    (cd "${_unpacked}" && while read -r _file; do chmod u+x "${_file}"; done) <<< "${_executables}"
+
+    if ! (cd "${_unpacked}" && find . -type f | sort) | diff "${srcdir}/unpacked-before.txt" - ; then
+        echo "app.asar.unpacked differs from upstream" >&2
+        return 1
+    fi
+}
+
+package() {
+    # 1. Application tree. The Electron binary finds its resources relative to
+    #    its own path, so the tree is kept whole under /opt.
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a "${srcdir}/Antigravity-x64/." "${pkgdir}/opt/${pkgname}/"
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}/opt/${pkgname}"
+    chmod 4755 "${pkgdir}/opt/${pkgname}/chrome-sandbox"
+
+    # 2. Launcher with the flags file, Wayland and Global Menu handling.
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+
+    # 3. Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+    # 4. Desktop entry, also the antigravity:// handler used for sign-in.
+    install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+    # 5. Icon (512px, from app.asar).
+    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+
+    # 6. Licenses shipped next to the binary.
+    install -Dm644 "${pkgdir}/opt/${pkgname}/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    install -Dm644 "${pkgdir}/opt/${pkgname}/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

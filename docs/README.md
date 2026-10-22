@@ -10,6 +10,7 @@ This directory contains individual documentation pages for all active packages a
 
 | Package | Version | Type | Status | Description |
 |---|---|---|---|---|
+| [**`antigravity`**](antigravity.md) | `2.22.0-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity with native title bar, KDE Global Menu & live system theme |
 | [**`antigravity-cli`**](antigravity-cli.md) | `1.4.4-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity CLI (`agy`) with pacman-managed updates |
 | [**`beeper`**](beeper.md) | `4.3.152-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unified messaging client with portal theme sync & Wayland auto-hinting |
 | [**`claude-desktop`**](claude-desktop.md) | `3.1623.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Claude desktop app repackaged for Arch with Wayland launcher, Cowork VM shims & native window title bar |
@@ -53,7 +54,6 @@ This directory contains individual documentation pages for all active packages a
 
 | Package | Last Version | Status | Reason |
 |---|---|---|---|
-| [**`antigravity`**](antigravity.md) | `2.22.0-1` | Archived | Archived per maintainer request |
 | [**`hyprmod`**](hyprmod.md) | `0.4.0-1` | Archived | Retired per maintainer request |
 | [**`proton-pass`**](proton-pass.md) | `1.42.0-1` | Archived | Archived per maintainer request |
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.2-1` | Archived | Archived per maintainer request |

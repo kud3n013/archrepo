@@ -31,7 +31,7 @@ sudo pacman -S dbusmenu-shortcut-shim
 ---
 
 ### Overview
-Chromium/Electron and Gecko export menu accelerators over DBusMenu using key names such as `comma`. KDE Plasma's Global Menu only understands literal characters, so shortcut tips like `Ctrl+,` go missing. This shim rewrites the key names to literal characters. It is the shared library used by the `cursor`, `obsidian` and `zotero` packages.
+Chromium/Electron and Gecko export menu accelerators over DBusMenu using key names such as `comma`. KDE Plasma's Global Menu only understands literal characters, so shortcut tips like `Ctrl+,` go missing. This shim rewrites the key names to literal characters. It is the shared library used by the `antigravity`, `cursor`, `obsidian` and `zotero` packages.
 
 ### Packaging Details
 - Built from the release tarball of [kud3n013/dbusmenu-shortcut-shim](https://github.com/kud3n013/dbusmenu-shortcut-shim).
