@@ -1,11 +1,11 @@
-# Proton Pass Desktop (`proton-pass`)
+# Proton Pass (`proton-pass`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.41.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![type](https://img.shields.io/badge/type-modified-orange)](#overview)
+[![version](https://img.shields.io/badge/version-1.42.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![type](https://img.shields.io/badge/type-original-blue)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://proton.me/pass)
 
-Official desktop client for Proton Pass password and identity manager, patched for responsive layout and unconstrained resizing.
+Official desktop app for Proton Pass, the end-to-end encrypted password and identity manager, repackaged from Proton's Debian package.
 
 ---
 
@@ -15,6 +15,8 @@ Official desktop client for Proton Pass password and identity manager, patched f
 sudo pacman -S proton-pass
 ```
 
+CachyOS also ships a `proton-pass` package. pacman takes a package from the first repository in `pacman.conf` that has it, so either keep `[archrepo]` above the CachyOS repositories or install it explicitly with `sudo pacman -S archrepo/proton-pass`.
+
 ---
 
 ## 🔍 Package Information
@@ -22,34 +24,43 @@ sudo pacman -S proton-pass
 | Attribute | Value |
 |---|---|
 | **Package Name** | `proton-pass` |
-| **Current Version** | `1.41.1-1` |
-| **Package Type** | **Modified** |
+| **Current Version** | `1.42.0-2` |
+| **Package Type** | **Original (repackaged upstream .deb)** |
 | **Build Status** | `passing` |
-| **Upstream Project** | [Proton Pass](https://proton.me/pass) |
-| **Category** | Core Application |
+| **Upstream Project** | [Proton Pass](https://proton.me/pass) ([source](https://github.com/ProtonMail/WebClients/tree/main/applications/pass-desktop)) |
+| **Category** | Password Manager |
 
 ---
 
 ### Overview
-Proton Pass is an end-to-end encrypted password and identity manager protecting your logins, credit cards, notes, and aliases.
+The package takes `proton-pass_<version>_amd64.deb` from `proton.me/download/pass/linux/`. The nightly upstream check reads `proton.me/download/pass/linux/version.json`, so a new release reaches the repository within a day instead of waiting for a distribution repository. The application tree goes to `/opt/proton-pass`. `app.asar` is not modified.
 
-### Modifications in `archrepo`
-- **Responsive Layout & Resizing Patch (`patch-pass.js`)**: Upstream Electron builds enforce restrictive minimum window boundaries. This patch removes artificial window bounds and enables responsive item view collapsing, allowing Proton Pass to fit neatly in compact sidebars and split-tiled layouts under Wayland compositors.
-- **Wayland Auto-Hinting**: Launcher wrapper automatically passes Wayland flags.
+### Changes from the upstream `.deb`
+- **Launcher** `/usr/bin/proton-pass` replaces upstream's bare symlink. It selects native Wayland in a Wayland session, reads the flags file, and sets `CHROME_DESKTOP=proton-pass.desktop` so the Wayland window matches its desktop entry.
+- **Desktop entry** `proton-pass.desktop` is this repository's file. It registers the `protonpass://` handler the app uses for its browser sign-in flow.
+- **Icon.** The app icon (`proton-pass.png`) is kept in this repository and also replaces the window icon in `resources/assets/logo.png`.
+
+### Desktop integration
+- **Title bar.** Upstream already uses the window manager's frame on Linux.
+- **Light/dark theme.** The app's theme setting defaults to following the system, and Electron follows the desktop's color scheme through the XDG portal, so no theme bridge is added.
+- **Tray.** Upstream has its own tray icon. GNOME needs the AppIndicator extension (`gnome-shell-extension-appindicator`).
+- **Menu bar.** Upstream hides the menu bar until Alt is pressed. It is not exported to the KDE Global Menu on native Wayland.
 
 ---
 
 ## ⚙️ Configuration & Flags
 
-Configuration file: `~/.config/proton-pass-flags.conf`
+Configuration file: `~/.config/proton-pass-flags.conf` (falls back to `/etc/proton-pass-flags.conf`). One flag per line:
 
 ```bash
---ozone-platform-hint=auto
---enable-wayland-ime
+# --ozone-platform=x11
+# --force-device-scale-factor=1.5
+# --password-store=gnome-libsecret
 ```
 
 ## 🔗 Related Links
 
-- [Upstream Repository / Website](https://proton.me/pass)
+- [Proton Pass](https://proton.me/pass)
+- [Upstream source (ProtonMail/WebClients, pass-desktop)](https://github.com/ProtonMail/WebClients/tree/main/applications/pass-desktop)
 - [archrepo Releases](https://github.com/kud3n013/archrepo/releases/tag/packages)
 - [Back to archrepo README](../README.md)

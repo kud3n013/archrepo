@@ -24,6 +24,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`obsidian`**](obsidian.md) | `1.13.7-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Markdown knowledge base with KDE Global Menu & portal dark mode sync |
 | [**`proton-drive-cli`**](proton-drive-cli.md) | `0.9.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Proton Drive command-line client |
 | [**`proton-mail`**](proton-mail.md) | `1.15.1-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Mail & Calendar desktop app with system tray & close-to-tray |
+| [**`proton-pass`**](proton-pass.md) | `1.42.0-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Pass password manager desktop app, updated as soon as Proton releases |
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`steam-globalmenu`**](steam-globalmenu.md) | `1.2.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
@@ -55,7 +56,6 @@ This directory contains individual documentation pages for all active packages a
 | Package | Last Version | Status | Reason |
 |---|---|---|---|
 | [**`hyprmod`**](hyprmod.md) | `0.4.0-1` | Archived | Retired per maintainer request |
-| [**`proton-pass`**](proton-pass.md) | `1.42.0-1` | Archived | Archived per maintainer request |
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.2-1` | Archived | Archived per maintainer request |
 | [**`stirling-pdf-desktop`**](stirling-pdf-desktop.md) | `3.0.1-1` | Archived | Archived per maintainer request |
 | [**`zed`**](zed.md) | `1.21.0-1` | Archived | Archived per maintainer request |
