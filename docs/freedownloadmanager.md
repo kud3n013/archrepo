@@ -1,7 +1,7 @@
 # Free Download Manager (`freedownloadmanager`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-6.34.4.6974--5-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-6.35.1.7021--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://www.freedownloadmanager.org/)
 
@@ -22,7 +22,7 @@ sudo pacman -S freedownloadmanager
 | Attribute | Value |
 |---|---|
 | **Package Name** | `freedownloadmanager` |
-| **Current Version** | `6.34.4.6974-5` |
+| **Current Version** | `6.35.1.7021-1` |
 | **Package Type** | **Modified** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Free Download Manager](https://www.freedownloadmanager.org/) |
