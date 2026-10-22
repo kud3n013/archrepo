@@ -10,6 +10,7 @@ This directory contains individual documentation pages for all active packages a
 
 | Package | Version | Type | Status | Description |
 |---|---|---|---|---|
+| [**`antigravity-cli`**](antigravity-cli.md) | `1.4.4-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity CLI (`agy`) with pacman-managed updates |
 | [**`beeper`**](beeper.md) | `4.3.152-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unified messaging client with portal theme sync & Wayland auto-hinting |
 | [**`claude-desktop`**](claude-desktop.md) | `3.1623.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Claude desktop app repackaged for Arch with Wayland launcher, Cowork VM shims & native window title bar |
 | [**`cursor`**](cursor.md) | `3.22.7-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | AI-first code editor with KDE Global Menu, Wayland auto-hinting & flags |

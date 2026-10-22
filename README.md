@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-26%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-27%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -44,6 +44,8 @@ Each package entry below provides direct links to its dedicated documentation in
 
 ### 🚀 Applications & Standalone Packages
 
+- [**`antigravity-cli`**](docs/antigravity-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.4.4--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/antigravity-cli.md) `sudo pacman -S antigravity-cli`
+  - Google Antigravity CLI (`agy`) terminal coding agent, with its self-updater turned off so pacman handles updates. Upstream: [Google Antigravity](https://antigravity.google/product/antigravity-cli)
 - [**`beeper`**](docs/beeper.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-4.3.152--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/beeper.md) `sudo pacman -S beeper`
   - Unified multi-network messaging client with XDG desktop portal dark theme sync and Wayland auto-hinting. Upstream: [Automattic / Beeper](https://www.beeper.com/changelog)
 - [**`claude-desktop`**](docs/claude-desktop.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.1623.0--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/claude-desktop.md) `sudo pacman -S claude-desktop`
