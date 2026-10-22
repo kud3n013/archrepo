@@ -121,6 +121,23 @@ case "$CHECK" in
     fi
     ;;
 
+  antigravity-cli-manifest)
+    # The CLI's own auto-updater manifest: {"version", "url", "sha512"}. The url carries
+    # <version>-<build>; a rebuilt release can keep the version and change only the build.
+    MANIFEST=$(curl -s "https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json" || true)
+    MATCH=$(echo "$MANIFEST" | jq -r '.url // empty' 2>/dev/null | grep -oP 'antigravity-public/antigravity-cli/\K[0-9.]+-[0-9]+(?=/linux-x64/cli_linux_x64\.tar\.gz)' | head -1 || true)
+    if [ -n "$MATCH" ]; then
+      VER="${MATCH%%-*}"
+      NEW_BUILD="${MATCH##*-}"
+      LATEST="$VER"
+      CURRENT_BUILD=$(grep -oP '^_build=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+      if [ -n "$NEW_BUILD" ] && [ "$NEW_BUILD" != "$CURRENT_BUILD" ]; then
+        UPDATE_NEEDED=true
+        EXTRA_INFO="build: ${CURRENT_BUILD} -> ${NEW_BUILD}"
+      fi
+    fi
+    ;;
+
   gdlauncher-cdn)
     VER=$(curl -s -A "Mozilla/5.0" "https://cdn-raw.gdl.gg/launcher/latest-linux.yml" | grep -oP '^version:\s*\K[0-9.]+' | head -1 || true)
     [ -n "$VER" ] && LATEST="$VER"
