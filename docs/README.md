@@ -11,6 +11,7 @@ This directory contains individual documentation pages for all active packages a
 | Package | Version | Type | Status | Description |
 |---|---|---|---|---|
 | [**`antigravity`**](antigravity.md) | `2.22.0-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity with native title bar, KDE Global Menu & live system theme |
+| [**`antigravity-cli`**](antigravity-cli.md) | `1.4.4-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Google Antigravity CLI (`agy`) with pacman-managed updates |
 | [**`beeper`**](beeper.md) | `4.3.152-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unified messaging client with portal theme sync & Wayland auto-hinting |
 | [**`claude-desktop`**](claude-desktop.md) | `3.1623.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Claude desktop app repackaged for Arch with Wayland launcher, Cowork VM shims & native window title bar |
 | [**`cursor`**](cursor.md) | `3.22.7-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | AI-first code editor with KDE Global Menu, Wayland auto-hinting & flags |
@@ -22,9 +23,11 @@ This directory contains individual documentation pages for all active packages a
 | [**`millennium`**](millennium.md) | `3.5.0-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam Client modding framework for custom skins, themes, and plugins |
 | [**`obsidian`**](obsidian.md) | `1.13.7-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Markdown knowledge base with KDE Global Menu & portal dark mode sync |
 | [**`proton-drive-cli`**](proton-drive-cli.md) | `0.9.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Proton Drive command-line client |
+| [**`proton-mail`**](proton-mail.md) | `1.15.1-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Mail & Calendar desktop app with system tray & close-to-tray |
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`steam-globalmenu`**](steam-globalmenu.md) | `1.2.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
+| [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zalo with ZaDark, KDE Global Menu, native title bar & live light/dark switching |
 | [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zed code editor with KDE Plasma Global Menu, server-side title bar & menu suppression |
 | [**`zotero`**](zotero.md) | `10.0.3-11` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Reference manager with native title bar, KDE Global Menu & Hyprland theming |
 
@@ -52,11 +55,9 @@ This directory contains individual documentation pages for all active packages a
 | Package | Last Version | Status | Reason |
 |---|---|---|---|
 | [**`hyprmod`**](hyprmod.md) | `0.4.0-1` | Archived | Retired per maintainer request |
-| [**`proton-mail`**](proton-mail.md) | `1.15.1-1` | Archived | Archived per maintainer request |
 | [**`proton-pass`**](proton-pass.md) | `1.42.0-1` | Archived | Archived per maintainer request |
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.2-1` | Archived | Archived per maintainer request |
 | [**`stirling-pdf-desktop`**](stirling-pdf-desktop.md) | `3.0.1-1` | Archived | Archived per maintainer request |
-| [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-1` | Archived | Archived per maintainer request |
 | [**`zed`**](zed.md) | `1.21.0-1` | Archived | Archived per maintainer request |
 | [**`zen-browser`**](zen-browser.md) | `1.22.2b-4` | Archived | Archived per maintainer request |
 

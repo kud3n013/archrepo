@@ -1,0 +1,22 @@
+pkgbase = antigravity-cli
+	pkgdesc = Google Antigravity CLI (agy), a terminal coding agent
+	pkgver = 1.4.4
+	pkgrel = 1
+	url = https://antigravity.google/product/antigravity-cli
+	arch = x86_64
+	license = LicenseRef-Google-Antigravity
+	depends = glibc
+	provides = agy
+	provides = antigravity-cli-bin
+	conflicts = agy
+	conflicts = antigravity-cli-bin
+	replaces = antigravity-cli-bin
+	options = !strip
+	options = !debug
+	options = !lto
+	source = cli_linux_x64-1.4.4-4783783166214144.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-cli/1.4.4-4783783166214144/linux-x64/cli_linux_x64.tar.gz
+	source = agy.sh
+	sha512sums = 7ce149d350344c1046c7b59b6659bcc5d659f351bf3a07c6c085887d93427ceb89d927752e4ccd0844b53ffb91d33d6a49f72835ceb276c7cffdd13cfb8023b8
+	sha512sums = 1157b9020098dde8eb2db14806efe78689bf562e563f8dad9d53da0ab5d4480d338d834f551a1e1b6a38f24eea4ad53c3bd00a718067f2ef1ec251d9313c7139
+
+pkgname = antigravity-cli

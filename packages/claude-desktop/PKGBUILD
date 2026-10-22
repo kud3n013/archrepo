@@ -6,11 +6,12 @@
 # repository and does not ship an Arch package. This recipe takes the official
 # amd64 .deb and rearranges it for Arch. The only change inside app.asar is a
 # bootstrap that makes the app use the window manager's title bar (see
-# titlebar-bootstrap.js).
+# titlebar-bootstrap.js) and follow the desktop's light/dark setting, with a tray
+# icon that contrasts with the panel (see theme-sync.js).
 
 pkgname=claude-desktop
 pkgver=3.1623.0
-pkgrel=3
+pkgrel=4
 pkgdesc="Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package"
 arch=('x86_64')
 url="https://claude.ai/download"
@@ -87,14 +88,16 @@ source=(
     "${pkgname}-flags.conf"
     "patch-titlebar.js"
     "titlebar-bootstrap.js"
+    "theme-sync.js"
 )
 # makepkg would unpack the .deb into $srcdir, but only data.tar.xz is needed.
 noextract=("${_deb}")
 sha256sums=('d39e1d9a570f1e517f158479f5a1d903b9a74d1ef3f279362002dcad375e33cf'
-            '4198b7870de0aa52581d0269460b575212102796a1b720697062b02ebdc2475a'
+            '710b5fe6762952fda3fd057d40eaf6643fcedea90313001e7ee8dac4ffd1e258'
             'dcccbdfe12b5e56d4e6a58bdb6b282fc4ce8255e4093b1e69629248bd9e3ae4f'
-            '26c60d1649895491488cff2347adfb9297eabda99695f18917cf3be854b978cc'
-            '3ff8d9eb3abd42bd191de9b20eb19b6cad125681d4aee28a0aad82ba08ea1a29')
+            'c7a3ccab0278d672335c3b1675112452c67908b3d117144675a940c99cfbc2d6'
+            '03b0d60ee6aca869f27084af0e9c3e9359e2541dc63a4157bc6c194a844ec6be'
+            '15f635bd4ef80a92f3f380002fa75c8e6d2275e9dd9bcf3a76a57ab4124675e7')
 
 prepare() {
     cd "${srcdir}"
@@ -115,8 +118,20 @@ prepare() {
 
     rm -rf "${srcdir}/app-src"
     asar extract "${_resources}/app.asar" "${srcdir}/app-src"
-    node "${srcdir}/patch-titlebar.js" "${srcdir}/app-src" "${srcdir}/titlebar-bootstrap.js"
+    node "${srcdir}/patch-titlebar.js" "${srcdir}/app-src" "${srcdir}/titlebar-bootstrap.js" "${srcdir}/theme-sync.js"
     node --check "${srcdir}/app-src/archrepo-bootstrap.js"
+    node --check "${srcdir}/app-src/archrepo-theme-sync.js"
+
+    # theme-sync.js swaps between upstream's two Linux tray glyphs by name. If a
+    # version bump renames them, fail here instead of shipping a tray fix that
+    # silently does nothing.
+    local _icon
+    for _icon in TrayIconLinux.png TrayIconLinux-Dark.png; do
+        if [[ -z $(find "${srcdir}/app-src" "${_resources}" -name "${_icon}" -print -quit) ]]; then
+            echo "tray icon ${_icon} not found" >&2
+            return 1
+        fi
+    done
 
     local _executables
     _executables=$(cd "${_unpacked}" && find . -type f -perm -u+x | sort)

@@ -1,9 +1,12 @@
-// Native window frames for Claude Desktop on Linux.
+// Native window frames and theme sync for Claude Desktop on Linux.
 //
 // The app creates its windows frameless (titleBarStyle "hidden" or "hiddenInset")
 // and draws its own title bar. This file runs before the app's entry point, from
 // app.asar, and makes normal app windows use the window manager's frame instead.
 // patch-titlebar.js writes it into app.asar and fills in the original entry point.
+// It also loads archrepo-theme-sync.js (theme-sync.js in the package), which makes
+// the app follow the desktop's light/dark setting live and picks a tray icon that
+// contrasts with the panel.
 "use strict";
 
 const path = require("path");
@@ -39,17 +42,18 @@ function globalMenuActive(electron) {
   );
 }
 
+const nativeFrames = process.env.CLAUDE_DESKTOP_CSD !== "1";
+const themeSync = process.env.CLAUDE_DESKTOP_THEME_SYNC !== "0";
+
 let patchedElectron = null;
 
-// A subclass, not a wrapper, so statics such as getAllWindows() and instanceof keep working.
-function patchElectron(electron) {
-  if (patchedElectron) {
-    return patchedElectron;
-  }
-  const { BrowserWindow } = electron;
-  const hideInPageMenu = globalMenuActive(electron);
+function framedWindowClass(electron) {
+  const Base = electron.BrowserWindow;
 
-  class FramedBrowserWindow extends BrowserWindow {
+  // A subclass, not a wrapper, so statics and instanceof keep working. It must be
+  // named BrowserWindow: Electron's getAllWindows(), getFocusedWindow() and
+  // fromWebContents() keep only windows whose constructor.name is "BrowserWindow".
+  return class BrowserWindow extends Base {
     constructor(options = {}) {
       const appWindow = isAppWindow(options);
       if (appWindow) {
@@ -65,29 +69,52 @@ function patchElectron(electron) {
     // setTitleBarOverlay is Windows-only and throws on Linux. The app calls it on every
     // window and logs "Failed to set title bar overlay" when it fails.
     setTitleBarOverlay() {}
-  }
+  };
+}
 
-  // The in-page title bar is a separate web contents (a view hosted by the window), so
-  // the CSS goes into every web contents, not only the window's own page. Navigation
-  // drops inserted CSS, so it is inserted again on every page load.
-  if (hideInPageMenu) {
-    electron.app.on("web-contents-created", (_event, contents) => {
-      contents.on("dom-ready", () => {
-        contents.insertCSS(IN_PAGE_MENU_CSS).catch((error) => {
-          require("fs").writeSync(2, `[archrepo] insertCSS failed: ${error}\n`);
+function patchElectron(electron) {
+  if (patchedElectron) {
+    return patchedElectron;
+  }
+  const overrides = {};
+
+  if (nativeFrames) {
+    overrides.BrowserWindow = framedWindowClass(electron);
+
+    // The in-page title bar is a separate web contents (a view hosted by the window), so
+    // the CSS goes into every web contents, not only the window's own page. Navigation
+    // drops inserted CSS, so it is inserted again on every page load.
+    if (globalMenuActive(electron)) {
+      electron.app.on("web-contents-created", (_event, contents) => {
+        contents.on("dom-ready", () => {
+          contents.insertCSS(IN_PAGE_MENU_CSS).catch((error) => {
+            require("fs").writeSync(2, `[archrepo] insertCSS failed: ${error}\n`);
+          });
         });
       });
-    });
+    }
   }
 
-  patchedElectron = Object.create(electron, {
-    BrowserWindow: { value: FramedBrowserWindow, enumerable: true },
-  });
+  // CLAUDE_DESKTOP_THEME_SYNC=0 leaves the theme and the tray icon to upstream.
+  if (themeSync) {
+    try {
+      Object.assign(overrides, require("./archrepo-theme-sync.js").install(electron));
+    } catch (error) {
+      require("fs").writeSync(2, `[archrepo] theme sync failed to start: ${error}\n`);
+    }
+  }
+
+  const descriptors = {};
+  for (const [name, value] of Object.entries(overrides)) {
+    descriptors[name] = { value, enumerable: true };
+  }
+  patchedElectron = Object.create(electron, descriptors);
   return patchedElectron;
 }
 
-// CLAUDE_DESKTOP_CSD=1 keeps upstream's frameless windows.
-if (process.platform === "linux" && process.env.CLAUDE_DESKTOP_CSD !== "1") {
+// CLAUDE_DESKTOP_CSD=1 keeps upstream's frameless windows. With that and
+// CLAUDE_DESKTOP_THEME_SYNC=0 both set, electron is not touched at all.
+if (process.platform === "linux" && (nativeFrames || themeSync)) {
   const load = Module._load;
   Module._load = function (request, parent, isMain) {
     const loaded = load.apply(this, arguments);

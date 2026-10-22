@@ -16,11 +16,9 @@ Packages in this directory:
 | Package | Original Upstream | Reason for Archiving |
 |---|---|---|
 | [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
-| [`proton-mail`](./proton-mail/) | [Proton Mail](https://proton.me/mail) | Archived per maintainer request. |
 | [`proton-pass`](./proton-pass/) | [Proton Pass](https://proton.me/pass) | Archived per maintainer request. |
 | [`proton-pass-cli`](./proton-pass-cli/) | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Archived per maintainer request. |
 | [`stirling-pdf-desktop`](./stirling-pdf-desktop/) | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | Archived per maintainer request. |
-| [`zalo-for-linux`](./zalo-for-linux/) | [VN-Linux-Family/zalo-for-linux](https://github.com/VN-Linux-Family/zalo-for-linux) | Archived per maintainer request. |
 | [`zed`](./zed/) | [Zed](https://zed.dev) | Archived per maintainer request. |
 | [`zen-browser`](./zen-browser/) | [zen-browser/desktop](https://github.com/zen-browser/desktop) | Archived per maintainer request. |
 

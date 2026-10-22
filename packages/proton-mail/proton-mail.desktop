@@ -1,11 +1,13 @@
 [Desktop Entry]
 Name=Proton Mail
+GenericName=Email Client
 Comment=Proton official desktop application for Proton Mail and Proton Calendar
-GenericName=Proton Mail
 Exec=/usr/bin/proton-mail %U
 Icon=proton-mail
 Type=Application
+Terminal=false
 StartupNotify=true
 StartupWMClass=Proton Mail
 Categories=Network;Email;
+Keywords=Proton;Mail;Email;Calendar;
 MimeType=x-scheme-handler/mailto;
