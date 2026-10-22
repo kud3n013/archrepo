@@ -56,17 +56,26 @@ case "$CHECK" in
       TAG="${TAG#v}"
       [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
 
-      # Special handling for zalo-for-linux
-      if [ "$PKG" = "zalo-for-linux" ]; then
-        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null | grep -E '^Zalo-.*-([0-9a-fA-F]+)-x86_64\.AppImage$' | head -1 || true)
-        if [ -n "$ASSET" ]; then
-          NEW_COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=-x86_64\.AppImage)' || true)
-          NEW_ZADARK=$(echo "$ASSET" | grep -oP '\+ZaDark-\K[0-9.]+(?=-)' || true)
-          CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
-          if [ -n "$NEW_COMMIT" ] && [ "$NEW_COMMIT" != "$CURRENT_COMMIT" ]; then
-            UPDATE_NEEDED=true
-            EXTRA_INFO="commit: ${CURRENT_COMMIT} -> ${NEW_COMMIT}"
-          fi
+      # zalo-for-linux packages the x86_64 ZaDark AppImage
+      # (Zalo-<ver>+ZaDark-<zadark>-<commit>-x86_64.AppImage). The release also has
+      # -Original- builds and other architectures, sometimes with another ZaDark
+      # version, so the asset is matched exactly and the newest ZaDark build wins.
+      # Without such an asset the check fails instead of guessing.
+      if [ "$PKG" = "zalo-for-linux" ] && [ -n "$TAG" ] && [ "$TAG" != "null" ]; then
+        ASSET=$(echo "$RELEASE_JSON" | jq -r --arg prefix "Zalo-${TAG}+ZaDark-" \
+          '.assets[].name | select(startswith($prefix) and endswith("-x86_64.AppImage"))' 2>/dev/null \
+          | grep -E '^Zalo-[0-9.]+\+ZaDark-[0-9.]+-[0-9a-fA-F]+-x86_64\.AppImage$' | sort -V | tail -1 || true)
+        if [ -z "$ASSET" ]; then
+          echo "::error::zalo-for-linux: release ${TAG} has no x86_64 +ZaDark- AppImage" >&2
+          exit 1
+        fi
+        NEW_COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=-x86_64\.AppImage$)')
+        NEW_ZADARK=$(echo "$ASSET" | grep -oP '\+ZaDark-\K[0-9.]+(?=-)')
+        CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+        CURRENT_ZADARK=$(grep -oP '^_zadarkver=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+        if [ "$NEW_COMMIT" != "$CURRENT_COMMIT" ] || [ "$NEW_ZADARK" != "$CURRENT_ZADARK" ]; then
+          UPDATE_NEEDED=true
+          EXTRA_INFO="asset: ${ASSET}"
         fi
       fi
     fi
