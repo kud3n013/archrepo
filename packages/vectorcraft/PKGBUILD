@@ -1,0 +1,37 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/vectorcraft
+# AUR Reference: https://aur.archlinux.org/packages/vectorcraft-bin
+
+pkgname=vectorcraft
+pkgver=0.15.0
+pkgrel=1
+pkgdesc="VectorCraft, an open-source vector illustration editor (Illustrator alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/vectorcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal: native file dialogs and the desktop light/dark setting'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('vectorcraft-bin')
+conflicts=('vectorcraft-bin' 'vectorcraft-git')
+replaces=('vectorcraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('5c8b331e5d9c8667bde70d1e39bbe4ccac848eb3e43a26a74408b9b6325252e7')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -dm755 "${pkgdir}/usr"
+    cp -dr --no-preserve=ownership "${_root}/bin" "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

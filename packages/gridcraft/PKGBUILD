@@ -1,0 +1,37 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/gridcraft
+# AUR Reference: https://aur.archlinux.org/packages/gridcraft-bin
+
+pkgname=gridcraft
+pkgver=0.11.1
+pkgrel=1
+pkgdesc="GridCraft, an open-source spreadsheet app (Excel alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/gridcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal-gtk: follow the light/dark setting (GridCraft reads GNOME'\''s color-scheme key)'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('gridcraft-bin')
+conflicts=('gridcraft-bin' 'gridcraft-git')
+replaces=('gridcraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('f2c83e6c26449a6c45983e903bf32c1d4c302b2042f263ead995271129c70e87')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -dm755 "${pkgdir}/usr"
+    cp -dr --no-preserve=ownership "${_root}/bin" "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

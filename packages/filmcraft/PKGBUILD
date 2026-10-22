@@ -1,0 +1,44 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/filmcraft
+# AUR Reference: https://aur.archlinux.org/packages/filmcraft-bin
+
+pkgname=filmcraft
+pkgver=0.11.0
+pkgrel=1
+pkgdesc="FilmCraft, an open-source video editor with color and sound (Premiere Pro alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/filmcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc (and alsa-lib). The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader' 'alsa-lib' 'jq')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal: native file dialogs and the desktop light/dark setting'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('filmcraft-bin')
+conflicts=('filmcraft-bin' 'filmcraft-git')
+replaces=('filmcraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
+        "filmcraft.sh")
+sha256sums=('6edea92f6fa50ca30ac9cd3db7e20edbccbee0cafe964a2dc1493d8d9c46d8b4'
+            'eae4302e74dbb75d47d7da4a8dfb2dd220ea6c948b5e4383e2812b5fbbff29b3')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    # The launcher at /usr/bin/filmcraft applies archrepo's defaults once, then runs
+    # the real binary. Its share/ link keeps the app's exe-relative ../share lookups.
+    install -Dm755 "${_root}/bin/${pkgname}" "${pkgdir}/usr/lib/${pkgname}/bin/${pkgname}"
+    ln -s ../../share "${pkgdir}/usr/lib/${pkgname}/share"
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm755 "${_root}/bin/${pkgname}-cli" "${pkgdir}/usr/bin/${pkgname}-cli"
+    cp -dr --no-preserve=ownership "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
