@@ -25,7 +25,7 @@ sudo pacman -S claude-desktop
 |---|---|
 | **Package Name** | `claude-desktop` |
 | **Current Version** | `2.42304.2-2` |
-| **Package Type** | **Modified (repackaged upstream .deb, native window title bar)** |
+| **Package Type** | **Modified (repackaged upstream .deb, native window title bar, theme sync)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Claude Desktop](https://claude.ai/download) |
 | **Category** | Productivity / AI Assistant |
@@ -49,6 +49,7 @@ Upstream's Linux app does not update itself. Anthropic's docs say updates arrive
 - **Licenses** are installed to `/usr/share/licenses/claude-desktop/`.
 - **Native title bar** (`titlebar-bootstrap.js`, added to `app.asar`). See the section below.
 - **Global Menu** on KDE Plasma: the launcher uses XWayland, and the bootstrap hides the in-page menu button. See the Global Menu section below.
+- **Theme sync and tray icon** (`theme-sync.js`, added to `app.asar`): the app follows the desktop's light/dark setting live, and the tray icon contrasts with the panel. See the Theme sync section below.
 
 ### Not shipped from the `.deb`
 - **Maintainer scripts** (`control.tar.xz`) are not used:
@@ -102,6 +103,32 @@ On KDE Plasma the launcher runs the app under XWayland (`--ozone-platform=x11`),
 - The in-page window buttons in the claude.ai view are not hidden. Their markup only appears when signed in, and no account was available to check it. If you see two sets of window buttons, use `CLAUDE_DESKTOP_CSD=1`.
 - Quick Entry staying frameless was checked by reading its window options, not by opening it.
 - Upgrading over the AUR `claude-desktop` 2.42304.0-1 package was not tested.
+
+### Theme sync and tray icon
+`theme-sync.js` is added to `app.asar` as `archrepo-theme-sync.js` and loaded by the bootstrap. It does two things.
+
+**Live light/dark.** It reads `org.freedesktop.appearance color-scheme` from the XDG portal and follows the portal's `SettingChanged` signal (a `gdbus monitor` child; `gdbus` comes with `glib2`). While the app's own theme choice is "system", the real `nativeTheme.themeSource` is set to `dark` or `light` to match. Chromium is meant to notice the change by itself, but under XWayland, which this package uses on KDE, it stops after the first change ([anthropics/claude-code#77171](https://github.com/anthropics/claude-code/issues/77171)).
+- An in-app Light or Dark choice still wins. The app reads back the value it set, and only "system" follows the desktop.
+- Colour scheme `0` ("no preference") counts as light, as the portal spec says.
+- Without a portal answer, the start value comes from `kdeglobals` on KDE, then `gsettings`.
+
+**Tray icon.** Upstream picks `TrayIconLinux.png` (dark glyph) or `TrayIconLinux-Dark.png` (light glyph) from the window colour scheme, so a light colour scheme with a dark panel gets a dark glyph on a dark panel ([anthropics/claude-code#77170](https://github.com/anthropics/claude-code/issues/77170)). On KDE Plasma (Breeze Twilight, or any dark Plasma style) the tray icon is now picked from the panel:
+- The Plasma style comes from `~/.config/plasmarc`. A style with its own `colors` file (`breeze-dark`, `breeze-light`, most third-party styles) uses that file's window background. The default Breeze style follows the colour scheme in `kdeglobals`.
+- `plasmarc` and `kdeglobals` are watched, so changing the Plasma style or colour scheme swaps the icon without a restart.
+- Cinnamon uses `gsettings get org.cinnamon.theme name`. GNOME and other desktops keep upstream's choice (GNOME's top bar is always dark and upstream already handles it).
+- **Override:** `CLAUDE_DESKTOP_TRAY_PANEL=dark` or `=light` names the panel colour yourself.
+- The build fails if a version bump renames the two tray icons.
+
+**GTK module pinning.** Under X11 or XWayland, GTK loads the modules named in XSETTINGS, and Electron's `dlclose()` of GTK leaves their callbacks registered, so a theme change crashes the app. The launcher pins `/usr/lib/gtk-3.0/modules/*.so` with `LD_PRELOAD` whenever the app runs on X11: the Global Menu path, an `--ozone-platform=x11` flag, or an X11 session. Native Wayland is left alone.
+
+**Opt out:** `CLAUDE_DESKTOP_THEME_SYNC=0` leaves the theme and the tray icon to upstream.
+
+**Logging:** one `[archrepo] theme sync: ...` line on start and on each change, and a `[archrepo] tray: panel is ...` line when the panel colour changes.
+
+**Not verified:** the official `.deb` could not be downloaded where this was written, so the module was tested against a mock of Electron (`themeSource` accessor, a native-style `Tray`, a fake `gdbus` and fake Plasma config), not in the real app. Check on a live Plasma session:
+- with Breeze Twilight (light windows, dark panel) the tray glyph is light;
+- switching Breeze Light ↔ Breeze Dark in System Settings changes the app and the tray within a second, many times in a row, without a crash;
+- the in-app theme choice still wins, and `CLAUDE_DESKTOP_THEME_SYNC=0` turns all of it off.
 
 ---
 

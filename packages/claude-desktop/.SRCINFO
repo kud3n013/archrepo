@@ -1,7 +1,7 @@
 pkgbase = claude-desktop
 	pkgdesc = Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package
 	pkgver = 3.1623.0
-	pkgrel = 3
+	pkgrel = 4
 	url = https://claude.ai/download
 	install = claude-desktop.install
 	arch = x86_64
@@ -63,10 +63,12 @@ pkgbase = claude-desktop
 	source = claude-desktop-flags.conf
 	source = patch-titlebar.js
 	source = titlebar-bootstrap.js
+	source = theme-sync.js
 	sha256sums = d39e1d9a570f1e517f158479f5a1d903b9a74d1ef3f279362002dcad375e33cf
-	sha256sums = 4198b7870de0aa52581d0269460b575212102796a1b720697062b02ebdc2475a
+	sha256sums = 710b5fe6762952fda3fd057d40eaf6643fcedea90313001e7ee8dac4ffd1e258
 	sha256sums = dcccbdfe12b5e56d4e6a58bdb6b282fc4ce8255e4093b1e69629248bd9e3ae4f
-	sha256sums = 26c60d1649895491488cff2347adfb9297eabda99695f18917cf3be854b978cc
-	sha256sums = 3ff8d9eb3abd42bd191de9b20eb19b6cad125681d4aee28a0aad82ba08ea1a29
+	sha256sums = c7a3ccab0278d672335c3b1675112452c67908b3d117144675a940c99cfbc2d6
+	sha256sums = 4abd42850d0e6c856a03d63b14870836ea94191787844d8b7007be51259aca66
+	sha256sums = 15f635bd4ef80a92f3f380002fa75c8e6d2275e9dd9bcf3a76a57ab4124675e7
 
 pkgname = claude-desktop
