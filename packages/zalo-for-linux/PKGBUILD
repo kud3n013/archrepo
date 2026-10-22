@@ -1,0 +1,166 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/VN-Linux-Family/zalo-for-linux
+
+# Repackages upstream's ZaDark AppImage. The only change inside app.asar is a
+# bootstrap (archrepo-bootstrap.js) that adds the KDE Global Menu, the window
+# manager's title bar and live light/dark switching. It changes no upstream file
+# and fails the build if upstream code it relies on is gone (patch-bootstrap.js).
+
+pkgname=zalo-for-linux
+pkgver=26.10.11
+_zadarkver=26.2.1
+_commithash=412e35f
+pkgrel=2
+pkgdesc="Zalo for Linux (unofficial port with ZaDark), with KDE Global Menu, native title bar and live theme switching"
+arch=('x86_64')
+url="https://github.com/VN-Linux-Family/zalo-for-linux"
+license=('MIT')
+provides=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+conflicts=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+replaces=('zalo-for-linux-bin')
+makedepends=('asar' 'nodejs')
+
+# The Electron 22 binary and Zalo's native addons run against the system libraries
+# (checked with objdump -p). Electron loads libnotify and libdbusmenu-glib at runtime.
+# glib2 provides gdbus for the theme sync, xdg-utils the xdg-settings call at startup.
+# The call engine runs on the bundled Electron (ELECTRON_RUN_AS_NODE), not on nodejs.
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'bash'
+    'cairo'
+    'dbus'
+    'dbusmenu-shortcut-shim'
+    'expat'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libdbusmenu-glib'
+    'libdrm'
+    'libgcc'
+    'libnotify'
+    'libstdc++'
+    'libx11'
+    'libxcb'
+    'libxcomposite'
+    'libxdamage'
+    'libxext'
+    'libxfixes'
+    'libxkbcommon'
+    'libxrandr'
+    'mesa'
+    'nspr'
+    'nss'
+    'openssl'
+    'pango'
+    'xdg-utils'
+    'xz'
+)
+# Only what current upstream calls: the native call engine, image paste and screenshots.
+optdepends=(
+    'python: voice and video calls'
+    'opus: voice and video calls'
+    'libpulse: voice and video calls (pactl, pacat, parec)'
+    'wl-clipboard: paste images on Wayland'
+    'xclip: paste images on X11 and XWayland'
+    'spectacle: screenshots on KDE Plasma'
+    'flameshot: screenshots'
+    'gnome-screenshot: screenshots on GNOME'
+)
+backup=('etc/zalo-flags.conf')
+install=${pkgname}.install
+# Electron binaries break if stripped, and !debug is only meaningful for compiled packages.
+options=('!strip' '!debug')
+
+_appimage="Zalo-${pkgver}+ZaDark-${_zadarkver}-${_commithash}-x86_64.AppImage"
+source=(
+    "https://github.com/VN-Linux-Family/zalo-for-linux/releases/download/${pkgver}/${_appimage}"
+    "zalo.sh"
+    "zalo-flags.conf"
+    "zalo.desktop"
+    "patch-bootstrap.js"
+    "archrepo-bootstrap.js"
+    "archrepo-globalmenu.js"
+    "archrepo-titlebar.js"
+    "archrepo-theme.js"
+    "archrepo-theme-preload.js"
+)
+sha256sums=('9bf18f28770d1ff9faade4c32416c56b825f81966edddefde51a6c51261d8174'
+            '63442e64bebf91397e45ce9125241809fb1321ecc6b51c05f5b7cafcccc4c070'
+            '8560335b446a2d41b02c4045bb1eeaecca9324d4ad151748ee63b561bc0a7cfe'
+            '6003f1ded1519a8a9be21a91f231bd59f5341efc20858fcf84f4f401b12b0ec2'
+            'dc8cd8207fc9d47d661e13f043665963c2cda7d81134dd7308d50d9d68e9a09d'
+            '25d5c300b92c1b52ee4208c53f0bb409e7754486104cb1754b5806b140766721'
+            '320610415f7b999413baff89d15c863c181fbcb7887dc8e9fac71600d74de3d8'
+            '24b33c421196350b1cbe3959efd433c500570c2232b10640baaac467a233fa9f'
+            '6407d5ef4ea9501b2aed5f7f78ed0c2308dfd434fa73fa22a788efb65e46190f'
+            '4a8cdce207c40ec4c0e2a7c60bf3e03c72103299961dad4b6d32eb436be16f69')
+
+prepare() {
+    cd "${srcdir}"
+
+    # The AppImage is a uruntime executable with a DwarFS image appended. No DwarFS
+    # tool is packaged in the Arch repos, so the runtime's own extractor is used. It
+    # is statically linked and needs no FUSE. The tree is upstream's electron-builder
+    # AppDir (squashfs-root is a symlink to it).
+    chmod +x "${_appimage}"
+    rm -rf AppDir squashfs-root
+    "./${_appimage}" --appimage-extract >/dev/null
+
+    # zalo.sh pins no GTK modules because Electron 22 links GTK directly and never
+    # unloads it. A newer Electron that loads GTK at runtime needs the pin back.
+    if ! objdump -p AppDir/zalo | grep -q 'NEEDED.*libgtk-3\.so\.0'; then
+        echo "AppDir/zalo no longer links libgtk-3.so.0: review the GTK module pin in zalo.sh" >&2
+        return 1
+    fi
+
+    # Add the bootstrap to app.asar. Only the entry point in package.json changes,
+    # so the repacked archive must list upstream's files plus the archrepo files.
+    local _asar="AppDir/resources/app.asar"
+    asar list "${_asar}" | sort > asar-before.txt
+    rm -rf app-src
+    asar extract "${_asar}" app-src
+    node patch-bootstrap.js app-src AppDir/app "${srcdir}"
+    for _file in app-src/archrepo-*.js; do
+        node --check "${_file}"
+    done
+    asar pack app-src "${_asar}"
+    rm -rf app-src
+
+    if ! asar list "${_asar}" | grep -v '^/archrepo-.*\.js$' | sort | diff asar-before.txt - ; then
+        echo "app.asar differs from upstream beyond the archrepo files" >&2
+        return 1
+    fi
+}
+
+package() {
+    cd "${srcdir}/AppDir"
+
+    # 1. Application tree. The Electron binary finds its resources relative to its own
+    #    path. AppRun and the AppImage desktop file are not needed. usr/ holds the icon
+    #    (installed below) and libraries nothing loads: GTK2 libappindicator and
+    #    libindicator, gconf, and copies of libnotify, libXss and libXtst.
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a . "${pkgdir}/opt/${pkgname}/"
+    rm -rf "${pkgdir}/opt/${pkgname}"/{usr,AppRun,zalo.desktop,zalo.png,.DirIcon}
+
+    # 2. Launcher.
+    install -Dm755 "${srcdir}/zalo.sh" "${pkgdir}/usr/bin/zalo"
+    ln -s zalo "${pkgdir}/usr/bin/zalo-for-linux"
+
+    # 3. Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/zalo-flags.conf" "${pkgdir}/etc/zalo-flags.conf"
+
+    # 4. Desktop entry and icon (the same image as pc-dist/favicon-512x512.png).
+    install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
+    install -Dm644 usr/share/icons/hicolor/512x512/apps/zalo.png \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
+    install -Dm644 usr/share/icons/hicolor/512x512/apps/zalo.png "${pkgdir}/usr/share/pixmaps/zalo.png"
+
+    # 5. Licenses shipped with Electron.
+    install -Dm644 LICENSE.electron.txt LICENSES.chromium.html -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
