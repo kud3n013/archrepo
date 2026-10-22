@@ -17,7 +17,6 @@ Packages in this directory:
 |---|---|---|
 | [`antigravity`](./antigravity/) | [Google Antigravity](https://antigravity.google) | Archived per maintainer request. |
 | [`hyprmod`](./hyprmod/) | [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) | Archived per maintainer request. |
-| [`proton-mail`](./proton-mail/) | [Proton Mail](https://proton.me/mail) | Archived per maintainer request. |
 | [`proton-pass`](./proton-pass/) | [Proton Pass](https://proton.me/pass) | Archived per maintainer request. |
 | [`proton-pass-cli`](./proton-pass-cli/) | [Proton Pass CLI](https://protonpass.github.io/pass-cli) | Archived per maintainer request. |
 | [`stirling-pdf-desktop`](./stirling-pdf-desktop/) | [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) | Archived per maintainer request. |
