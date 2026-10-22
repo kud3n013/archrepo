@@ -1,0 +1,122 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://proton.me/pass
+# AUR Reference: https://aur.archlinux.org/packages/proton-pass-bin (repackages the same .deb)
+
+# Repackaging of Proton's official Linux .deb, kept here so updates land as soon as
+# Proton publishes them. app.asar is not modified: upstream already uses the window
+# manager's title bar, has its own tray icon, and follows the desktop's light/dark
+# theme by default. The app icon is this repository's own.
+
+pkgname=proton-pass
+pkgver=1.42.0
+pkgrel=2
+pkgdesc="Proton official desktop application for Proton Pass, the end-to-end encrypted password manager"
+arch=('x86_64')
+url="https://proton.me/pass"
+license=('GPL-3.0-or-later')
+depends=(
+    'alsa-lib'
+    'glib2'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libdrm'
+    'libxkbcommon'
+    'mesa'
+    'nss'
+)
+optdepends=(
+    'gnome-shell-extension-appindicator: tray icon on GNOME Shell'
+    'libnotify: desktop notifications'
+    'org.freedesktop.secrets: key storage via Secret Service (gnome-keyring or kwallet)'
+    'xdg-utils: open links in the default browser'
+)
+provides=('proton-pass-bin' 'protonpass')
+conflicts=('proton-pass-bin' 'protonpass')
+replaces=('proton-pass-bin')
+backup=("etc/${pkgname}-flags.conf")
+# Electron binaries break if stripped, and !debug is only meaningful for compiled packages.
+options=('!strip' '!debug')
+
+_deb="${pkgname}-${pkgver}.deb"
+source=(
+    "${_deb}::https://proton.me/download/pass/linux/proton-pass_${pkgver}_amd64.deb"
+    "${pkgname}.sh"
+    "${pkgname}-flags.conf"
+    "${pkgname}.desktop"
+    "${pkgname}.png"
+)
+# makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
+noextract=("${_deb}")
+sha512sums=('860550c8741da153494d381743226c9d44cfba42b381239f0f083336101d60e27340c10b00c2bcd2a0ec5cd8c226a4e8cb60508940b9cfdcc079584af035eec8'
+            'f553557f47c2f28b7659738ad7a760b8d1c799844fc4d827b93f94e3033592e93a45196156c5d2a1b5d4082d72d815504310b8392ed8106970b927ff98430525'
+            '731dc22624bc42eb65c04b8bdd4c24cd5bfcd04fd62a7488bd5810204c9a806eb4c5cd12893e344e54f0cb88790f36c00f2ca180cd0283d9d8aed5e421126816'
+            'a62f78cb7e4e90d981c6793e152cd5eef7793a6a604f6b372643813b172727197f986d60ea0f5a42ceb5a4b12c19a19d763956b444271efcf92faeac507c3419'
+            '179c76bd8814b5d98779996a6bc523cae0130e93f76b7a0981663b3d1233193b2cfafed6e9b5d56da837830ddfaa0201ab82084eb68576d50e03a5062633652f')
+
+prepare() {
+    cd "${srcdir}"
+
+    local _data
+    _data="$(bsdtar -tf "${_deb}" | grep -m1 '^data\.tar')"
+    bsdtar -xf "${_deb}" "${_data}"
+    rm -rf data
+    mkdir -p data
+    bsdtar -xf "${_data}" -C data
+}
+
+package() {
+    cd "${srcdir}/data"
+
+    # Application tree. The Electron binary finds its resources relative to its
+    # own path, so the tree is kept whole under /opt.
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a "usr/lib/${pkgname}/." "${pkgdir}/opt/${pkgname}/"
+
+    # Upstream names the binary after the product ("Proton Pass"). Its
+    # /usr/bin/proton-pass symlink says which file that is; give it a name
+    # without spaces for the launcher.
+    local _bin="Proton Pass"
+    if [ -L "usr/bin/${pkgname}" ]; then
+        _bin="$(basename "$(readlink "usr/bin/${pkgname}")")"
+    fi
+    if [ ! -x "usr/lib/${pkgname}/${_bin}" ]; then
+        echo "cannot find the Electron binary '${_bin}' in usr/lib/${pkgname}" >&2
+        return 1
+    fi
+    ln -s "${_bin}" "${pkgdir}/opt/${pkgname}/${pkgname}"
+
+    # Launcher, in place of upstream's /usr/bin/proton-pass symlink.
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+
+    # Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+    # Desktop entry, which also registers the protonpass:// login callback.
+    install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+    # Icons. Only this repository's PNG is installed under the proton-pass name,
+    # and it replaces the window icon the app loads from resources/assets.
+    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+    if [ -f "${pkgdir}/opt/${pkgname}/resources/assets/logo.png" ]; then
+        install -m644 "${srcdir}/${pkgname}.png" "${pkgdir}/opt/${pkgname}/resources/assets/logo.png"
+    fi
+
+    # Licenses
+    install -Dm644 "usr/lib/${pkgname}/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    if [ -f "usr/lib/${pkgname}/LICENSE" ]; then
+        install -Dm644 "usr/lib/${pkgname}/LICENSE" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    fi
+    if [ -f "usr/share/doc/${pkgname}/copyright" ]; then
+        install -Dm644 "usr/share/doc/${pkgname}/copyright" "${pkgdir}/usr/share/licenses/${pkgname}/copyright"
+    fi
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+
+    # Chromium's setuid sandbox helper. The extraction above drops the setuid bit
+    # for an unprivileged build user, so set it explicitly after the chmod. It only
+    # matters when unprivileged user namespaces are unavailable.
+    if [ -f "${pkgdir}/opt/${pkgname}/chrome-sandbox" ]; then
+        chmod 4755 "${pkgdir}/opt/${pkgname}/chrome-sandbox"
+    fi
+}
