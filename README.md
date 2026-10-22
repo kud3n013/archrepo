@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-26%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-27%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -66,6 +66,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Powerful Markdown knowledge base patched with KDE Global Menu / AppMenu support and XDG portal dark/light theme switching. Upstream: [Obsidian](https://obsidian.md)
 - [**`proton-drive-cli`**](docs/proton-drive-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/proton-drive-cli.md) `sudo pacman -S proton-drive-cli`
   - Official Proton Drive command-line client for browsing, uploading, downloading and sharing files. Upstream: [Proton Drive CLI](https://proton.me/download/drive/cli/index.html)
+- [**`proton-mail`**](docs/proton-mail.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.15.1--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/proton-mail.md) `sudo pacman -S proton-mail`
+  - Official Proton Mail and Proton Calendar desktop app, repackaged from Proton's Debian build with a system tray icon and close-to-tray. Upstream: [Proton Mail](https://proton.me/mail)
 - [**`searxng`**](docs/searxng.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-r9799.12f8b65--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/searxng.md) `sudo pacman -S searxng`
   - Privacy metasearch engine with systemd service unit, isolated venv, and auto-generated secret keys. Upstream: [searxng/searxng](https://searxng.github.io/searxng/)
 - [**`sine`**](docs/sine.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.3.3--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/sine.md) `sudo pacman -S sine`
@@ -105,13 +107,12 @@ Each package entry below provides direct links to its dedicated documentation in
 ---
 
 <details>
-<summary><b>🗄️ Archived Packages (9)</b></summary>
+<summary><b>🗄️ Archived Packages (8)</b></summary>
 
 The following packages have been retired from active distribution and their binary packages pruned from the database:
 
 - [**`antigravity`**](docs/antigravity.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-2.22.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/antigravity/`](archive/antigravity/) &bull; Upstream: [Google Antigravity](https://antigravity.google) (Archived per maintainer request)
 - [**`hyprmod`**](docs/hyprmod.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-0.4.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/hyprmod/`](archive/hyprmod/) &bull; Upstream: [BlueManCZ/hyprmod](https://github.com/BlueManCZ/hyprmod) (Retired per maintainer request)
-- [**`proton-mail`**](docs/proton-mail.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.15.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-mail/`](archive/proton-mail/) &bull; Upstream: [Proton Mail](https://proton.me/mail) (Archived per maintainer request)
 - [**`proton-pass`**](docs/proton-pass.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-1.42.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-pass/`](archive/proton-pass/) &bull; Upstream: [Proton Pass](https://proton.me/pass) (Archived per maintainer request)
 - [**`proton-pass-cli`**](docs/proton-pass-cli.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-2.4.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/proton-pass-cli/`](archive/proton-pass-cli/) &bull; Upstream: [Proton Pass CLI](https://protonpass.github.io/pass-cli) (Archived per maintainer request)
 - [**`stirling-pdf-desktop`**](docs/stirling-pdf-desktop.md) [![status](https://img.shields.io/badge/status-archived-lightgrey)](archive/README.md) [![version](https://img.shields.io/badge/version-3.0.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) &bull; Location: [`archive/stirling-pdf-desktop/`](archive/stirling-pdf-desktop/) &bull; Upstream: [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF) (Archived per maintainer request)
