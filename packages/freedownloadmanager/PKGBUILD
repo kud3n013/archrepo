@@ -3,18 +3,16 @@
 # Contributor: Rizwan Hasan <rizwan.hasan486@gmail.com>
 
 _pkgname=freedownloadmanager
-pkgname=fdm
+pkgname=freedownloadmanager
 pkgver=6.34.4.6974
 pkgrel=5
 pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
 arch=('x86_64')
 url="https://www.freedownloadmanager.org/"
 license=('Freeware')
-# Renamed from freedownloadmanager; replaces= moves existing installs over on -Syu.
-# extra/fdm (the mail fetcher) shares the name and /usr/bin/fdm, hence the conflict.
-provides=("${_pkgname}" "${_pkgname}-bin")
-conflicts=("${_pkgname}" "${_pkgname}-bin")
-replaces=("${_pkgname}" "${_pkgname}-bin")
+provides=("${pkgname}-bin" 'fdm')
+conflicts=("${pkgname}-bin" 'fdm')
+replaces=("${pkgname}-bin")
 install="${pkgname}.install"
 backup=("etc/${_pkgname}-flags.conf")
 options=(!strip !debug)
@@ -74,7 +72,7 @@ sha512sums=('cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fef
             '49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b'
             '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d'
             'ad006f70539518d2f05cf004bca3208df2a61ae2048ce917bc1c2d4ae0c2ee014623d2a0f2136f51771aa7cd6b83a64000cf7c1d8624934cd9c893b9814d7f48'
-            'd0350715caf62834aa8837356701a8985da19835a843ff6386f509ccceedc8910febdf6c5e1086b4a5f33c3aa0c7072b2151f02d3820e482cefa7b906a1a4d59'
+            '5f57c4f3f730071e0926a9c97c369973f100f64d6511f1d4535966ddc80a76ac129a07f08a9fc71bcce9759f5160ebb8253d946545ac1ea43130af963e3517b0'
             'c7e74fd8305e48375f7ae9537dc0a1510842cb54698fedaf7584081081ca907ebf5b44d8b57cb981bbd06e400109c0f4964f85ea21283d19cec438e223206ff1')
 
 prepare() {
@@ -108,7 +106,7 @@ package() {
 
     # Install the global menu loader and the menu it loads
     install -Dm755 "${srcdir}/libfdm-globalmenu.so" "${pkgdir}/opt/${_pkgname}/lib/libfdm-globalmenu.so"
-    install -Dm644 "${srcdir}/GlobalMenuBar.qml" "${pkgdir}/usr/share/fdm/GlobalMenuBar.qml"
+    install -Dm644 "${srcdir}/GlobalMenuBar.qml" "${pkgdir}/usr/share/freedownloadmanager/GlobalMenuBar.qml"
 
     # Inject both libraries into the fdm binary's DT_NEEDED so they load on EVERY invocation
     # (autostart, browser magnet/torrent handler, internal app restart, and CLI)

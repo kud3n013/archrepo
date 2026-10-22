@@ -30,7 +30,7 @@ constexpr int kMaxPolls = 4 * 60 * 5; // the main window shows up within seconds
 QString menuFile()
 {
     const QString path = qEnvironmentVariable("FDM_GLOBALMENU_QML");
-    return path.isEmpty() ? QStringLiteral("/usr/share/fdm/GlobalMenuBar.qml") : path;
+    return path.isEmpty() ? QStringLiteral("/usr/share/freedownloadmanager/GlobalMenuBar.qml") : path;
 }
 
 // Returns true once there is nothing left to do: the menu is attached, or it failed for good.
