@@ -53,9 +53,9 @@ _setup_elephant_plugin() {
 
     # Inform user about Deno runtime
     if command -v deno &>/dev/null; then
-        echo "==> [freedownloadmanager-elephant] Deno runtime detected: $(deno --version 2>/dev/null | head -1)"
+        echo "==> [fdm-elephant] Deno runtime detected: $(deno --version 2>/dev/null | head -1)"
     else
-        echo "==> [freedownloadmanager-elephant] NOTICE: Deno is required by Elephant for YouTube stream extraction."
+        echo "==> [fdm-elephant] NOTICE: Deno is required by Elephant for YouTube stream extraction."
         echo "==> Please ensure 'deno' is installed: sudo pacman -S deno"
     fi
 }

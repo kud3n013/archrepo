@@ -1,18 +1,23 @@
 # Maintainer: archrepo CI <ci@archrepo>
 # Contributor: meowcateatrat <https://github.com/meowcateatrat>
 
-pkgname=freedownloadmanager-elephant
+_oldname=freedownloadmanager-elephant
+pkgname=fdm-elephant
 pkgver=1.3.9
-pkgrel=2
+pkgrel=3
 pkgdesc="Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp)"
 arch=('any')
 url="https://github.com/meowcateatrat/elephant"
 license=('MIT')
-provides=("${pkgname}-bin")
-conflicts=("${pkgname}-bin")
+# Renamed from freedownloadmanager-elephant; replaces= moves existing installs over on -Syu.
+provides=("${_oldname}" "${_oldname}-bin")
+conflicts=("${_oldname}" "${_oldname}-bin")
+replaces=("${_oldname}" "${_oldname}-bin")
 install="${pkgname}.install"
 options=(!strip !debug)
 
+# 'freedownloadmanager' (provided by archrepo's fdm) rather than 'fdm', which
+# extra/fdm, an unrelated mail fetcher, would also satisfy
 depends=(
     'freedownloadmanager'
     'deno'
