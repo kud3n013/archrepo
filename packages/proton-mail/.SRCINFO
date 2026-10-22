@@ -1,7 +1,7 @@
 pkgbase = proton-mail
 	pkgdesc = Proton official desktop application for Proton Mail and Proton Calendar (with system tray and close-to-tray)
 	pkgver = 1.15.1
-	pkgrel = 2
+	pkgrel = 3
 	url = https://proton.me/mail
 	arch = x86_64
 	license = GPL-3.0-or-later
@@ -38,13 +38,15 @@ pkgbase = proton-mail
 	source = proton-mail-tray.svg
 	source = patch-tray.js
 	source = tray-bootstrap.js
+	source = theme-sync.js
 	sha256sums = 583616c195b2fa05449213732d23ca753d00c7b4cc2e5cf17af9c5022ee69c31
 	sha256sums = f5ba7c5a0feb616eec9464bd5a83cf5801ae524c08802dec2f37157451f4647a
-	sha256sums = 5e0e7eed6824e4ad13a3bf75c8be4166ca1b585731d45c94d0b699d113f6bace
+	sha256sums = b88ac136df39b17a1a92b18e267b0817620130da560f8af096c7ce05549d66e8
 	sha256sums = a3e3c159ea17cb46507e711b1ce98f8e548088abd462245e2f609ebab3684b41
 	sha256sums = 9a84b663bc99285a368366da54a06a614b564b05c92b9e78669b27c4545d3773
 	sha256sums = 2cf6f56e7ac141fcc13e7b3bc3dbf19542910acee86bdc52f5ba3ee92e195997
-	sha256sums = 43eaa1bf247a0e0652e5679768e401ec43402d00e62214d04183791f6f88eab0
-	sha256sums = 0f10629c4ba95a3c6836e0eda2e429f26bf1771f14caa08fd05fa9e5348599a4
+	sha256sums = f8112e227b2613bdfa9cde31a7e62dbf722bf952363dfb046fef01372d67146e
+	sha256sums = 50ac76347517f3a231a6de60ef3c88dadd68e2d3d93bba801d5010cad461b62b
+	sha256sums = 76e3f02a50b1e892212633cb49f4acd0df6fd51bfeaf94b3652e85fdea053cf6
 
 pkgname = proton-mail

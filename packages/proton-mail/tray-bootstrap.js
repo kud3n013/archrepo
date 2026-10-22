@@ -1,9 +1,12 @@
-// System tray and close-to-tray for Proton Mail on Linux.
+// System tray, close-to-tray and live theme sync for Proton Mail on Linux.
 //
 // Upstream has no tray on Linux, and closing the window quits the app. This file
 // runs before the app's entry point, from app.asar, and adds a tray icon. Closing
 // the window then hides it to the tray, and the tray's Quit item quits.
 // patch-tray.js writes it into app.asar and fills in the original entry point.
+//
+// It also loads archrepo-theme-sync.js (theme-sync.js in the package), which makes
+// the app's "Auto" theme follow the desktop's light/dark setting live.
 //
 // It uses only Electron's public API and two menu item ids from upstream's View menu.
 // Nothing here depends on names in the minified bundle, so a version bump cannot
@@ -197,7 +200,19 @@ function hasTrayHost(callback) {
 }
 
 // PROTON_MAIL_TRAY=0 keeps upstream's behaviour: no tray, closing the window quits.
-if (process.platform === "linux" && process.env.PROTON_MAIL_TRAY !== "0") {
+// PROTON_MAIL_THEME_SYNC=0 leaves the theme to Chromium.
+const trayEnabled = process.env.PROTON_MAIL_TRAY !== "0";
+const themeSync = process.env.PROTON_MAIL_THEME_SYNC !== "0";
+
+if (process.platform === "linux" && themeSync) {
+  try {
+    require("./archrepo-theme-sync.js").install(require("electron"));
+  } catch (error) {
+    log(`theme sync failed to start: ${error}`);
+  }
+}
+
+if (process.platform === "linux" && trayEnabled) {
   electron = require("electron");
   const patched = patchElectron(electron);
 
