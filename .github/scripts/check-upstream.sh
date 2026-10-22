@@ -58,8 +58,12 @@ case "$CHECK" in
 
       # Special handling for zalo-for-linux
       if [ "$PKG" = "zalo-for-linux" ]; then
-        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null | grep -E '^Zalo-.*-([0-9a-fA-F]+)-x86_64\.AppImage$' | head -1 || true)
-        if [ -n "$ASSET" ]; then
+        # Upstream publishes an -Original- and a +ZaDark- AppImage; the package uses ZaDark.
+        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null | grep -E '^Zalo-[0-9.]+\+ZaDark-[0-9.]+-[0-9a-fA-F]+-x86_64\.AppImage$' | head -1 || true)
+        if [ -z "$ASSET" ]; then
+          echo "Warning: no +ZaDark- x86_64 AppImage in the latest zalo-for-linux release" >&2
+          LATEST="$CURRENT"
+        else
           NEW_COMMIT=$(echo "$ASSET" | grep -oP '\-\K[0-9a-fA-F]+(?=-x86_64\.AppImage)' || true)
           NEW_ZADARK=$(echo "$ASSET" | grep -oP '\+ZaDark-\K[0-9.]+(?=-)' || true)
           CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
