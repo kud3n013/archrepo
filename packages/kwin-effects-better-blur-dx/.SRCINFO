@@ -1,7 +1,7 @@
 pkgbase = kwin-effects-better-blur-dx
 	pkgdesc = Fork of KWin's Blur effect with force blur, refraction and rounded corners (Wayland)
 	pkgver = 2.6.0
-	pkgrel = 2
+	pkgrel = 3
 	url = https://github.com/xarblu/kwin-effects-better-blur-dx
 	install = kwin-effects-better-blur-dx.install
 	arch = x86_64
