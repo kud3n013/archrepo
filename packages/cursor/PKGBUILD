@@ -3,8 +3,8 @@
 
 _pkgname=cursor
 pkgname=cursor
-pkgver=3.26.13
-_commithash=3bfec373749d3d4a53a151283022d49743ab50ba
+pkgver=3.26.16
+_commithash=8fcb8ace5c73fa31f2e2707fd6783160e4ed3e49
 pkgrel=1
 pkgdesc="AI-first code editor built for pair programming with artificial intelligence (official binary release with KDE Global Menu integration)"
 arch=('x86_64')
@@ -72,7 +72,7 @@ source=(
 
 noextract=("${pkgname}_${pkgver}_amd64.deb")
 
-sha256sums=('98580b1b8763847522171814cfd1efaa866915d09370197d65f477384aec4aae'
+sha256sums=('c2e8a604e343bb72571d07f6c148e09e124250b3e5333b13f115254272671045'
             '2c760cf0ebb0a475bfc80578e55d9a7ed410b5a5dbc23dd910b53eacb6b826a5'
             '14aa994c5a9d6bf3bad36b3e3fe5bee0cec5b50896ee6717c3f2314bf4e2ca9d'
             '1e0189f87fbe6252277e12123c23ed0760431336e012eb55dcb10289549890ec'
