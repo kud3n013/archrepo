@@ -48,10 +48,12 @@ const themeSync = process.env.CLAUDE_DESKTOP_THEME_SYNC !== "0";
 let patchedElectron = null;
 
 function framedWindowClass(electron) {
-  const { BrowserWindow } = electron;
+  const Base = electron.BrowserWindow;
 
-  // A subclass, not a wrapper, so statics such as getAllWindows() and instanceof keep working.
-  return class FramedBrowserWindow extends BrowserWindow {
+  // A subclass, not a wrapper, so statics and instanceof keep working. It must be
+  // named BrowserWindow: Electron's getAllWindows(), getFocusedWindow() and
+  // fromWebContents() keep only windows whose constructor.name is "BrowserWindow".
+  return class BrowserWindow extends Base {
     constructor(options = {}) {
       const appWindow = isAppWindow(options);
       if (appWindow) {
