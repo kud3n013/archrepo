@@ -38,10 +38,11 @@ fi
 # blurry on scaled displays. Quick Entry's GlobalShortcuts portal is already
 # enabled by the app itself, so it needs no flag.
 HAS_OZONE=false
+OZONE_X11=false
 for arg in "${FLAGS[@]}" "$@"; do
     if [[ "$arg" == --ozone-platform* ]]; then
         HAS_OZONE=true
-        break
+        [[ "$arg" == --ozone-platform=x11 ]] && OZONE_X11=true
     fi
 done
 
@@ -70,8 +71,11 @@ fi
 # colorreload-gtk-module, ...). Electron unloads GTK with dlclose(), which unmaps
 # those modules while their GIO monitors and D-Bus callbacks stay registered, and
 # the next GIO callback crashes (SIGSEGV, SEGV_ACCERR). Pin the GTK3 modules into
-# memory so dlclose() cannot unmap them.
-if [[ "$USE_GLOBALMENU_X11" == true ]]; then
+# memory so dlclose() cannot unmap them. The app follows theme changes live (see
+# theme-sync.js), so every X11 run needs this: the Global Menu path above, an
+# --ozone-platform=x11 flag, or an X11 session. Native Wayland is left alone.
+if [[ "$USE_GLOBALMENU_X11" == true || "$OZONE_X11" == true ]] ||
+   [[ "$HAS_OZONE" == false && -z "$WAYLAND_DISPLAY" && "$XDG_SESSION_TYPE" != wayland ]]; then
     for _mod in /usr/lib/gtk-3.0/modules/*.so; do
         if [[ -f "$_mod" ]]; then
             export LD_PRELOAD="${LD_PRELOAD:+${LD_PRELOAD}:}$_mod"
