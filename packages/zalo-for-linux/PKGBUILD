@@ -1,0 +1,111 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# Upstream: https://github.com/VN-Linux-Family/zalo-for-linux
+#
+# Repackages upstream's ZaDark AppImage (Electron 22) to run on the system's
+# libraries. The only change inside the app is a small bootstrap in app.asar
+# (archrepo-bootstrap.js): live theme sync from the portal, and hiding Zalo's
+# in-page title bar where KWin already draws one. The Global Menu is Zalo's own
+# menu, exported by Electron under XWayland (see zalo.sh).
+
+_pkgname=zalo
+pkgname=zalo-for-linux
+pkgver=26.10.11
+_zadarkver=26.2.1
+_commithash=412e35f
+pkgrel=1
+pkgdesc="Zalo for Linux, unofficial port with ZaDark, KDE title bar, Global Menu and live theme sync"
+arch=('x86_64')
+url="https://github.com/VN-Linux-Family/zalo-for-linux"
+license=('MIT')
+provides=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+conflicts=('zalo' 'zalo-for-linux-bin' 'zalux-bin')
+replaces=('zalo-for-linux-bin')
+backup=('etc/zalo-flags.conf')
+options=(!strip !debug)
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'dbusmenu-shortcut-shim'
+    'gcc-libs'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libdbusmenu-glib'
+    'libdrm'
+    'libnotify'
+    'libxkbcommon'
+    'mesa'
+    'nss'
+    'openssl'
+    'xz'
+)
+makedepends=('asar' 'nodejs')
+optdepends=(
+    'python: voice and video calls'
+    'opus: voice and video calls'
+    'libpulse: voice and video calls (pactl, pacat, parec)'
+    'wl-clipboard: paste images on Wayland'
+    'xclip: paste images on X11'
+    'spectacle: screenshots'
+    'flameshot: screenshots'
+)
+source=(
+    "zalo.AppImage::${url}/releases/download/${pkgver}/Zalo-${pkgver}+ZaDark-${_zadarkver}-${_commithash}-x86_64.AppImage"
+    "archrepo-bootstrap.js"
+    "patch-bootstrap.js"
+    "zalo.sh"
+    "zalo-flags.conf"
+    "zalo.desktop"
+)
+sha256sums=('9bf18f28770d1ff9faade4c32416c56b825f81966edddefde51a6c51261d8174'
+            '5e914f87d2f7ea33e4a7fe5709adc983e10a24ef68f094f177664f0ceff3f705'
+            'a4b8a8edd26a5dd9c104f61f740ab8fa1e22275237e1de35217331f54533f31f'
+            'deaf2b24234c21f1edc4ce1c3d6e9cf301c41c38a02677faaf4ec3b8cbe75a51'
+            '0258ef619d1f9f78043b96634a0aa24f2b8340f4e1536b8573e5a2991371afdf'
+            '6003f1ded1519a8a9be21a91f231bd59f5341efc20858fcf84f4f401b12b0ec2')
+
+prepare() {
+    cd "${srcdir}"
+    rm -rf AppDir squashfs-root app-src
+
+    # The AppImage is a DwarFS image behind upstream's uruntime. The runtime
+    # extracts it to ./AppDir (with a squashfs-root symlink); the app itself
+    # does not run.
+    chmod +x zalo.AppImage
+    ./zalo.AppImage --appimage-extract >/dev/null
+    [[ -x AppDir/zalo ]] || { echo "AppImage layout changed: AppDir/zalo not found" >&2; return 1; }
+
+    # Add the bootstrap to app.asar. Only the entry point in package.json changes.
+    asar extract AppDir/resources/app.asar app-src
+    node patch-bootstrap.js app-src archrepo-bootstrap.js AppDir/app/main-dist
+    node --check app-src/archrepo-bootstrap.js
+    asar pack app-src AppDir/resources/app.asar
+    rm -rf app-src
+}
+
+package() {
+    local _appdir="${srcdir}/AppDir"
+
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a "${_appdir}/." "${pkgdir}/opt/${pkgname}/"
+
+    # AppImage plumbing and the libraries electron-builder bundles (libappindicator,
+    # libgconf, libnotify, ...). The app runs on the system's libraries instead.
+    rm -rf "${pkgdir}/opt/${pkgname}"/{AppRun,.DirIcon,zalo.desktop,zalo.png,usr}
+    # electron-updater's config: updates come from pacman.
+    rm -f "${pkgdir}/opt/${pkgname}/resources/app-update.yml"
+
+    install -Dm755 "${srcdir}/zalo.sh" "${pkgdir}/usr/bin/${_pkgname}"
+    ln -s "${_pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm644 "${srcdir}/zalo-flags.conf" "${pkgdir}/etc/zalo-flags.conf"
+    install -Dm644 "${srcdir}/zalo.desktop" "${pkgdir}/usr/share/applications/zalo.desktop"
+    install -Dm644 "${_appdir}/usr/share/icons/hicolor/512x512/apps/zalo.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/zalo.png"
+
+    install -Dm644 "${_appdir}/LICENSE.electron.txt" "${_appdir}/LICENSES.chromium.html" \
+        -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

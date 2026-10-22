@@ -24,6 +24,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`steam-globalmenu`**](steam-globalmenu.md) | `1.2.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
+| [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unofficial Zalo client with ZaDark, KWin title bar, KDE Global Menu & live theme sync |
 | [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zed code editor with KDE Plasma Global Menu, server-side title bar & menu suppression |
 | [**`zotero`**](zotero.md) | `10.0.3-11` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Reference manager with native title bar, KDE Global Menu & Hyprland theming |
 
@@ -56,7 +57,6 @@ This directory contains individual documentation pages for all active packages a
 | [**`proton-pass`**](proton-pass.md) | `1.42.0-1` | Archived | Archived per maintainer request |
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.2-1` | Archived | Archived per maintainer request |
 | [**`stirling-pdf-desktop`**](stirling-pdf-desktop.md) | `3.0.1-1` | Archived | Archived per maintainer request |
-| [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-1` | Archived | Archived per maintainer request |
 | [**`zed`**](zed.md) | `1.21.0-1` | Archived | Archived per maintainer request |
 | [**`zen-browser`**](zen-browser.md) | `1.22.2b-4` | Archived | Archived per maintainer request |
 
