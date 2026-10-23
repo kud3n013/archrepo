@@ -1,0 +1,24 @@
+_howdy_hint() {
+	cat <<'MSG'
+==> linux-enable-ir-emitter: run `linux-enable-ir-emitter configure` as your
+    own user (in a large terminal) to find the control that turns the emitter on.
+    The configuration is saved to ~/.config/linux-enable-ir-emitter.toml.
+
+==> To use it with Howdy, add this line before the howdy line in every file
+    listed by `grep -rl howdy /etc/pam.d` (replace <USER>):
+      auth optional pam_exec.so /usr/bin/linux-enable-ir-emitter run --config /home/<USER>/.config/linux-enable-ir-emitter.toml
+MSG
+}
+
+post_install() {
+	_howdy_hint
+}
+
+post_upgrade() {
+	# v7 cannot read v6 configurations (/etc/linux-enable-ir-emitter/*)
+	if [ "$(vercmp "$2" 7)" -lt 0 ]; then
+		echo "==> linux-enable-ir-emitter v7 does not read v6 configurations; run \`linux-enable-ir-emitter configure\` again."
+		echo "    Update any pam_exec line that called the old binary to the v7 form below."
+		_howdy_hint
+	fi
+}

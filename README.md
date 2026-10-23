@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-45%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-46%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -80,6 +80,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Arch/CachyOS setup TUI with an App Vault backup engine and Proton Drive backups. Upstream: [kud3n013/kast](https://github.com/kud3n013/kast)
 - [**`lightcraft`**](docs/lightcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.12.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/lightcraft.md) `sudo pacman -S lightcraft`
   - LightCraft, ArtCraft's open-source photo library and raw developer (Lightroom alternative) with live light/dark switching through the XDG portal. Upstream: [storytold/lightcraft](https://github.com/storytold/lightcraft)
+- [**`linux-enable-ir-emitter`**](docs/linux-enable-ir-emitter.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-7.0.0beta2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/linux-enable-ir-emitter.md) `sudo pacman -S linux-enable-ir-emitter`
+  - Turns on the infrared emitter of IR cameras that Linux leaves dark, for Howdy face login. Tracks the v7 beta (Rust rewrite with a TUI configurator). Upstream: [EmixamPP/linux-enable-ir-emitter](https://github.com/EmixamPP/linux-enable-ir-emitter)
 - [**`millennium`**](docs/millennium.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.5.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/millennium.md) `sudo pacman -S millennium`
   - Steam Client modding framework for custom skins, themes, and community plugins. Upstream: [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium)
 - [**`obsidian`**](docs/obsidian.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.13.7--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/obsidian.md) `sudo pacman -S obsidian`
