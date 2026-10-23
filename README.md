@@ -157,15 +157,6 @@ See [`archive/README.md`](archive/README.md) for instructions on restoring archi
 
 ---
 
-## 🏠 Build-It-Yourself Packages
-
-These recipes live in [`local/`](local/README.md) and are never built by CI or published, because their licenses forbid redistribution. Build them with `makepkg -si` on your own machine.
-
-- [**`ttf-ms-win11`**](docs/ttf-ms-win11.md) [![status](https://img.shields.io/badge/status-build%20locally-lightgrey)](local/README.md) [![version](https://img.shields.io/badge/version-10.0.26200.9445--1-blue)](local/ttf-ms-win11/PKGBUILD) &bull; Location: [`local/ttf-ms-win11/`](local/ttf-ms-win11/)
-  - Microsoft Windows 11 fonts (Segoe UI, Calibri, Consolas, Yu Gothic, YaHei and more) from your own Windows 11 ISO, with `extract-fonts.sh` to pull them out. Upstream: [AUR ttf-ms-win11](https://aur.archlinux.org/packages/ttf-ms-win11)
-
----
-
 ## 📁 Repository Structure
 
 ```text
@@ -173,7 +164,6 @@ archrepo/
 ├── docs/              # Comprehensive package documentation & customization guides
 ├── packages/          # Active package build recipes (PKGBUILD, scripts, flags)
 ├── archive/           # Retired package recipes (excluded from builds & database)
-├── local/             # Build-it-yourself recipes that may not be redistributed (never built by CI)
 ├── keys/              # Public repository signing key (archrepo.asc)
 ├── tools/             # Maintainer developer utilities (clean.sh, scaffold.sh)
 ├── templates/         # Package creation prompt template for AI assistants
