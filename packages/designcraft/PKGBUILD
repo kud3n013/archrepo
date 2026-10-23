@@ -1,0 +1,37 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/designcraft
+# AUR Reference: https://aur.archlinux.org/packages/designcraft-bin
+
+pkgname=designcraft
+pkgver=0.12.0
+pkgrel=1
+pkgdesc="DesignCraft, an open-source page layout and publishing app (InDesign alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/designcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal: native file dialogs and the desktop light/dark setting'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('designcraft-bin')
+conflicts=('designcraft-bin' 'designcraft-git')
+replaces=('designcraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('0e7bbe349670f8d5eb178fa9bd4a1bf1c7c51d6a54e1b802b8dcdbb2ae68fe1d')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -dm755 "${pkgdir}/usr"
+    cp -dr --no-preserve=ownership "${_root}/bin" "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

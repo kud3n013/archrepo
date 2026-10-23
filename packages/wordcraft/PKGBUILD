@@ -1,0 +1,37 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/wordcraft
+# AUR Reference: https://aur.archlinux.org/packages/wordcraft-bin
+
+pkgname=wordcraft
+pkgver=0.10.0
+pkgrel=1
+pkgdesc="WordCraft, an open-source word processor (Word alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/wordcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal-gtk: follow the light/dark setting (WordCraft reads GNOME'\''s color-scheme key)'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('wordcraft-bin')
+conflicts=('wordcraft-bin' 'wordcraft-git')
+replaces=('wordcraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('ca99ea350ba0aea4103fc8020cad98f051c58d9e9fcf670c119d810108cc45ff')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -dm755 "${pkgdir}/usr"
+    cp -dr --no-preserve=ownership "${_root}/bin" "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

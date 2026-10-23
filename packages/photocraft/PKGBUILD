@@ -1,0 +1,44 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/photocraft
+# AUR Reference: https://aur.archlinux.org/packages/photocraft-bin
+
+pkgname=photocraft
+pkgver=0.13.0
+pkgrel=1
+pkgdesc="PhotoCraft, an open-source layered image and photo editor (Photoshop alternative) from the ArtCraft suite"
+arch=('x86_64')
+url="https://github.com/storytold/photocraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcursor' 'libxi' 'libxrandr' 'wayland' 'libglvnd' 'vulkan-icd-loader' 'jq')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal: native file dialogs and the desktop light/dark setting'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser')
+provides=('photocraft-bin')
+conflicts=('photocraft-bin' 'photocraft-git')
+replaces=('photocraft-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
+        "photocraft.sh")
+sha256sums=('baf6206b57f553576f41ccb18c6d3b12bd1f3a56933ff6775c51e551f30b9142'
+            '67d56e146a5b2c812f14fe95f98c0e35bc635e591f88df82ea0638e5f47b40fb')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    # The launcher at /usr/bin/photocraft applies archrepo's defaults once, then runs
+    # the real binary. Its share/ link keeps the app's exe-relative ../share lookups.
+    install -Dm755 "${_root}/bin/${pkgname}" "${pkgdir}/usr/lib/${pkgname}/bin/${pkgname}"
+    ln -s ../../share "${pkgdir}/usr/lib/${pkgname}/share"
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm755 "${_root}/bin/${pkgname}-cli" "${pkgdir}/usr/bin/${pkgname}-cli"
+    cp -dr --no-preserve=ownership "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
