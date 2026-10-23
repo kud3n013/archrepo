@@ -1,12 +1,13 @@
 [Desktop Entry]
 Name=Proton Pass
-Comment=Proton Pass desktop application
 GenericName=Password Manager
+Comment=Proton official desktop application for Proton Pass
 Exec=/usr/bin/proton-pass %U
 Icon=proton-pass
 Type=Application
-StartupNotify=true
-StartupWMClass=proton-pass
-Categories=Utility;Security;
-MimeType=x-scheme-handler/protonpass;
 Terminal=false
+StartupNotify=true
+StartupWMClass=Proton Pass
+Categories=Utility;Security;
+Keywords=Proton;Pass;Password;Passkey;Vault;
+MimeType=x-scheme-handler/protonpass;

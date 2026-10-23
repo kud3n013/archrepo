@@ -21,7 +21,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`effectcraft`**](effectcraft.md) | `0.15.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | EffectCraft, ArtCraft's open-source motion graphics and visual effects compositor (After Effects alternative) with live light/dark switching through the XDG portal |
 | [**`figcraft`**](figcraft.md) | `0.10.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | FigCraft, ArtCraft's open-source interface design and prototyping tool (Figma alternative) |
 | [**`filmcraft`**](filmcraft.md) | `0.11.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | FilmCraft, ArtCraft's open-source video editor with color and sound (Premiere Pro alternative) with live light/dark switching through the XDG portal |
-| [**`freedownloadmanager`**](freedownloadmanager.md) | `6.34.4.6974-4` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Download accelerator with injected dark mode & portal fix |
+| [**`freedownloadmanager`**](freedownloadmanager.md) | `6.35.1.7021-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Download accelerator with KDE Global Menu and portal dark mode fix |
 | [**`galaxybudsclient`**](galaxybudsclient.md) | `5.2.1-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Galaxy Buds manager with dynamic Wayland HiDPI auto-scaling & persistent tray |
 | [**`gdlauncher-carbon`**](gdlauncher-carbon.md) | `2.0.40-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | GDLauncher Carbon Minecraft launcher with Wayland support |
 | [**`gridcraft`**](gridcraft.md) | `0.11.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | GridCraft, ArtCraft's open-source spreadsheet app (Excel alternative) |
@@ -34,6 +34,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`photocraft`**](photocraft.md) | `0.13.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | PhotoCraft, ArtCraft's open-source layered image and photo editor (Photoshop alternative) with the window manager's title bar and live light/dark switching through the XDG portal |
 | [**`proton-drive-cli`**](proton-drive-cli.md) | `0.9.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Official Proton Drive command-line client |
 | [**`proton-mail`**](proton-mail.md) | `1.15.1-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Mail & Calendar desktop app with system tray & close-to-tray |
+| [**`proton-pass`**](proton-pass.md) | `1.42.0-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Pass password manager desktop app, updated as soon as Proton releases |
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`soundcraft`**](soundcraft.md) | `0.12.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | SoundCraft, ArtCraft's open-source digital audio workstation (Pro Tools alternative) |
@@ -68,7 +69,6 @@ This directory contains individual documentation pages for all active packages a
 | Package | Last Version | Status | Reason |
 |---|---|---|---|
 | [**`hyprmod`**](hyprmod.md) | `0.4.0-1` | Archived | Retired per maintainer request |
-| [**`proton-pass`**](proton-pass.md) | `1.42.0-1` | Archived | Archived per maintainer request |
 | [**`proton-pass-cli`**](proton-pass-cli.md) | `2.4.2-1` | Archived | Archived per maintainer request |
 | [**`stirling-pdf-desktop`**](stirling-pdf-desktop.md) | `3.0.1-1` | Archived | Archived per maintainer request |
 | [**`zed`**](zed.md) | `1.21.0-1` | Archived | Archived per maintainer request |

@@ -4,8 +4,8 @@
 
 _pkgname=freedownloadmanager
 pkgname=freedownloadmanager
-pkgver=6.34.4.6974
-pkgrel=4
+pkgver=6.35.1.7021
+pkgrel=1
 pkgdesc="Fast and powerful modern download accelerator and organizer (binary release)"
 arch=('x86_64')
 url="https://www.freedownloadmanager.org/"
@@ -19,6 +19,7 @@ options=(!strip !debug)
 
 makedepends=(
     'patchelf'
+    'qt6-declarative'
 )
 
 depends=(
@@ -62,13 +63,17 @@ source=(
     "${_pkgname}.desktop"
     "${_pkgname}.png"
     "fdm-theme-fix.c"
+    "fdm-globalmenu.cpp"
+    "GlobalMenuBar.qml"
 )
-sha512sums=('cd70e50eb7d533ed55ec02c464c8e14ac66a56e716201f39b6bf1cd47e5274b7fefc3bde80ff81cc34464ed2c1f6ee7bfb798b32737412a9eccbd92d358c8d6c'
+sha512sums=('437520fd9d920ca668046483345d4f739f2166378da5190f1641cdbaba780ae075794fea7c5f023247e477750515f7f80c066f2effd3b811777a71146540a217'
             'e991d0db3ecd87df7b590be7cc9616228e473b10759080f95d2aa27ff065e6e898fd6c038ccbb9c0e32dd851c829dde235b7764dbc98a72e0a790fd7e05dc7b5'
             '6b0d75ffc1442721ee3b89681792686f993697689b106b7b48ed450cab610f477e8a99d2a13e9b2ea07ddcf19a1b7ad69a78a260557441655dfc37db7d0a8769'
             '49d91e6cb4d5dc96c60fe9c13ac87bac4a436f89fd06770f8ea4c3f815ccbcdaedfb6422f7b4376011f7fa93c262de746349f865719984b5873f2801322e3a4b'
             '36aa9f36b18f4445ae55c886f8005947262ef1eb43a14df5b16260ca47ae832f115716568ecf1a1ea0e5f0b08eecfa3e8bdb3ee09a3ee7a58259a2ac058dde7d'
-            'ad006f70539518d2f05cf004bca3208df2a61ae2048ce917bc1c2d4ae0c2ee014623d2a0f2136f51771aa7cd6b83a64000cf7c1d8624934cd9c893b9814d7f48')
+            'ad006f70539518d2f05cf004bca3208df2a61ae2048ce917bc1c2d4ae0c2ee014623d2a0f2136f51771aa7cd6b83a64000cf7c1d8624934cd9c893b9814d7f48'
+            '5f57c4f3f730071e0926a9c97c369973f100f64d6511f1d4535966ddc80a76ac129a07f08a9fc71bcce9759f5160ebb8253d946545ac1ea43130af963e3517b0'
+            'c7e74fd8305e48375f7ae9537dc0a1510842cb54698fedaf7584081081ca907ebf5b44d8b57cb981bbd06e400109c0f4964f85ea21283d19cec438e223206ff1')
 
 prepare() {
     # Extract deb archive data payload
@@ -78,6 +83,17 @@ prepare() {
 build() {
     # Compile the environment constructor hook that ensures portal dark theme detection
     gcc -shared -fPIC -O2 -Wall "${srcdir}/fdm-theme-fix.c" -o "${srcdir}/libfdm-theme-fix.so"
+
+    # Global menu loader. Headers come from the system Qt, but it links against the
+    # Qt that FDM bundles, so --no-undefined fails the build if it needs a symbol
+    # that the bundled Qt doesn't export.
+    local qtinc=/usr/include/qt6
+    local fdmlib="${srcdir}/opt/${_pkgname}/lib"
+    g++ ${CXXFLAGS} -shared -fPIC -std=c++17 \
+        -I"${qtinc}" -I"${qtinc}/QtCore" -I"${qtinc}/QtGui" -I"${qtinc}/QtQml" \
+        "${srcdir}/fdm-globalmenu.cpp" -o "${srcdir}/libfdm-globalmenu.so" \
+        ${LDFLAGS} -Wl,--no-undefined -Wl,-rpath,'$ORIGIN' -Wl,-rpath-link,"${fdmlib}" -L"${fdmlib}" \
+        -l:libQt6Qml.so.6 -l:libQt6Gui.so.6 -l:libQt6Core.so.6
 }
 
 package() {
@@ -88,9 +104,14 @@ package() {
     # Install environment constructor hook into bundled libraries
     install -Dm755 "${srcdir}/libfdm-theme-fix.so" "${pkgdir}/opt/${_pkgname}/lib/libfdm-theme-fix.so"
 
-    # Inject constructor hook into fdm binary DT_NEEDED so it loads on EVERY invocation
+    # Install the global menu loader and the menu it loads
+    install -Dm755 "${srcdir}/libfdm-globalmenu.so" "${pkgdir}/opt/${_pkgname}/lib/libfdm-globalmenu.so"
+    install -Dm644 "${srcdir}/GlobalMenuBar.qml" "${pkgdir}/usr/share/freedownloadmanager/GlobalMenuBar.qml"
+
+    # Inject both libraries into the fdm binary's DT_NEEDED so they load on EVERY invocation
     # (autostart, browser magnet/torrent handler, internal app restart, and CLI)
     patchelf --add-needed libfdm-theme-fix.so "${pkgdir}/opt/${_pkgname}/fdm"
+    patchelf --add-needed libfdm-globalmenu.so "${pkgdir}/opt/${_pkgname}/fdm"
 
     # Ensure binary permissions
     chmod 755 "${pkgdir}/opt/${_pkgname}/fdm"
