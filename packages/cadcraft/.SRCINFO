@@ -1,6 +1,6 @@
 pkgbase = cadcraft
 	pkgdesc = CADCraft, an open-source 2D CAD and drafting app (AutoCAD alternative) from the ArtCraft suite
-	pkgver = 0.11.0
+	pkgver = 0.12.0
 	pkgrel = 1
 	url = https://github.com/storytold/cadcraft
 	arch = x86_64
@@ -29,9 +29,9 @@ pkgbase = cadcraft
 	replaces = cadcraft-bin
 	options = !strip
 	options = !debug
-	source = cadcraft-0.11.0-linux-x86_64.tar.gz::https://github.com/storytold/cadcraft/releases/download/v0.11.0/cadcraft-0.11.0-linux-x86_64.tar.gz
+	source = cadcraft-0.12.0-linux-x86_64.tar.gz::https://github.com/storytold/cadcraft/releases/download/v0.12.0/cadcraft-0.12.0-linux-x86_64.tar.gz
 	source = cadcraft.sh
-	sha256sums = 7f551bb2897c3409992cbdbc9f82e0d95fd8edb9493ce941472f37ff040ce58d
+	sha256sums = 6ae27b9eabc3608caef356a00f69b9fdccbf1e408d6308b5614b6e6b256308de
 	sha256sums = b6170456a89479f86ede2c11d7ae50aa50725c8f14b8f44099df818ac8f3596c
 
 pkgname = cadcraft
