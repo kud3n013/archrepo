@@ -1,6 +1,0 @@
-# Microsoft fonts and their license are not redistributable: never commit them
-*.ttf
-*.ttc
-*.TTF
-*.TTC
-license.rtf
