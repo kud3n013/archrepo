@@ -43,6 +43,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`wordcraft`**](wordcraft.md) | `0.10.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | WordCraft, ArtCraft's open-source word processor (Word alternative) |
 | [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zalo with ZaDark, KDE Global Menu, native title bar & live light/dark switching |
 | [**`zed-globalmenu`**](zed-globalmenu.md) | `1.21.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zed code editor with KDE Plasma Global Menu, server-side title bar & menu suppression |
+| [**`z-library`**](z-library.md) | `3.2.1-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Z-Library desktop app with native title bar, KDE Global Menu & pacman-managed updates |
 | [**`zotero`**](zotero.md) | `10.0.3-11` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Reference manager with native title bar, KDE Global Menu & Hyprland theming |
 
 ---
