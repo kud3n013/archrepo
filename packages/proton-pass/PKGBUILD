@@ -8,8 +8,8 @@
 # theme by default. The app icon is this repository's own.
 
 pkgname=proton-pass
-pkgver=1.42.0
-pkgrel=2
+pkgver=1.43.0
+pkgrel=1
 pkgdesc="Proton official desktop application for Proton Pass, the end-to-end encrypted password manager"
 arch=('x86_64')
 url="https://proton.me/pass"
@@ -47,7 +47,7 @@ source=(
 )
 # makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
 noextract=("${_deb}")
-sha512sums=('860550c8741da153494d381743226c9d44cfba42b381239f0f083336101d60e27340c10b00c2bcd2a0ec5cd8c226a4e8cb60508940b9cfdcc079584af035eec8'
+sha512sums=('ac19002dd7e5e6110fd5ca5d342d2cacbd2528d95966e83c1ac8df928e86506927d9cad1ffafaa1b542bb6ebf13aaa8f7b5e6d6499531a62aa82bbf82a706c62'
             'f553557f47c2f28b7659738ad7a760b8d1c799844fc4d827b93f94e3033592e93a45196156c5d2a1b5d4082d72d815504310b8392ed8106970b927ff98430525'
             '731dc22624bc42eb65c04b8bdd4c24cd5bfcd04fd62a7488bd5810204c9a806eb4c5cd12893e344e54f0cb88790f36c00f2ca180cd0283d9d8aed5e421126816'
             'a62f78cb7e4e90d981c6793e152cd5eef7793a6a604f6b372643813b172727197f986d60ea0f5a42ceb5a4b12c19a19d763956b444271efcf92faeac507c3419'
