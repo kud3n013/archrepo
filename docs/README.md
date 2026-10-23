@@ -64,6 +64,14 @@ This directory contains individual documentation pages for all active packages a
 
 ---
 
+## 🏠 Build-It-Yourself Packages
+
+| Package | Version | Status | Description |
+|---|---|---|---|
+| [**`ttf-ms-win11`**](ttf-ms-win11.md) | `10.0.26200.9445-1` | Local build only | Microsoft Windows 11 fonts from your own Windows 11 ISO (not redistributable, never published) |
+
+---
+
 ## 🗄️ Archived Packages
 
 | Package | Last Version | Status | Reason |
