@@ -198,6 +198,29 @@ case "$CHECK" in
     fi
     ;;
 
+  linux-enable-ir-emitter-release)
+    # Prereleases count (the package tracks the v7 beta), so /releases/latest is
+    # not used. The newest release with the x86-64 binary wins; its version comes
+    # from the asset name, because the tag can lag it (tag 7.0.0-beta ships
+    # 7.0.0-beta2). Hyphens are dropped (7.0.0-beta2 -> 7.0.0beta2) so vercmp
+    # orders the prerelease before the final 7.0.0.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASE_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases?per_page=20" | \
+        jq -c '[.[] | select(.draft == false and any(.assets[].name; test("^linux-enable-ir-emitter-.+-release-x86-64\\.tar\\.gz$")))][0] // empty' 2>/dev/null || true)
+      if [ -n "$RELEASE_JSON" ]; then
+        NEW_RELTAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty')
+        VER=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' | grep -oP '^linux-enable-ir-emitter-\K.+(?=-release-x86-64\.tar\.gz$)' | head -1 || true)
+        VER="${VER//-/}"
+        [ -n "$VER" ] && LATEST="$VER"
+        CURRENT_RELTAG=$(grep -oP '^_reltag=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+        if [ -n "$NEW_RELTAG" ] && [ "$NEW_RELTAG" != "$CURRENT_RELTAG" ]; then
+          UPDATE_NEEDED=true
+          EXTRA_INFO="tag: ${CURRENT_RELTAG} -> ${NEW_RELTAG}"
+        fi
+      fi
+    fi
+    ;;
+
   obsidian-desktop)
     # Obsidian releases include both mobile (e.g. Android apk only) and desktop builds.
     # Filter releases for the latest release containing the desktop debian package.
@@ -246,6 +269,7 @@ if [ "$LATEST" != "$CURRENT" ]; then
     NEW_BUILD=""
     NEW_COMMIT=""
     NEW_ZADARK=""
+    NEW_RELTAG=""
   else
     UPDATE_NEEDED=true
   fi
@@ -302,6 +326,9 @@ if [ "$APPLY" = "--apply" ] && [ "$UPDATE_NEEDED" = "true" ]; then
   fi
   if [ -n "${NEW_ZADARK:-}" ] && [[ "$NEW_ZADARK" =~ ^[0-9.]+$ ]]; then
     sed -i "s/^_zadarkver=.*/_zadarkver=${NEW_ZADARK}/" "${PKG_DIR}/PKGBUILD"
+  fi
+  if [ -n "${NEW_RELTAG:-}" ] && [[ "$NEW_RELTAG" =~ ^[0-9A-Za-z._+-]+$ ]]; then
+    sed -i "s/^_reltag=.*/_reltag=${NEW_RELTAG}/" "${PKG_DIR}/PKGBUILD"
   fi
   if [ -n "$NEW_KWIN" ] && [[ "$NEW_KWIN" =~ ^[0-9A-Za-z._+:-]+$ ]]; then
     sed -i "s/^_kwinver=.*/_kwinver=${NEW_KWIN}/" "${PKG_DIR}/PKGBUILD"

@@ -1,0 +1,23 @@
+pkgbase = linux-enable-ir-emitter
+	pkgdesc = Enables infrared cameras that are not directly enabled out-of-the-box (v7 beta, Rust rewrite)
+	pkgver = 7.0.0beta2
+	pkgrel = 1
+	url = https://github.com/EmixamPP/linux-enable-ir-emitter
+	install = linux-enable-ir-emitter.install
+	arch = x86_64
+	license = MIT
+	depends = gcc-libs
+	depends = glibc
+	optdepends = howdy-next: facial-recognition login that uses the IR camera
+	provides = linux-enable-ir-emitter-bin=7.0.0beta2
+	conflicts = linux-enable-ir-emitter-bin
+	conflicts = linux-enable-ir-emitter-git
+	replaces = linux-enable-ir-emitter-bin
+	options = !strip
+	options = !debug
+	source = linux-enable-ir-emitter-7.0.0beta2.tar.gz::https://github.com/EmixamPP/linux-enable-ir-emitter/releases/download/7.0.0-beta/linux-enable-ir-emitter-7.0.0-beta2-release-x86-64.tar.gz
+	source = LICENSE-7.0.0beta2::https://raw.githubusercontent.com/EmixamPP/linux-enable-ir-emitter/7.0.0-beta/LICENSE
+	sha256sums = f7c48323d608291a96ea439a23f45d4dd90fecd5b6b85d7fe42baa72f9b7904b
+	sha256sums = 0c046ae9a18c9f3b87b7a8f36d86db42e44c335846bfd6416a85f11fe068d282
+
+pkgname = linux-enable-ir-emitter

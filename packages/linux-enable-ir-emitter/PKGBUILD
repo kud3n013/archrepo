@@ -1,0 +1,38 @@
+# Maintainer: archrepo CI <ci@archrepo>
+# AUR Reference: https://aur.archlinux.org/packages/linux-enable-ir-emitter
+# Upstream: https://github.com/EmixamPP/linux-enable-ir-emitter
+
+pkgname=linux-enable-ir-emitter
+pkgver=7.0.0beta2
+pkgrel=1
+# Prereleases are stored without the hyphen (7.0.0-beta2 -> 7.0.0beta2) so
+# pacman sorts them before the final release; restore it for the asset name.
+_ver="$pkgver"
+[[ "$pkgver" =~ ^([0-9.]+)([a-z].*)$ ]] && _ver="${BASH_REMATCH[1]}-${BASH_REMATCH[2]}"
+# The release tag can differ from the binary's version (tag 7.0.0-beta ships
+# 7.0.0-beta2), so the nightly check records it separately.
+_reltag=7.0.0-beta
+pkgdesc="Enables infrared cameras that are not directly enabled out-of-the-box (v7 beta, Rust rewrite)"
+arch=('x86_64')
+url="https://github.com/EmixamPP/linux-enable-ir-emitter"
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+optdepends=('howdy-next: facial-recognition login that uses the IR camera')
+provides=("${pkgname}-bin=${pkgver}")
+conflicts=("${pkgname}-bin" "${pkgname}-git")
+replaces=("${pkgname}-bin")
+install=linux-enable-ir-emitter.install
+options=(!strip !debug)
+
+source=(
+	"${pkgname}-${pkgver}.tar.gz::${url}/releases/download/${_reltag}/${pkgname}-${_ver}-release-x86-64.tar.gz"
+	"LICENSE-${pkgver}::https://raw.githubusercontent.com/EmixamPP/linux-enable-ir-emitter/${_reltag}/LICENSE"
+)
+sha256sums=('f7c48323d608291a96ea439a23f45d4dd90fecd5b6b85d7fe42baa72f9b7904b'
+            '0c046ae9a18c9f3b87b7a8f36d86db42e44c335846bfd6416a85f11fe068d282')
+
+package() {
+	# Upstream's tarball holds only the executable
+	install -Dm755 "${srcdir}/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+	install -Dm644 "${srcdir}/LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
