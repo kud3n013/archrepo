@@ -164,6 +164,18 @@ case "$CHECK" in
     fi
     ;;
 
+  freedownloadmanager-deb)
+    # Upstream only publishes an unversioned "latest" .deb. The control member sits
+    # at the start of the ar archive, so the first 256 KiB is enough to read Version.
+    DEB_HEAD=$(mktemp)
+    curl -s -r 0-262143 -o "$DEB_HEAD" "https://files2.freedownloadmanager.org/6/latest/freedownloadmanager.deb" || true
+    VER=$(bsdtar -xOf "$DEB_HEAD" 'control.tar.*' 2>/dev/null | bsdtar -xOf - ./control 2>/dev/null | sed -n 's/^Version: *//p' | head -1 || true)
+    rm -f "$DEB_HEAD"
+    VER="${VER#*:}"   # epoch
+    VER="${VER%%-*}"  # Debian revision
+    [ -n "$VER" ] && LATEST="$VER"
+    ;;
+
   proton-mail-json)
     VER=$(curl -s "https://proton.me/download/mail/linux/version.json" | jq -r '.Releases[0].Version // empty' 2>/dev/null || true)
     [ -n "$VER" ] && [ "$VER" != "null" ] && LATEST="$VER"
