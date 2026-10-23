@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-44%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-45%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -110,6 +110,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Zalo messaging client with ZaDark, KDE Global Menu, the window manager's title bar and live light/dark switching. Upstream: [VN-Linux-Family/zalo-for-linux](https://github.com/VN-Linux-Family/zalo-for-linux)
 - [**`zed-globalmenu`**](docs/zed-globalmenu.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.21.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zed-globalmenu.md) `sudo pacman -S zed-globalmenu`
   - High-performance code editor patched with KDE Plasma Global Menu export, server-side decorations, and in-app menu suppression. Upstream: [Zed](https://zed.dev)
+- [**`z-library`**](docs/z-library.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.2.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/z-library.md) `sudo pacman -S z-library`
+  - Z-Library desktop app with the window manager's title bar, its menu in the KDE Plasma Global Menu, and pacman-managed updates; bundled Tor and Xray for Linux only. Upstream: [Z-Library](https://z-lib.fm)
 - [**`zotero`**](docs/zotero.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-10.0.3--11-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/zotero.md) `sudo pacman -S zotero`
   - Reference manager with native title bar decorations, KDE Global Menu via LD_PRELOAD, and Hyprland/KDE auto-theming. Upstream: [Zotero](https://www.zotero.org)
 

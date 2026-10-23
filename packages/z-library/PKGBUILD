@@ -1,0 +1,192 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://z-lib.fm
+
+# Z-Library publishes its desktop app for Linux as a plain x64 tarball (Electron
+# 30) with a Tor client and an Xray client next to it, which the app starts to
+# reach the library. This recipe installs it under /opt and adds Linux desktop
+# integration. The only addition inside app.asar is a bootstrap that runs before
+# the app's entry point (see z-library-bootstrap.js); no upstream file is edited.
+#
+# Left out, because the app never loads them: the Windows builds of Tor, Xray and
+# their transports, the Conjure transport (torrc_template configures lyrebird
+# only), the bundled OpenSSL (tor has no RUNPATH and links the system's), stray
+# TypeScript sources, and the copies of Tor and Xray inside app.asar that the app
+# uses only when it is not packaged.
+
+pkgname=z-library
+pkgver=3.2.1
+pkgrel=1
+pkgdesc="Z-Library desktop app, with native title bar, KDE Global Menu and pacman-managed updates"
+arch=('x86_64')
+url="https://z-lib.fm"
+license=('LicenseRef-Z-Library')
+makedepends=('asar' 'nodejs')
+
+# Libraries the Electron binary links directly (objdump -p), plus what it opens
+# at runtime. openssl and zlib are for the bundled tor; lyrebird needs only glibc
+# and xray is static.
+depends=(
+    'alsa-lib'
+    'at-spi2-core'
+    'cairo'
+    'dbus'
+    'expat'
+    'gcc-libs'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libcups'
+    'libdrm'
+    'libx11'
+    'libxcb'
+    'libxcomposite'
+    'libxdamage'
+    'libxext'
+    'libxfixes'
+    'libxkbcommon'
+    'libxrandr'
+    'mesa'
+    'nspr'
+    'nss'
+    'openssl'
+    'pango'
+    'systemd-libs'
+    'xdg-utils'
+    'zlib'
+)
+optdepends=(
+    'libsecret: keep the sign-in encrypted in a Secret Service keyring (GNOME Keyring, KeePassXC)'
+    'kwallet: keep the sign-in encrypted in KWallet on KDE Plasma'
+    'xdg-desktop-portal-kde: file dialogs and system settings on KDE Plasma'
+    'xdg-desktop-portal-gtk: file dialogs and system settings on GTK desktops'
+    'wl-clipboard: Wayland clipboard integration'
+    'xclip: X11 clipboard integration'
+)
+
+# The AUR packages of the same app install the same files.
+provides=('z-library-bin' 'z-library-electron')
+conflicts=('z-library-bin' 'z-library-electron')
+replaces=('z-library-bin')
+
+backup=("etc/${pkgname}-flags.conf")
+install="${pkgname}.install"
+# Electron binaries break if stripped, and !debug is only meaningful for compiled packages.
+options=('!strip' '!debug')
+
+source=(
+    "https://s3proxy-alp.cdn-zlib.sk/swfs_second_public_files/soft/desktop/Z-Library-${pkgver}.tar.gz"
+    "${pkgname}.sh"
+    "${pkgname}.desktop"
+    "${pkgname}-flags.conf"
+    "patch-asar.js"
+    "${pkgname}-bootstrap.js"
+)
+sha256sums=('303e1d6eb1e8e6604075da0c728e974de6ad76e480a30ea79cb8df157d9151f4'
+            'a2e3096bb814bde7d87d7e7be7fdf7a993291281ce5a055ef3830d76bc0e14ef'
+            '284394077013b6acc2d249a493371de4088500b6ad0192dd643cee843cf1add0'
+            'd3c24c679660aad8ead45b360ddd998e44356e958808bd782507040568d7b528'
+            '508aca792de5666da77457db5710ae2df3eb30a78749be723d6142beedbc7802'
+            '40ac942f69960038779300f04fe9c2dd3eee9e1a7e1a196981ed4f22b3735631')
+
+prepare() {
+    cd "${srcdir}/Z-Library-${pkgver}"
+    local _proxies="resources/proxies"
+
+    # Files the app starts from resources/proxies (dist-electron/main.js). A bump
+    # that moves them fails here instead of shipping an app that cannot connect.
+    local _file
+    for _file in \
+        torProxy/configs/torrc_template \
+        torProxy/linux-64/tor \
+        torProxy/linux-64/libevent-2.1.so.7 \
+        torProxy/linux-64/pluggable_transports/lyrebird \
+        xray-proxy/xray/linux-64/xray \
+        xray-proxy/xray/configs; do
+        if [[ ! -e "${_proxies}/${_file}" ]]; then
+            echo "missing ${_proxies}/${_file}" >&2
+            return 1
+        fi
+    done
+
+    rm -rf \
+        "${_proxies}/torProxy/windows-64" \
+        "${_proxies}/torProxy/configs/pluggable_transports" \
+        "${_proxies}/torProxy/linux-64/libssl.so.3" \
+        "${_proxies}/torProxy/linux-64/libcrypto.so.3" \
+        "${_proxies}/torProxy/linux-64/pluggable_transports/conjure-client" \
+        "${_proxies}/torProxy/linux-64/pluggable_transports/README.CONJURE.md" \
+        "${_proxies}/torProxy/index.ts" \
+        "${_proxies}/torProxy/index.js" \
+        "${_proxies}/torProxy/index.js.map" \
+        "${_proxies}/xray-proxy/xray/windows-64" \
+        "${_proxies}/xray-proxy/index.ts" \
+        "${_proxies}/utils" \
+        resources/apparmor-profile
+
+    # Add the bootstrap to app.asar. Upstream ships no app.asar.unpacked, and the
+    # repacked archive must not grow one.
+    if [[ -e resources/app.asar.unpacked ]]; then
+        echo "upstream now ships app.asar.unpacked; repack it with --unpack" >&2
+        return 1
+    fi
+
+    rm -rf "${srcdir}/app-src"
+    asar extract resources/app.asar "${srcdir}/app-src"
+    if [[ ! -f "${srcdir}/app-src/dist-electron/mainWindowPreload.cjs" ]]; then
+        echo "dist-electron/mainWindowPreload.cjs not found; the bootstrap finds the main window by it" >&2
+        return 1
+    fi
+    node "${srcdir}/patch-asar.js" "${srcdir}/app-src" "${srcdir}/${pkgname}-bootstrap.js"
+    node --check "${srcdir}/app-src/archrepo-bootstrap.cjs"
+
+    # Development copies of Tor and Xray (about 290 MB). The packaged app reads
+    # them from resources/proxies; these are used only when app.isPackaged is false.
+    rm -rf "${srcdir}/app-src/dist-electron/"{tor,xray,configs}
+
+    # Icons, from the macOS iconset inside app.asar.
+    rm -rf "${srcdir}/icons"
+    cp -r "${srcdir}/app-src/dist/icon.iconset" "${srcdir}/icons"
+
+    asar pack "${srcdir}/app-src" resources/app.asar
+    rm -rf "${srcdir}/app-src"
+
+    if [[ -e resources/app.asar.unpacked ]]; then
+        echo "asar pack created app.asar.unpacked" >&2
+        return 1
+    fi
+}
+
+package() {
+    # 1. Application tree. The Electron binary finds its resources relative to
+    #    its own path, so the tree is kept whole under /opt.
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    cp -a "${srcdir}/Z-Library-${pkgver}/." "${pkgdir}/opt/${pkgname}/"
+
+    # 2. Launcher with the flags file, Wayland and Global Menu handling.
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+
+    # 3. Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+    # 4. Desktop entry.
+    install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+    # 5. Icons. The iconset names files by point size; @2x files are double that.
+    local _size
+    for _size in 16 32 128 256 512; do
+        install -Dm644 "${srcdir}/icons/icon_${_size}x${_size}.png" \
+            "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/${pkgname}.png"
+    done
+    install -Dm644 "${srcdir}/icons/icon_32x32@2x.png" "${pkgdir}/usr/share/icons/hicolor/64x64/apps/${pkgname}.png"
+    install -Dm644 "${srcdir}/icons/icon_512x512.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+
+    # 6. Licenses shipped next to the binaries.
+    install -Dm644 "${pkgdir}/opt/${pkgname}/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    install -Dm644 "${pkgdir}/opt/${pkgname}/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+    install -Dm644 "${pkgdir}/opt/${pkgname}/resources/proxies/xray-proxy/xray/linux-64/LICENSE" \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.xray"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+    chmod 4755 "${pkgdir}/opt/${pkgname}/chrome-sandbox"
+}

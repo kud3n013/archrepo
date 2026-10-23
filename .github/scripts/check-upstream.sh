@@ -216,6 +216,17 @@ case "$CHECK" in
     [ -n "$VER" ] && LATEST="$VER"
     ;;
 
+  z-library-feed)
+    # The app's own electron-updater feed (named by the library's /eapi/info/service).
+    # It lists only the .deb and .rpm, so a version is taken only once the tarball
+    # the PKGBUILD downloads is up next to it.
+    FEED_BASE="https://s3proxy-alp.cdn-zlib.sk/swfs_second_public_files/soft/desktop"
+    VER=$(curl -s -m 30 "${FEED_BASE}/latest-linux.yml" | grep -oP '^version:\s*\K[0-9.]+' | head -1 || true)
+    if [ -n "$VER" ] && curl -sfI -m 30 -o /dev/null "${FEED_BASE}/Z-Library-${VER}.tar.gz"; then
+      LATEST="$VER"
+    fi
+    ;;
+
   none)
     ;;
 esac
