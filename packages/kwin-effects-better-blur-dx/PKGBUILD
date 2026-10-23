@@ -4,12 +4,12 @@
 
 pkgname=kwin-effects-better-blur-dx
 pkgver=2.6.0
-pkgrel=3
+pkgrel=4
 # The Arch kwin version (pkgver-pkgrel) this build targets. The effect links
 # against KWin's private C++ API, so it only loads against the exact kwin it
 # was built for. CI bumps this together with pkgrel (see rebuild_on in
 # upstream.json) whenever Arch ships a new kwin.
-_kwinver=6.8.1-1
+_kwinver=6.8.1-2
 pkgdesc="Fork of KWin's Blur effect with force blur, refraction and rounded corners (Wayland)"
 arch=('x86_64')
 url="https://github.com/xarblu/kwin-effects-better-blur-dx"
