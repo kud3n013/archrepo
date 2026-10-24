@@ -73,7 +73,7 @@ What the bootstrap does on Linux:
 - `setTitleBarOverlay()` becomes a no-op. It is a Windows-only call that the app makes on every window, and it throws on Linux.
 - Quick Entry, the Cowork glow and the small indicator window stay frameless. They set `frame: false`, `transparent` or `alwaysOnTop`, so the rule above does not match them.
 - Each framed window logs one line to stderr: `[archrepo] native frame for window "<title>"`.
-- The claude.ai view is told the window is always fullscreen. claude.ai keeps the top right of its header free for the window buttons that `titleBarOverlay` draws (120 px on Linux) and gives that space back only in fullscreen. With the native frame those buttons are gone, so without this the header buttons stop 120 px short of the right edge, in a chat and on the new chat page. The bootstrap answers the page's `WindowState` `getFullscreen` call with `true` and rewrites its `fullscreenChanged` event to `true`. In this claude.ai build the page uses that state only for the window button space.
+- claude.ai's top bar (the row with the sidebar and back buttons) keeps 120 px at its end for the window buttons that `titleBarOverlay` draws. With the native frame those buttons are gone, so the top bar's buttons stopped 120 px short of the right edge, in a chat and on the new chat page. The bootstrap inserts CSS into every web contents that removes that space from `.dframe-chrome-bar` and puts its last button 8 px from the edge, in line with the pane header's buttons below it. An earlier version told the page the window was always fullscreen, but claude.ai changes other parts of its layout in fullscreen (the browser panel lost its divider, for example).
 
 **Opt out:** start the app with `CLAUDE_DESKTOP_CSD=1` (for example `CLAUDE_DESKTOP_CSD=1 claude-desktop`) to get upstream's frameless window back.
 
@@ -101,7 +101,7 @@ On KDE Plasma the launcher runs the app under XWayland (`--ozone-platform=x11`),
 **Electron fuses:** the package does not change any fuse. `EnableEmbeddedAsarIntegrityValidation` is on in this build. In a test on Linux (Electron 44.7.2), a repacked `app.asar` still started, so the bootstrap loads on this platform.
 
 **Not verified:**
-- The header layout after the fullscreen change was checked by reading the bundled claude.ai frontend and by checking, in a test run, that the claude.ai view gets `true` from `getFullscreen` and from `fullscreenChanged` while the window is not fullscreen. The signed-in header itself was not seen, because no account was available.
+- The top bar CSS was checked in a signed-in test run on the new chat page, in a chat, in an artifact and with the browser panel open. Right-to-left layouts were not checked.
 - Quick Entry staying frameless was checked by reading its window options, not by opening it.
 - Upgrading over the AUR `claude-desktop` 2.42304.0-1 package was not tested.
 

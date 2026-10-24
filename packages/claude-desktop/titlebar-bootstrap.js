@@ -32,40 +32,24 @@ function withNativeFrame(options) {
 // The aria-label form covers the login page's top bar if the test id ever changes.
 const IN_PAGE_MENU_CSS = `[data-testid="topbar-windows-menu"], div.draggable.fixed.top-0 button[aria-label="Menu"] { display: none !important; }`;
 
-// claude.ai keeps the top right of its header free for the window buttons that
-// titleBarOverlay draws (120px on Linux, from env(titlebar-area-*) with a fixed
-// fallback). With a native frame those buttons are gone but the gap stays, so the
-// header buttons end short of the right edge. The page reserves nothing while it
-// believes the window is fullscreen, and that belief is used for nothing else, so the
-// claude.ai view is told the window is always fullscreen. The page asks over the
-// WindowState IPC interface: a getFullscreen call and a fullscreenChanged event. The
-// channel names carry a per-build id, so they are matched by suffix.
-const FULLSCREEN_QUERY = "_$_claude.web_$_WindowState_$_getFullscreen";
-const FULLSCREEN_EVENT = "_$_claude.web_$_WindowState_$_fullscreenChanged";
+// claude.ai's top bar (.dframe-chrome-bar, the 36px row with the sidebar and back
+// buttons) keeps its end free for the window buttons that titleBarOverlay draws: its
+// padding uses env(titlebar-area-*) with a 120px fallback on Linux, and
+// --df-chrome-bar-caption-reserve carries the same 120px. With a native frame those
+// buttons are gone, so the top bar's own buttons stopped 120px short of the edge. The
+// page sets these as inline styles, which !important rules override. The end gutter
+// defaults to 8px instead of the page's 12px so the top bar's last button lines up with
+// the pane header's buttons below it, which sit 8px from the edge. Faking fullscreen
+// also removed the gap, but claude.ai changes other parts of its layout in fullscreen.
+const WINDOW_CONTROLS_GAP_CSS = `.dframe-chrome-bar { padding-inline-start: 12px !important; padding-inline-end: var(--df-chrome-bar-end-gutter, 8px) !important; --df-chrome-bar-pad-start: 12px !important; --df-chrome-bar-caption-reserve: 0px !important; }`;
 
-function hideWindowControlsGap(contents) {
-  const ipc = contents.ipc;
-  const handle = ipc.handle;
-  ipc.handle = function (channel, listener) {
-    if (typeof channel === "string" && channel.endsWith(FULLSCREEN_QUERY)) {
-      // The app's listener checks the caller's origin and throws if it fails, so it
-      // still runs and only its answer is replaced.
-      const original = listener;
-      listener = async (...args) => {
-        await original(...args);
-        return true;
-      };
-    }
-    return handle.call(this, channel, listener);
-  };
-
-  const send = contents.send;
-  contents.send = function (channel, ...args) {
-    if (typeof channel === "string" && channel.endsWith(FULLSCREEN_EVENT)) {
-      return send.call(this, channel, true);
-    }
-    return send.call(this, channel, ...args);
-  };
+// Navigation drops inserted CSS, so it is inserted again on every page load.
+function insertCSSOnLoad(contents, css) {
+  contents.on("dom-ready", () => {
+    contents.insertCSS(css).catch((error) => {
+      require("fs").writeSync(2, `[archrepo] insertCSS failed: ${error}\n`);
+    });
+  });
 }
 
 // The launcher (claude-desktop.sh) runs the app under XWayland on KDE, which is the
@@ -117,23 +101,15 @@ function patchElectron(electron) {
   if (nativeFrames) {
     overrides.BrowserWindow = framedWindowClass(electron);
 
-    // Every web contents, because the claude.ai view is created before it is attached
-    // to a window and registers its IPC handlers right away. Only the claude.ai view
-    // has the claude.web WindowState interface.
+    // The in-page title bar is a separate web contents (a view hosted by the window), so
+    // the CSS goes into every web contents, not only the window's own page.
     electron.app.on("web-contents-created", (_event, contents) => {
-      hideWindowControlsGap(contents);
+      insertCSSOnLoad(contents, WINDOW_CONTROLS_GAP_CSS);
     });
 
-    // The in-page title bar is a separate web contents (a view hosted by the window), so
-    // the CSS goes into every web contents, not only the window's own page. Navigation
-    // drops inserted CSS, so it is inserted again on every page load.
     if (globalMenuActive(electron)) {
       electron.app.on("web-contents-created", (_event, contents) => {
-        contents.on("dom-ready", () => {
-          contents.insertCSS(IN_PAGE_MENU_CSS).catch((error) => {
-            require("fs").writeSync(2, `[archrepo] insertCSS failed: ${error}\n`);
-          });
-        });
+        insertCSSOnLoad(contents, IN_PAGE_MENU_CSS);
       });
     }
   }
