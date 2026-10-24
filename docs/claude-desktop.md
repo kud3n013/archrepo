@@ -1,7 +1,7 @@
 # Claude Desktop (`claude-desktop`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-3.1623.0--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-3.6556.2--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#native-title-bar)
 [![upstream](https://img.shields.io/badge/upstream-anthropic-informational)](https://claude.ai/download)
 
@@ -24,7 +24,7 @@ sudo pacman -S claude-desktop
 | Attribute | Value |
 |---|---|
 | **Package Name** | `claude-desktop` |
-| **Current Version** | `2.42304.2-2` |
+| **Current Version** | `3.6556.2-2` |
 | **Package Type** | **Modified (repackaged upstream .deb, native window title bar, theme sync)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Claude Desktop](https://claude.ai/download) |
@@ -73,6 +73,7 @@ What the bootstrap does on Linux:
 - `setTitleBarOverlay()` becomes a no-op. It is a Windows-only call that the app makes on every window, and it throws on Linux.
 - Quick Entry, the Cowork glow and the small indicator window stay frameless. They set `frame: false`, `transparent` or `alwaysOnTop`, so the rule above does not match them.
 - Each framed window logs one line to stderr: `[archrepo] native frame for window "<title>"`.
+- The claude.ai view is told the window is always fullscreen. claude.ai keeps the top right of its header free for the window buttons that `titleBarOverlay` draws (120 px on Linux) and gives that space back only in fullscreen. With the native frame those buttons are gone, so without this the header buttons stop 120 px short of the right edge, in a chat and on the new chat page. The bootstrap answers the page's `WindowState` `getFullscreen` call with `true` and rewrites its `fullscreenChanged` event to `true`. In this claude.ai build the page uses that state only for the window button space.
 
 **Opt out:** start the app with `CLAUDE_DESKTOP_CSD=1` (for example `CLAUDE_DESKTOP_CSD=1 claude-desktop`) to get upstream's frameless window back.
 
@@ -100,7 +101,7 @@ On KDE Plasma the launcher runs the app under XWayland (`--ozone-platform=x11`),
 **Electron fuses:** the package does not change any fuse. `EnableEmbeddedAsarIntegrityValidation` is on in this build. In a test on Linux (Electron 44.7.2), a repacked `app.asar` still started, so the bootstrap loads on this platform.
 
 **Not verified:**
-- The in-page window buttons in the claude.ai view are not hidden. Their markup only appears when signed in, and no account was available to check it. If you see two sets of window buttons, use `CLAUDE_DESKTOP_CSD=1`.
+- The header layout after the fullscreen change was checked by reading the bundled claude.ai frontend and by checking, in a test run, that the claude.ai view gets `true` from `getFullscreen` and from `fullscreenChanged` while the window is not fullscreen. The signed-in header itself was not seen, because no account was available.
 - Quick Entry staying frameless was checked by reading its window options, not by opening it.
 - Upgrading over the AUR `claude-desktop` 2.42304.0-1 package was not tested.
 

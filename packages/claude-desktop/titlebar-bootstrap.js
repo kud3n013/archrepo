@@ -32,6 +32,42 @@ function withNativeFrame(options) {
 // The aria-label form covers the login page's top bar if the test id ever changes.
 const IN_PAGE_MENU_CSS = `[data-testid="topbar-windows-menu"], div.draggable.fixed.top-0 button[aria-label="Menu"] { display: none !important; }`;
 
+// claude.ai keeps the top right of its header free for the window buttons that
+// titleBarOverlay draws (120px on Linux, from env(titlebar-area-*) with a fixed
+// fallback). With a native frame those buttons are gone but the gap stays, so the
+// header buttons end short of the right edge. The page reserves nothing while it
+// believes the window is fullscreen, and that belief is used for nothing else, so the
+// claude.ai view is told the window is always fullscreen. The page asks over the
+// WindowState IPC interface: a getFullscreen call and a fullscreenChanged event. The
+// channel names carry a per-build id, so they are matched by suffix.
+const FULLSCREEN_QUERY = "_$_claude.web_$_WindowState_$_getFullscreen";
+const FULLSCREEN_EVENT = "_$_claude.web_$_WindowState_$_fullscreenChanged";
+
+function hideWindowControlsGap(contents) {
+  const ipc = contents.ipc;
+  const handle = ipc.handle;
+  ipc.handle = function (channel, listener) {
+    if (typeof channel === "string" && channel.endsWith(FULLSCREEN_QUERY)) {
+      // The app's listener checks the caller's origin and throws if it fails, so it
+      // still runs and only its answer is replaced.
+      const original = listener;
+      listener = async (...args) => {
+        await original(...args);
+        return true;
+      };
+    }
+    return handle.call(this, channel, listener);
+  };
+
+  const send = contents.send;
+  contents.send = function (channel, ...args) {
+    if (typeof channel === "string" && channel.endsWith(FULLSCREEN_EVENT)) {
+      return send.call(this, channel, true);
+    }
+    return send.call(this, channel, ...args);
+  };
+}
+
 // The launcher (claude-desktop.sh) runs the app under XWayland on KDE, which is the
 // only path where Electron exports the menu to the Plasma Global Menu.
 function globalMenuActive(electron) {
@@ -80,6 +116,13 @@ function patchElectron(electron) {
 
   if (nativeFrames) {
     overrides.BrowserWindow = framedWindowClass(electron);
+
+    // Every web contents, because the claude.ai view is created before it is attached
+    // to a window and registers its IPC handlers right away. Only the claude.ai view
+    // has the claude.web WindowState interface.
+    electron.app.on("web-contents-created", (_event, contents) => {
+      hideWindowControlsGap(contents);
+    });
 
     // The in-page title bar is a separate web contents (a view hosted by the window), so
     // the CSS goes into every web contents, not only the window's own page. Navigation
