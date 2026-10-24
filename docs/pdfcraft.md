@@ -22,7 +22,7 @@ sudo pacman -S pdfcraft
 | Attribute | Value |
 |---|---|
 | **Package Name** | `pdfcraft` |
-| **Commands** | `pdfcraft`, `pdfcraft-cli` |
+| **Commands** | `pdfcraft` (`pdfcraft-cli` from the [`pdfcraft-cli`](pdfcraft-cli.md) dependency) |
 | **Current Version** | `0.12.0-1` |
 | **Package Type** | **Modified** |
 | **Build Status** | `passing` |
@@ -46,7 +46,7 @@ Repackages upstream's Linux release tarball unmodified, plus a small launcher th
 ### Packaging Details
 - **Source**: `pdfcraft-<version>-linux-x86_64.tar.gz` from the [GitHub release](https://github.com/storytold/pdfcraft/releases), the same FHS tree (`bin/`, `share/`) upstream's own deb, rpm and AppImage are built from.
 - **Dependencies**: the binaries link only glibc and libgcc; Wayland, X11, Vulkan/EGL and D-Bus are loaded at run time, so the PKGBUILD lists them explicitly. Without a Vulkan driver the app falls back to OpenGL or CPU rendering.
-- **Layout**: the app binary lives in `/usr/lib/pdfcraft/bin/` with a `share` link back to `/usr/share`, so its exe-relative lookups still work. `/usr/bin/pdfcraft` is the launcher; `/usr/bin/pdfcraft-cli` is upstream's CLI as is.
+- **Layout**: the app binary lives in `/usr/lib/pdfcraft/bin/` with a `share` link back to `/usr/share`, so its exe-relative lookups still work. `/usr/bin/pdfcraft` is the launcher. The CLI comes from the [`pdfcraft-cli`](pdfcraft-cli.md) dependency, which also finds its OCR models in this package's `/usr/share/pdfcraft/models`.
 - **First-run defaults**: the launcher sets Appearance set to Use system setting in `${XDG_CONFIG_HOME:-$HOME/.config}/pdfcraft/app.ron`, then writes `~/.local/state/archrepo/pdfcraft-defaults` and never touches the file again. The file is RON, so it is only created for a new profile; an existing one is left alone. Set `PDFCRAFT_ARCHREPO_DEFAULTS=0` to skip it.
 - **Updates**: the daily check follows the latest GitHub release of `storytold/pdfcraft`.
 - **Replaces** the AUR package `pdfcraft-bin` and conflicts with `pdfcraft-git` and the old PrintCraft names (`printcraft`, `printcraft-bin`, `printcraft-git`). The AUR's source-built `pdfcraft` has the same name, so only one of the two can be installed.

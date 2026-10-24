@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-46%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-47%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -88,6 +88,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Powerful Markdown knowledge base patched with KDE Global Menu / AppMenu support and XDG portal dark/light theme switching. Upstream: [Obsidian](https://obsidian.md)
 - [**`pdfcraft`**](docs/pdfcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.12.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/pdfcraft.md) `sudo pacman -S pdfcraft`
   - PdfCraft, ArtCraft's open-source PDF reader and editor (Acrobat alternative) with live light/dark switching through the XDG portal. Upstream: [storytold/pdfcraft](https://github.com/storytold/pdfcraft)
+- [**`pdfcraft-cli`**](docs/pdfcraft-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.13.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/pdfcraft-cli.md) `sudo pacman -S pdfcraft-cli`
+  - PdfCraft's command-line tool and opt-in MCP server for PDF automation from scripts, CI and AI agents. Upstream: [storytold/pdfcraft](https://github.com/storytold/pdfcraft)
 - [**`photocraft`**](docs/photocraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.13.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/photocraft.md) `sudo pacman -S photocraft`
   - PhotoCraft, ArtCraft's open-source layered image and photo editor (Photoshop alternative) with the window manager's title bar and live light/dark switching through the XDG portal. Upstream: [storytold/photocraft](https://github.com/storytold/photocraft)
 - [**`proton-drive-cli`**](docs/proton-drive-cli.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/proton-drive-cli.md) `sudo pacman -S proton-drive-cli`

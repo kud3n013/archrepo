@@ -1,11 +1,12 @@
 pkgbase = pdfcraft
 	pkgdesc = PdfCraft, an open-source PDF reader and editor (Acrobat alternative) from the ArtCraft suite
 	pkgver = 0.13.0
-	pkgrel = 1
+	pkgrel = 2
 	url = https://github.com/storytold/pdfcraft
 	arch = x86_64
 	license = MIT OR Apache-2.0
 	license = OFL-1.1
+	depends = pdfcraft-cli
 	depends = glibc
 	depends = gcc-libs
 	depends = hicolor-icon-theme

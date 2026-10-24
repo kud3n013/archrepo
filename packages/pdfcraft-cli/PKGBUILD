@@ -1,0 +1,31 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/pdfcraft
+
+pkgname=pdfcraft-cli
+pkgver=0.13.0
+pkgrel=1
+pkgdesc="PdfCraft's command-line tool and opt-in MCP server for PDF automation (ArtCraft suite)"
+arch=('x86_64')
+url="https://github.com/storytold/pdfcraft"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binary links only glibc and libgcc; the fonts it substitutes with are built in.
+depends=('glibc' 'gcc-libs')
+# OCR looks for its models exe-relative in ../share/pdfcraft/models, which the
+# desktop package installs. PDFCRAFT_MODELS points it at another folder.
+optdepends=('pdfcraft: text recognition models for the OCR commands and tools')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('fd40f80157856cadd4348a464ef0acde8f19894d831d78e9823708ecf70a3352')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -Dm755 "${_root}/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+    install -Dm644 "${_root}/README.md" "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

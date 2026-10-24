@@ -1,0 +1,17 @@
+pkgbase = pdfcraft-cli
+	pkgdesc = PdfCraft's command-line tool and opt-in MCP server for PDF automation (ArtCraft suite)
+	pkgver = 0.13.0
+	pkgrel = 1
+	url = https://github.com/storytold/pdfcraft
+	arch = x86_64
+	license = MIT OR Apache-2.0
+	license = OFL-1.1
+	depends = glibc
+	depends = gcc-libs
+	optdepends = pdfcraft: text recognition models for the OCR commands and tools
+	options = !strip
+	options = !debug
+	source = pdfcraft-cli-0.13.0-linux-x86_64.tar.gz::https://github.com/storytold/pdfcraft/releases/download/v0.13.0/pdfcraft-cli-0.13.0-linux-x86_64.tar.gz
+	sha256sums = fd40f80157856cadd4348a464ef0acde8f19894d831d78e9823708ecf70a3352
+
+pkgname = pdfcraft-cli
