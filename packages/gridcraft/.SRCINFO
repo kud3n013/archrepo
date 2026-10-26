@@ -1,6 +1,6 @@
 pkgbase = gridcraft
 	pkgdesc = GridCraft, an open-source spreadsheet app (Excel alternative) from the ArtCraft suite
-	pkgver = 0.11.1
+	pkgver = 0.12.1
 	pkgrel = 1
 	url = https://github.com/storytold/gridcraft
 	arch = x86_64
@@ -29,7 +29,7 @@ pkgbase = gridcraft
 	replaces = gridcraft-bin
 	options = !strip
 	options = !debug
-	source = gridcraft-0.11.1-linux-x86_64.tar.gz::https://github.com/storytold/gridcraft/releases/download/v0.11.1/gridcraft-0.11.1-linux-x86_64.tar.gz
-	sha256sums = f2c83e6c26449a6c45983e903bf32c1d4c302b2042f263ead995271129c70e87
+	source = gridcraft-0.12.1-linux-x86_64.tar.gz::https://github.com/storytold/gridcraft/releases/download/v0.12.1/gridcraft-0.12.1-linux-x86_64.tar.gz
+	sha256sums = 1c1750dd6d26376cf8c8af22b46dc0ed3d8d5cbb115e555f0fc7d0cf7a9aea9a
 
 pkgname = gridcraft
