@@ -3,7 +3,7 @@
 
 pkgname=searxng
 _pkgname=searxng
-pkgver=r9843.ef0ec03
+pkgver=r9844.54ca1d9
 pkgrel=1
 pkgdesc="A privacy-respecting, hackable metasearch engine"
 arch=('any')
