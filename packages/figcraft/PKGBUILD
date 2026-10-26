@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/figcraft-bin
 
 pkgname=figcraft
-pkgver=0.10.0
+pkgver=0.11.2
 pkgrel=1
 pkgdesc="FigCraft, an open-source interface design and prototyping tool (Figma alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('figcraft-bin' 'figcraft-git')
 replaces=('figcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('b3e2ffdab54d203a3f6ed1a0018b8325300bd22dbed6a02f0af6757f3eb669da')
+sha256sums=('69d21d0d3717738f9da79d04bc86c152e9b8f919e6395ae97b1cb56b36cde2b9')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
