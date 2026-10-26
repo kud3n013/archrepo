@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/photocraft-bin
 
 pkgname=photocraft
-pkgver=0.15.1
+pkgver=0.16.0
 pkgrel=1
 pkgdesc="PhotoCraft, an open-source layered image and photo editor (Photoshop alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -22,7 +22,7 @@ replaces=('photocraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
         "photocraft.sh")
-sha256sums=('b622be40355513056f8152afe895d0a05c1bc3c344a027f772a9a12fa3d1c223'
+sha256sums=('7c17f3633ebf7dabf27628e2d2637d918c7c2a5b163b8b90347a78acddf63608'
             '67d56e146a5b2c812f14fe95f98c0e35bc635e591f88df82ea0638e5f47b40fb')
 
 package() {
