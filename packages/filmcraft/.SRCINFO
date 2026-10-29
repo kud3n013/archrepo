@@ -1,6 +1,6 @@
 pkgbase = filmcraft
 	pkgdesc = FilmCraft, an open-source video editor with color and sound (Premiere Pro alternative) from the ArtCraft suite
-	pkgver = 0.13.0
+	pkgver = 0.14.0
 	pkgrel = 1
 	url = https://github.com/storytold/filmcraft
 	arch = x86_64
@@ -31,9 +31,9 @@ pkgbase = filmcraft
 	replaces = filmcraft-bin
 	options = !strip
 	options = !debug
-	source = filmcraft-0.13.0-linux-x86_64.tar.gz::https://github.com/storytold/filmcraft/releases/download/v0.13.0/filmcraft-0.13.0-linux-x86_64.tar.gz
+	source = filmcraft-0.14.0-linux-x86_64.tar.gz::https://github.com/storytold/filmcraft/releases/download/v0.14.0/filmcraft-0.14.0-linux-x86_64.tar.gz
 	source = filmcraft.sh
-	sha256sums = 40e9d685fb3ed1b0a21c9c02211f1a8499e09a47c551244ce7ee80f2584d3a9b
+	sha256sums = d2aa213cc08abd21e05ab511a78cc38f157caf2226992f3fc8a5e0496a3f7e7d
 	sha256sums = eae4302e74dbb75d47d7da4a8dfb2dd220ea6c948b5e4383e2812b5fbbff29b3
 
 pkgname = filmcraft
