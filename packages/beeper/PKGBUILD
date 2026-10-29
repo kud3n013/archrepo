@@ -4,7 +4,7 @@
 _pkgname=beeper
 pkgname=beeper
 pkgver=4.3.229
-pkgrel=1
+pkgrel=2
 pkgdesc="The ultimate messaging app (formerly Beeper v4)"
 arch=('x86_64')
 url="https://www.beeper.com/changelog"
@@ -188,9 +188,9 @@ package() {
     # Install flags configuration
     install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
 
-    # Install desktop entry and Wayland app_id symlink
+    # Install desktop entry (only one: every file name here is a separate launcher entry;
+    # windows match it via CHROME_DESKTOP in beeper.sh and StartupWMClass=Beeper)
     install -Dm644 "${srcdir}/beeper.desktop" "${pkgdir}/usr/share/applications/beeper.desktop"
-    ln -sf "beeper.desktop" "${pkgdir}/usr/share/applications/Beeper.desktop"
 
     # Install icons and matching Wayland app_id symlinks
     install -Dm644 "${srcdir}/squashfs-root/usr/share/icons/hicolor/512x512/apps/beepertexts.png" \

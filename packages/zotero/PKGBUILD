@@ -6,7 +6,7 @@
 _pkgname=zotero
 pkgname=zotero
 pkgver=10.0.6
-pkgrel=2
+pkgrel=3
 pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
 arch=('x86_64')
 url="https://www.zotero.org"
@@ -93,9 +93,9 @@ PREFS
     # Install user configuration flags file
     install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
 
-    # Install desktop entry and Wayland app_id symlink
+    # Install desktop entry (only one: every file name here is a separate launcher entry;
+    # the Wayland app_id is set to "zotero" in zotero.sh and matches this file)
     install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
-    ln -sf "${_pkgname}.desktop" "${pkgdir}/usr/share/applications/Zotero.desktop"
 
     # Install high-resolution 512x512 icon (and Zotero.png symlink)
     install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
