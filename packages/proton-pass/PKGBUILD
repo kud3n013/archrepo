@@ -5,11 +5,11 @@
 # Repackaging of Proton's official Linux .deb, kept here so updates land as soon as
 # Proton publishes them. app.asar is not modified: upstream already uses the window
 # manager's title bar, has its own tray icon, and follows the desktop's light/dark
-# theme by default. The app icon is this repository's own.
+# theme by default.
 
 pkgname=proton-pass
 pkgver=1.43.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Proton official desktop application for Proton Pass, the end-to-end encrypted password manager"
 arch=('x86_64')
 url="https://proton.me/pass"
@@ -43,15 +43,13 @@ source=(
     "${pkgname}.sh"
     "${pkgname}-flags.conf"
     "${pkgname}.desktop"
-    "${pkgname}.png"
 )
 # makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
 noextract=("${_deb}")
 sha512sums=('ac19002dd7e5e6110fd5ca5d342d2cacbd2528d95966e83c1ac8df928e86506927d9cad1ffafaa1b542bb6ebf13aaa8f7b5e6d6499531a62aa82bbf82a706c62'
             'f553557f47c2f28b7659738ad7a760b8d1c799844fc4d827b93f94e3033592e93a45196156c5d2a1b5d4082d72d815504310b8392ed8106970b927ff98430525'
             '731dc22624bc42eb65c04b8bdd4c24cd5bfcd04fd62a7488bd5810204c9a806eb4c5cd12893e344e54f0cb88790f36c00f2ca180cd0283d9d8aed5e421126816'
-            'a62f78cb7e4e90d981c6793e152cd5eef7793a6a604f6b372643813b172727197f986d60ea0f5a42ceb5a4b12c19a19d763956b444271efcf92faeac507c3419'
-            '179c76bd8814b5d98779996a6bc523cae0130e93f76b7a0981663b3d1233193b2cfafed6e9b5d56da837830ddfaa0201ab82084eb68576d50e03a5062633652f')
+            'a62f78cb7e4e90d981c6793e152cd5eef7793a6a604f6b372643813b172727197f986d60ea0f5a42ceb5a4b12c19a19d763956b444271efcf92faeac507c3419')
 
 prepare() {
     cd "${srcdir}"
@@ -94,13 +92,15 @@ package() {
     # Desktop entry, which also registers the protonpass:// login callback.
     install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
 
-    # Icons. Only this repository's PNG is installed under the proton-pass name,
-    # and it replaces the window icon the app loads from resources/assets.
-    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
-    install -Dm644 "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
-    if [ -f "${pkgdir}/opt/${pkgname}/resources/assets/logo.png" ]; then
-        install -m644 "${srcdir}/${pkgname}.png" "${pkgdir}/opt/${pkgname}/resources/assets/logo.png"
+    # Icons, taken from upstream's own assets so the launcher matches the app.
+    local _assets="usr/lib/${pkgname}/resources/assets"
+    if [ ! -f "${_assets}/icon.png" ] || [ ! -f "${_assets}/logo.svg" ]; then
+        echo "cannot find icon.png and logo.svg in ${_assets}" >&2
+        return 1
     fi
+    install -Dm644 "${_assets}/icon.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+    install -Dm644 "${_assets}/logo.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/${pkgname}.svg"
+    install -Dm644 "${_assets}/icon.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
 
     # Licenses
     install -Dm644 "usr/lib/${pkgname}/LICENSES.chromium.html" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
