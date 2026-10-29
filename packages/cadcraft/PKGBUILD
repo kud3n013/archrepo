@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/cadcraft-bin
 
 pkgname=cadcraft
-pkgver=0.13.0
+pkgver=0.14.0
 pkgrel=1
 pkgdesc="CADCraft, an open-source 2D CAD and drafting app (AutoCAD alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -22,7 +22,7 @@ replaces=('cadcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
         "cadcraft.sh")
-sha256sums=('d38755beb61889756bebd938df491e6ee0de78c2f35fd35105a479909fd1ca92'
+sha256sums=('95067c849f82305648249299bb86e645b730275aa8c5f19965d81990f83aea9b'
             'b6170456a89479f86ede2c11d7ae50aa50725c8f14b8f44099df818ac8f3596c')
 
 package() {
