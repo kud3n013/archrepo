@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/vectorcraft-bin
 
 pkgname=vectorcraft
-pkgver=0.17.0
+pkgver=0.18.0
 pkgrel=1
 pkgdesc="VectorCraft, an open-source vector illustration editor (Illustrator alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('vectorcraft-bin' 'vectorcraft-git')
 replaces=('vectorcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('66c289d0bd354b71e4cd787193ea0481e3a1cd239f2a18068110ea36852fc026')
+sha256sums=('76948b50ef78dd482a6ece06f10b7047937bbc0c05f5cf6bc43d88b07f74d826')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
