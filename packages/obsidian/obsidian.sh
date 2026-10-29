@@ -3,7 +3,7 @@
 export DESKTOPINTEGRATION=0
 
 # Enforce desktop file identity mapping
-export CHROME_DESKTOP="${CHROME_DESKTOP:-obsidian.desktop}"
+export CHROME_DESKTOP="${CHROME_DESKTOP:-md.obsidian.Obsidian.desktop}"
 
 # If invoked with known Obsidian CLI subcommands, pass directly to the bundled obsidian-cli
 case "$1" in

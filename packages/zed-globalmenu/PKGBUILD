@@ -3,7 +3,7 @@
 
 pkgname=zed-globalmenu
 pkgver=1.21.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A high-performance, multiplayer code editor from the creators of Atom and Tree-sitter (with KDE Global Menu patch)"
 arch=('x86_64')
 url="https://zed.dev"
@@ -116,6 +116,8 @@ prepare() {
   export BRANDING_LIGHT="#99c1f1"
   export BRANDING_DARK="#1a5fb4"
   envsubst < "crates/zed/resources/zed.desktop.in" > "${_appid}.desktop"
+  grep -q '^StartupWMClass=' "${_appid}.desktop" || \
+    sed -i "/^StartupNotify=/a StartupWMClass=${_appid}" "${_appid}.desktop"
   envsubst < "crates/zed/resources/flatpak/zed.metainfo.xml.in" > "${_appid}.metainfo.xml"
   sed -i '/@release_info@/d' "${_appid}.metainfo.xml"
 
@@ -160,10 +162,9 @@ package() {
   # User flags configuration template
   install -Dm0644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
 
-  # Desktop entries
+  # Desktop entry (only one: every file name here is a separate launcher entry;
+  # its name matches Zed's Wayland app_id)
   install -Dm0644 "${_appid}.desktop" "${pkgdir}/usr/share/applications/${_appid}.desktop"
-  ln -s "${_appid}.desktop" "${pkgdir}/usr/share/applications/zed.desktop"
-  ln -s "${_appid}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
 
   # AppStream Metainfo
   install -Dm0644 "${_appid}.metainfo.xml" "${pkgdir}/usr/share/metainfo/${_appid}.metainfo.xml"
