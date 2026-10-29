@@ -38,7 +38,7 @@ The package takes `proton-pass_<version>_amd64.deb` from `proton.me/download/pas
 ### Changes from the upstream `.deb`
 - **Launcher** `/usr/bin/proton-pass` replaces upstream's bare symlink. It selects native Wayland in a Wayland session, reads the flags file, and sets `CHROME_DESKTOP=proton-pass.desktop` so the Wayland window matches its desktop entry.
 - **Desktop entry** `proton-pass.desktop` is this repository's file. It registers the `protonpass://` handler the app uses for its browser sign-in flow.
-- **Icon.** The app icon (`proton-pass.png`) is kept in this repository and also replaces the window icon in `resources/assets/logo.png`.
+- **Icons.** Upstream's own `resources/assets/icon.png` and `logo.svg` are installed into the hicolor theme under the `proton-pass` name, so the launcher icon matches the app's window icon.
 
 ### Desktop integration
 - **Title bar.** Upstream already uses the window manager's frame on Linux.
