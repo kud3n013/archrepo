@@ -1,6 +1,6 @@
 pkgbase = pdfcraft
 	pkgdesc = PdfCraft, an open-source PDF reader and editor (Acrobat alternative) from the ArtCraft suite
-	pkgver = 0.14.0
+	pkgver = 0.15.0
 	pkgrel = 1
 	url = https://github.com/storytold/pdfcraft
 	arch = x86_64
@@ -32,9 +32,9 @@ pkgbase = pdfcraft
 	replaces = pdfcraft-bin
 	options = !strip
 	options = !debug
-	source = pdfcraft-0.14.0-linux-x86_64.tar.gz::https://github.com/storytold/pdfcraft/releases/download/v0.14.0/pdfcraft-0.14.0-linux-x86_64.tar.gz
+	source = pdfcraft-0.15.0-linux-x86_64.tar.gz::https://github.com/storytold/pdfcraft/releases/download/v0.15.0/pdfcraft-0.15.0-linux-x86_64.tar.gz
 	source = pdfcraft.sh
-	sha256sums = a93f511e87f63036ca5f5300b1a7a18a3cd2285205deab15394caa6ee83c6f1f
+	sha256sums = b167a18c60a7b329f05a5bbf97e32dc678aad3f8d5866d8e4378ff24273f8313
 	sha256sums = b29d8003aaa6778cfb57200e1a4d146b68c6cda269df38d7b6533d17db7fd37f
 
 pkgname = pdfcraft
