@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/effectcraft-bin
 
 pkgname=effectcraft
-pkgver=0.17.0
+pkgver=0.18.0
 pkgrel=1
 pkgdesc="EffectCraft, an open-source motion graphics and visual effects compositor (After Effects alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -22,7 +22,7 @@ replaces=('effectcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
         "effectcraft.sh")
-sha256sums=('cd7ace0d74734b79e851f18537c14b2953b7feb5da240f5005e6805476a15292'
+sha256sums=('94d1d85691d54ba57fa86e04872fbcc426c33d1bd364f1fc976b1f607344880b'
             '78bea687a4fb0bbd85b14b1f2361aa06e159e5c3207c541a5289f425d10bdbbc')
 
 package() {
