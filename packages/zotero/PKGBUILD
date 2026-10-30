@@ -5,8 +5,8 @@
 
 _pkgname=zotero
 pkgname=zotero
-pkgver=10.0.6
-pkgrel=3
+pkgver=10.0.7
+pkgrel=1
 pkgdesc="A free, easy-to-use tool to help you collect, organize, cite, and share your research sources"
 arch=('x86_64')
 url="https://www.zotero.org"
@@ -52,7 +52,7 @@ source=(
     "policies.json"
 )
 
-sha256sums=('246c2574a9ac526abeaf3027ffd22fc45536a5ab25f227bb1df932fca9cedd63'
+sha256sums=('ddf43b50413f00ea9ba863c7913a4f1350288c1e81b45c2aaf192227b67d9549'
             '04d9829e12c6eb3cb727d84072695c17ada495c1a3ee4050b06356a8b1097fcd'
             'd8752428e47776f9700a2e448a84dc6a812b0ee03461e388e2fdd0d917ea4f03'
             'c7c1c942ce9e7c81d49962dadf2113884312d320fb53a60198a25343b7425897'
