@@ -10,7 +10,7 @@
 # icon that contrasts with the panel (see theme-sync.js).
 
 pkgname=claude-desktop
-pkgver=4.29.0
+pkgver=4.4212.0
 pkgrel=1
 pkgdesc="Official Claude desktop app from Anthropic (Chat, Cowork and Claude Code), repackaged from the Debian package"
 arch=('x86_64')
@@ -92,7 +92,7 @@ source=(
 )
 # makepkg would unpack the .deb into $srcdir, but only data.tar.xz is needed.
 noextract=("${_deb}")
-sha256sums=('4aa0f763d6c05ac79502392dd50f5d7f5c455b2f0a405d5bdf1554acd8342a89'
+sha256sums=('4fcf658e0fc895390ab82593287281dfbce261b0ec3ea90060e82d8bfbfd7a84'
             '710b5fe6762952fda3fd057d40eaf6643fcedea90313001e7ee8dac4ffd1e258'
             'dcccbdfe12b5e56d4e6a58bdb6b282fc4ce8255e4093b1e69629248bd9e3ae4f'
             'c7a3ccab0278d672335c3b1675112452c67908b3d117144675a940c99cfbc2d6'
