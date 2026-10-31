@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/pdfcraft-bin
 
 pkgname=pdfcraft
-pkgver=0.15.0
+pkgver=0.16.1
 pkgrel=1
 pkgdesc="PdfCraft, an open-source PDF reader and editor (Acrobat alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -22,7 +22,7 @@ replaces=('pdfcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
         "pdfcraft.sh")
-sha256sums=('b167a18c60a7b329f05a5bbf97e32dc678aad3f8d5866d8e4378ff24273f8313'
+sha256sums=('bb36e071d10a14af5121299a0eed8d7c5db8e5c7580b6cbebec085c41d1bfe0a'
             'b29d8003aaa6778cfb57200e1a4d146b68c6cda269df38d7b6533d17db7fd37f')
 
 package() {
