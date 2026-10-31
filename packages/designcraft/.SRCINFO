@@ -1,6 +1,6 @@
 pkgbase = designcraft
 	pkgdesc = DesignCraft, an open-source page layout and publishing app (InDesign alternative) from the ArtCraft suite
-	pkgver = 0.14.0
+	pkgver = 0.15.2
 	pkgrel = 1
 	url = https://github.com/storytold/designcraft
 	arch = x86_64
@@ -29,7 +29,7 @@ pkgbase = designcraft
 	replaces = designcraft-bin
 	options = !strip
 	options = !debug
-	source = designcraft-0.14.0-linux-x86_64.tar.gz::https://github.com/storytold/designcraft/releases/download/v0.14.0/designcraft-0.14.0-linux-x86_64.tar.gz
-	sha256sums = 25c87be759d35a81ca44e1f625ed4304b16e5aab6a03a1051bca498a81bfc547
+	source = designcraft-0.15.2-linux-x86_64.tar.gz::https://github.com/storytold/designcraft/releases/download/v0.15.2/designcraft-0.15.2-linux-x86_64.tar.gz
+	sha256sums = e7b782f7464977efe935ad68e3c908b0939f3b666070c88df2046198dc6e8944
 
 pkgname = designcraft
