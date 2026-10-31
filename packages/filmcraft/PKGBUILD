@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/filmcraft-bin
 
 pkgname=filmcraft
-pkgver=0.14.0
+pkgver=0.15.0
 pkgrel=1
 pkgdesc="FilmCraft, an open-source video editor with color and sound (Premiere Pro alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -22,7 +22,7 @@ replaces=('filmcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz"
         "filmcraft.sh")
-sha256sums=('d2aa213cc08abd21e05ab511a78cc38f157caf2226992f3fc8a5e0496a3f7e7d'
+sha256sums=('22b106b4ca6294d9b3e9a4af40b40a653a1897437364805046a01ddbaa4b22c1'
             'eae4302e74dbb75d47d7da4a8dfb2dd220ea6c948b5e4383e2812b5fbbff29b3')
 
 package() {
