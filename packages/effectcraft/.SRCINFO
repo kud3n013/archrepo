@@ -1,6 +1,6 @@
 pkgbase = effectcraft
 	pkgdesc = EffectCraft, an open-source motion graphics and visual effects compositor (After Effects alternative) from the ArtCraft suite
-	pkgver = 0.18.0
+	pkgver = 0.19.0
 	pkgrel = 1
 	url = https://github.com/storytold/effectcraft
 	arch = x86_64
@@ -30,9 +30,9 @@ pkgbase = effectcraft
 	replaces = effectcraft-bin
 	options = !strip
 	options = !debug
-	source = effectcraft-0.18.0-linux-x86_64.tar.gz::https://github.com/storytold/effectcraft/releases/download/v0.18.0/effectcraft-0.18.0-linux-x86_64.tar.gz
+	source = effectcraft-0.19.0-linux-x86_64.tar.gz::https://github.com/storytold/effectcraft/releases/download/v0.19.0/effectcraft-0.19.0-linux-x86_64.tar.gz
 	source = effectcraft.sh
-	sha256sums = 94d1d85691d54ba57fa86e04872fbcc426c33d1bd364f1fc976b1f607344880b
+	sha256sums = 7ec9391dae775f7ce7e7291268f7b1233228c1bade83ced8840303535c951970
 	sha256sums = 78bea687a4fb0bbd85b14b1f2361aa06e159e5c3207c541a5289f425d10bdbbc
 
 pkgname = effectcraft
