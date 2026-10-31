@@ -1,6 +1,6 @@
 pkgbase = lightcraft
 	pkgdesc = LightCraft, an open-source photo library and raw developer (Lightroom alternative) from the ArtCraft suite
-	pkgver = 0.15.0
+	pkgver = 0.16.0
 	pkgrel = 1
 	url = https://github.com/storytold/lightcraft
 	arch = x86_64
@@ -30,9 +30,9 @@ pkgbase = lightcraft
 	replaces = lightcraft-bin
 	options = !strip
 	options = !debug
-	source = lightcraft-0.15.0-linux-x86_64.tar.gz::https://github.com/storytold/lightcraft/releases/download/v0.15.0/lightcraft-0.15.0-linux-x86_64.tar.gz
+	source = lightcraft-0.16.0-linux-x86_64.tar.gz::https://github.com/storytold/lightcraft/releases/download/v0.16.0/lightcraft-0.16.0-linux-x86_64.tar.gz
 	source = lightcraft.sh
-	sha256sums = 0b1acdefc085babb334b9add290dd1a69b50e96efbdad2ec15d44bd6d64bfd3d
+	sha256sums = d22edf5ac40100291d8c3d8dde8bf1c91cae21a0b56d4ca9cc0026db3139a926
 	sha256sums = ddce65463b1f6f6fef59435a909d8e42de930580374d5b93017830feb6a3ebc9
 
 pkgname = lightcraft
