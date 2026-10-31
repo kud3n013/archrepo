@@ -232,6 +232,20 @@ case "$CHECK" in
     fi
     ;;
 
+  triggers-client-release)
+    # Staging builds (v4.6.1-staging) are published as ordinary releases, so
+    # /releases/latest can return one. Take the newest plain vX.Y.Z tag that
+    # carries the x86_64 .deb the PKGBUILD downloads.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASES_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases?per_page=20" || true)
+      TAG=$(echo "$RELEASES_JSON" | jq -r '[.[] | .tag_name as $tag | select(.draft == false and .prerelease == false
+        and ($tag | test("^v[0-9]+(\\.[0-9]+)+$"))
+        and any(.assets[].name; . == "Triggers.Client_\($tag | ltrimstr("v"))_amd64.deb"))][0].tag_name // empty' 2>/dev/null || true)
+      TAG="${TAG#v}"
+      [ -n "$TAG" ] && [ "$TAG" != "null" ] && LATEST="$TAG"
+    fi
+    ;;
+
   claude-desktop-apt)
     # The apt index lists every published version; take the newest claude-desktop stanza.
     VER=$(curl -s "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages" | \

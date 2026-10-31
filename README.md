@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-46%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-47%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -104,6 +104,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - SoundCraft, ArtCraft's open-source digital audio workstation (Pro Tools alternative). Upstream: [storytold/soundcraft](https://github.com/storytold/soundcraft)
 - [**`steam-globalmenu`**](docs/steam-globalmenu.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.2.0--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/steam-globalmenu.md) `sudo pacman -S steam-globalmenu`
   - Steam client menu bar and recent games bridge exporting to KDE Plasma Global Menu via DBusMenu. Upstream: [kud3n013/steam-dbusmenu-export](https://github.com/kud3n013/steam-dbusmenu-export)
+- [**`triggers-client`**](docs/triggers-client.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-4.7.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/triggers-client.md) `sudo pacman -S triggers-client`
+  - Official launcher for the Triggers Minecraft server, repackaged from upstream's Debian build with pacman-managed updates. Upstream: [Triggers](https://saominecraft.com/us)
 - [**`vectorcraft`**](docs/vectorcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.15.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/vectorcraft.md) `sudo pacman -S vectorcraft`
   - VectorCraft, ArtCraft's open-source vector illustration editor (Illustrator alternative). Upstream: [storytold/vectorcraft](https://github.com/storytold/vectorcraft)
 - [**`wordcraft`**](docs/wordcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.10.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/wordcraft.md) `sudo pacman -S wordcraft`

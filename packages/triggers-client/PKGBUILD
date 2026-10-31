@@ -1,0 +1,100 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://saominecraft.com/us
+# Releases: https://github.com/SAOFR-DEV/Triggers-Client-Releases
+# AUR Reference: none
+
+# Repackaging of Triggers Studio's official Linux .deb. The app is a Tauri 2 build
+# that links the system WebKitGTK, so the 10 MB .deb is used instead of the 99 MB
+# AppImage, which bundles its own copy of WebKitGTK and GTK.
+
+pkgname=triggers-client
+pkgver=4.7.0
+pkgrel=1
+pkgdesc="Official launcher for the Triggers Minecraft server: installs and updates the game instances, signs in with Microsoft and starts the game"
+arch=('x86_64')
+url="https://saominecraft.com/us"
+license=('LicenseRef-triggers-client')
+depends=(
+    'cairo'
+    'dbus'
+    'gcc-libs'
+    'gdk-pixbuf2'
+    'glib2'
+    'glibc'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libayatana-appindicator'
+    'libsoup3'
+    'webkit2gtk-4.1'
+    'xz'
+)
+optdepends=(
+    'xdg-utils: open the Microsoft sign-in page and links in the default browser'
+)
+provides=('triggers-client-bin')
+conflicts=('triggers-client-bin')
+backup=("etc/${pkgname}-flags.conf")
+options=('!strip' '!debug')
+
+_deb="${pkgname}-${pkgver}.deb"
+source=(
+    "${_deb}::https://github.com/SAOFR-DEV/Triggers-Client-Releases/releases/download/v${pkgver}/Triggers.Client_${pkgver}_amd64.deb"
+    "${pkgname}.sh"
+    "${pkgname}-flags.conf"
+    "${pkgname}.desktop"
+)
+# makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
+noextract=("${_deb}")
+sha256sums=('d17f774a2834a12812f4ef97886aa88c0769d383b0c2ce03ff3c55e6fb19aec6'
+            'a047afbffd9753598dee00200a59609fb49fa075314d10d1f75e9b9a25473a89'
+            '175e8ee0ffa2e40af4881f48649310e51c76e7f4c1016eebed6437c150eb14a3'
+            '32a0f1eeae719da6be3f8c1708f27d0781506fddab6969b0d86a32913caa2c64')
+
+prepare() {
+    cd "${srcdir}"
+
+    local _data
+    _data="$(bsdtar -tf "${_deb}" | grep -m1 '^data\.tar')"
+    bsdtar -xf "${_deb}" "${_data}"
+    rm -rf data
+    mkdir -p data
+    bsdtar -xf "${_data}" -C data
+
+    # The Tauri bundler stamps the binary with the format it was packaged in, and
+    # the in-app updater installs updates in that format: for a .deb it runs
+    # `pkexec dpkg -i`, which would write files pacman does not track. Marking the
+    # bundle type unknown (same length, so the binary layout is unchanged) sends
+    # the updater down its AppImage path instead, which cannot replace a binary
+    # in root-owned /opt, so updates come only from pacman.
+    local _bin="data/usr/bin/${pkgname}"
+    if [ "$(grep -c '__TAURI_BUNDLE_TYPE_VAR_DEB' "${_bin}")" -ne 1 ]; then
+        echo "cannot find the Tauri bundle type marker in ${_bin}" >&2
+        return 1
+    fi
+    sed -i 's/__TAURI_BUNDLE_TYPE_VAR_DEB/__TAURI_BUNDLE_TYPE_VAR_UNK/' "${_bin}"
+}
+
+package() {
+    cd "${srcdir}/data"
+
+    # Application binary. Tauri embeds its frontend, so this is the whole app.
+    install -Dm755 "usr/bin/${pkgname}" "${pkgdir}/opt/${pkgname}/${pkgname}"
+
+    # Launcher, in place of upstream's binary in /usr/bin.
+    install -Dm755 "${srcdir}/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+
+    # Flags file. Listed in backup= so user edits survive upgrades.
+    install -Dm644 "${srcdir}/${pkgname}-flags.conf" "${pkgdir}/etc/${pkgname}-flags.conf"
+
+    # Desktop entry. Upstream's is named "Triggers Client.desktop" and has no categories.
+    install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+
+    # Icons. Upstream's 256x256@2 directory holds a plain 256x256 image.
+    local _icons="usr/share/icons/hicolor"
+    install -Dm644 "${_icons}/32x32/apps/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/32x32/apps/${pkgname}.png"
+    install -Dm644 "${_icons}/128x128/apps/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/128x128/apps/${pkgname}.png"
+    install -Dm644 "${_icons}/256x256@2/apps/${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${pkgname}.png"
+    install -Dm644 "${_icons}/256x256@2/apps/${pkgname}.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Triggers Client
+GenericName=Minecraft Launcher
+Comment=Official launcher for the Triggers Minecraft server
+Exec=/usr/bin/triggers-client %U
+Icon=triggers-client
+Type=Application
+Terminal=false
+StartupNotify=true
+StartupWMClass=triggers-client
+Categories=Game;
+Keywords=Minecraft;Triggers;Launcher;
