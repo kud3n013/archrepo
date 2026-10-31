@@ -40,6 +40,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`soundcraft`**](soundcraft.md) | `0.12.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | SoundCraft, ArtCraft's open-source digital audio workstation (Pro Tools alternative) |
 | [**`steam-globalmenu`**](steam-globalmenu.md) | `1.2.0-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Steam client menu and recent games exporter for KDE Plasma Global Menu |
+| [**`triggers-client`**](triggers-client.md) | `4.7.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Triggers Minecraft server launcher with pacman-managed updates |
 | [**`vectorcraft`**](vectorcraft.md) | `0.15.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | VectorCraft, ArtCraft's open-source vector illustration editor (Illustrator alternative) |
 | [**`wordcraft`**](wordcraft.md) | `0.10.0-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | WordCraft, ArtCraft's open-source word processor (Word alternative) |
 | [**`zalo-for-linux`**](zalo-for-linux.md) | `26.10.11-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Zalo with ZaDark, KDE Global Menu, native title bar & live light/dark switching |
