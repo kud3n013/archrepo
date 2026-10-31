@@ -1,7 +1,7 @@
 # Triggers Client (`triggers-client`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-4.7.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-4.7.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://saominecraft.com/us)
 
@@ -22,7 +22,7 @@ sudo pacman -S triggers-client
 | Attribute | Value |
 |---|---|
 | **Package Name** | `triggers-client` |
-| **Current Version** | `4.7.0-1` |
+| **Current Version** | `4.7.0-2` |
 | **Package Type** | **Modified (repackaged upstream .deb, in-app updater disabled)** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Triggers](https://saominecraft.com/us) ([releases](https://github.com/SAOFR-DEV/Triggers-Client-Releases)) |
@@ -35,6 +35,7 @@ The package takes `Triggers.Client_<version>_amd64.deb` from [SAOFR-DEV/Triggers
 
 ### Changes from the upstream `.deb`
 - **In-app updater disabled.** The Tauri bundler stamps the binary with the format it shipped in, and for a `.deb` the updater installs updates with `pkexec dpkg -i`, which would put files on the system that pacman does not track. `prepare()` changes that stamp to "unknown" (3 bytes). The updater then tries to replace its own binary, which fails because `/opt` is owned by root, so updates come only from pacman. The app's own auto-update setting can be turned off to skip the attempt.
+- **`gst-plugins-good` is a dependency.** The app's page sets up audio as soon as it loads. `webkit2gtk-4.1` only lists `gst-plugins-good` as optional, and without its `autoaudiosink` and `scaletempo` elements the WebKit web process aborts, leaving a blank window.
 - **Launcher** `/usr/bin/triggers-client` replaces upstream's binary there and reads the flags file.
 - **Desktop entry** `triggers-client.desktop` is this repository's file: upstream's is named `Triggers Client.desktop` and has no category. This one is filed under Games.
 - **Icons.** Upstream's 32, 128 and 256 px icons go into the hicolor theme. Upstream ships the 256 px one in a `256x256@2` directory, which is installed as `256x256`.

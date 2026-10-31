@@ -9,7 +9,7 @@
 
 pkgname=triggers-client
 pkgver=4.7.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Official launcher for the Triggers Minecraft server: installs and updates the game instances, signs in with Microsoft and starts the game"
 arch=('x86_64')
 url="https://saominecraft.com/us"
@@ -21,6 +21,10 @@ depends=(
     'gdk-pixbuf2'
     'glib2'
     'glibc'
+    # The app's page sets up audio at startup. Without autoaudiosink and
+    # scaletempo (optional for webkit2gtk-4.1) the WebKit web process aborts
+    # and the window stays blank.
+    'gst-plugins-good'
     'gtk3'
     'hicolor-icon-theme'
     'libayatana-appindicator'
