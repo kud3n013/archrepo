@@ -2,31 +2,54 @@
 
 pkgname=kwin-scripts-krohnkite
 _pkgname=krohnkite
-pkgver=0.9.10.0
+pkgver=0.9.10.0.r45.gfef8405
 pkgrel=1
 pkgdesc="A dynamic tiling extension for KWin (KDE Plasma 6)"
 arch=('any')
-url="https://codeberg.org/anametologin/krohnkite"
+url="https://codeberg.org/kud3n/Krohnkite"
 license=('MIT')
-depends=('kwin')
+# python: iconinstaller.qml runs contents/code/install-icons.py on load
+depends=('kwin' 'python')
+makedepends=('git' 'npm' 'gettext')
 provides=("${_pkgname}")
 conflicts=("${_pkgname}" "${pkgname}-git")
 options=('!strip' '!debug')
 install="${pkgname}.install"
-noextract=("${pkgname}-${pkgver}.kwinscript")
-source=(
-  "${pkgname}-${pkgver}.kwinscript::https://codeberg.org/anametologin/Krohnkite/releases/download/${pkgver}/${_pkgname}.kwinscript"
-  "LICENSE-${pkgver}::https://codeberg.org/anametologin/krohnkite/raw/tag/${pkgver}/LICENSE"
-)
-sha256sums=('7fe9b1af925061577004e8e46be17c014d081f06891779f1db72b9361dfcad40'
-            '78db30bbf93af90846d93f470bb7c754be5307477c2c99270bb76ac4b14aa609')
+
+# kud3n's fork: anametologin's master plus the pointer options sent upstream
+# as PRs #75 and #76. check-upstream.sh moves _commithash to the branch head.
+_gitbranch="local/pointer-combined"
+_commithash=fef84058af7faf71f04c574d53f13b2c308b2d0c
+source=("${_pkgname}::git+${url}.git#commit=${_commithash}")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "${_pkgname}"
+  git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+  cd "${_pkgname}"
+  export npm_config_cache="${srcdir}/npm-cache"
+  # A second make over an existing pkg/ deletes metadata.json without rebuilding it
+  rm -rf pkg
+  make all
+
+  # make leaves translations out; upstream releases ship them compiled
+  local pair
+  for pair in ru:russian zh:chinese; do
+    install -dm755 "pkg/contents/locale/${pair%%:*}/LC_MESSAGES"
+    msgfmt --check -o "pkg/contents/locale/${pair%%:*}/LC_MESSAGES/${_pkgname}.mo" \
+      "translations/${pair##*:}.po"
+  done
+}
 
 package() {
+  cd "${_pkgname}"
   install -dm755 "${pkgdir}/usr/share/kwin/scripts/${_pkgname}"
-  bsdtar --no-same-owner -xf "${srcdir}/${pkgname}-${pkgver}.kwinscript" \
-    -C "${pkgdir}/usr/share/kwin/scripts/${_pkgname}"
+  cp -r --no-preserve=ownership pkg/. "${pkgdir}/usr/share/kwin/scripts/${_pkgname}/"
 
-  install -Dm644 "${srcdir}/LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
   # Ensure consistent directory and file permissions
   chmod -R u+rwX,go+rX,go-w "${pkgdir}"

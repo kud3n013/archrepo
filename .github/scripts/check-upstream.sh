@@ -115,6 +115,32 @@ case "$CHECK" in
     fi
     ;;
 
+  codeberg-branch)
+    # Tracks a branch head rather than releases (kwin-scripts-krohnkite builds
+    # kud3n's fork). The version is what the PKGBUILD's pkgver() derives from
+    # `git describe --long --tags` (0.9.10.0-45-gfef8405 -> 0.9.10.0.r45.gfef8405),
+    # so a blobless clone is described here the same way.
+    BRANCH=""
+    [ -f "$CONFIG_FILE" ] && BRANCH=$(jq -r '.branch // ""' "$CONFIG_FILE")
+    if [ -n "$UPSTREAM" ] && [ -n "$BRANCH" ]; then
+      CLONE_DIR=$(mktemp -d)
+      if git clone -q --filter=blob:none --no-checkout --single-branch -b "$BRANCH" \
+          "https://codeberg.org/${UPSTREAM}.git" "$CLONE_DIR" 2>/dev/null; then
+        DESC=$(git -C "$CLONE_DIR" describe --long --tags 2>/dev/null || true)
+        SHA=$(git -C "$CLONE_DIR" rev-parse HEAD 2>/dev/null || true)
+        if [ -n "$DESC" ] && [ -n "$SHA" ]; then
+          LATEST=$(echo "$DESC" | sed 's/\([^-]*-g\)/r\1/;s/-/./g')
+          CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+          if [ "$SHA" != "$CURRENT_COMMIT" ]; then
+            NEW_COMMIT="$SHA"
+            EXTRA_INFO="commit: ${CURRENT_COMMIT:0:7} -> ${SHA:0:7}"
+          fi
+        fi
+      fi
+      rm -rf "$CLONE_DIR"
+    fi
+    ;;
+
   antigravity-download)
     DOWNLOAD_HTML=$(curl -sL --compressed -A "Mozilla/5.0" "https://antigravity.google/download" || true)
     MATCH=$(echo "$DOWNLOAD_HTML" | grep -oP 'https://storage\.googleapis\.com/antigravity-public/antigravity-hub/\K[0-9.]+\-[0-9]+(?=/linux-x64/Antigravity\.tar\.gz)' | head -1 || true)

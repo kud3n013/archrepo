@@ -1,21 +1,22 @@
 pkgbase = kwin-scripts-krohnkite
 	pkgdesc = A dynamic tiling extension for KWin (KDE Plasma 6)
-	pkgver = 0.9.10.0
+	pkgver = 0.9.10.0.r45.gfef8405
 	pkgrel = 1
-	url = https://codeberg.org/anametologin/krohnkite
+	url = https://codeberg.org/kud3n/Krohnkite
 	install = kwin-scripts-krohnkite.install
 	arch = any
 	license = MIT
+	makedepends = git
+	makedepends = npm
+	makedepends = gettext
 	depends = kwin
+	depends = python
 	provides = krohnkite
 	conflicts = krohnkite
 	conflicts = kwin-scripts-krohnkite-git
-	noextract = kwin-scripts-krohnkite-0.9.10.0.kwinscript
 	options = !strip
 	options = !debug
-	source = kwin-scripts-krohnkite-0.9.10.0.kwinscript::https://codeberg.org/anametologin/Krohnkite/releases/download/0.9.10.0/krohnkite.kwinscript
-	source = LICENSE-0.9.10.0::https://codeberg.org/anametologin/krohnkite/raw/tag/0.9.10.0/LICENSE
-	sha256sums = 7fe9b1af925061577004e8e46be17c014d081f06891779f1db72b9361dfcad40
-	sha256sums = 78db30bbf93af90846d93f470bb7c754be5307477c2c99270bb76ac4b14aa609
+	source = krohnkite::git+https://codeberg.org/kud3n/Krohnkite.git#commit=fef84058af7faf71f04c574d53f13b2c308b2d0c
+	sha256sums = SKIP
 
 pkgname = kwin-scripts-krohnkite
