@@ -1,6 +1,6 @@
 pkgbase = photocraft
 	pkgdesc = PhotoCraft, an open-source layered image and photo editor (Photoshop alternative) from the ArtCraft suite
-	pkgver = 0.18.0
+	pkgver = 0.19.0
 	pkgrel = 1
 	url = https://github.com/storytold/photocraft
 	arch = x86_64
@@ -30,9 +30,9 @@ pkgbase = photocraft
 	replaces = photocraft-bin
 	options = !strip
 	options = !debug
-	source = photocraft-0.18.0-linux-x86_64.tar.gz::https://github.com/storytold/photocraft/releases/download/v0.18.0/photocraft-0.18.0-linux-x86_64.tar.gz
+	source = photocraft-0.19.0-linux-x86_64.tar.gz::https://github.com/storytold/photocraft/releases/download/v0.19.0/photocraft-0.19.0-linux-x86_64.tar.gz
 	source = photocraft.sh
-	sha256sums = 4b8ac8e1146ac9a97e7bfdef16b267d5396a77809fd4e2329b83dad78086574f
+	sha256sums = 123385b1730ace18f12bc0f494606e6a4cd3f4ab891f93036cd4e71b8aea70f7
 	sha256sums = 67d56e146a5b2c812f14fe95f98c0e35bc635e591f88df82ea0638e5f47b40fb
 
 pkgname = photocraft
