@@ -14,8 +14,21 @@ _cleanup_user_desktops() {
     update-desktop-database -q 2>/dev/null || true
 }
 
+_cleanup_user_cli_copies() {
+    # Older builds let "Register CLI" copy obsidian-cli to ~/.local/bin/obsidian,
+    # which hides /usr/bin/obsidian in PATH and cannot start the app
+    for user_home in /home/*; do
+        local cli_copy="$user_home/.local/bin/obsidian"
+        if [ -f "$cli_copy" ] && [ ! -L "$cli_copy" ] &&
+            grep -qa 'The CLI is unable to find Obsidian' "$cli_copy" 2>/dev/null; then
+            rm -f "$cli_copy" || true
+        fi
+    done
+}
+
 post_install() {
     _cleanup_user_desktops
+    _cleanup_user_cli_copies
 
     if ! { [[ -L /proc/self/ns/user ]] && unshare --user true; }; then
         chmod 4755 '/opt/Obsidian/chrome-sandbox' || true

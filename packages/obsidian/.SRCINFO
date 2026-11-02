@@ -1,7 +1,7 @@
 pkgbase = obsidian
 	pkgdesc = A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)
 	pkgver = 1.14.5
-	pkgrel = 2
+	pkgrel = 3
 	url = https://obsidian.md
 	install = obsidian.install
 	arch = x86_64
@@ -36,12 +36,14 @@ pkgbase = obsidian
 	source = obsidian.png
 	source = patch-portal-theme.js
 	source = patch-globalmenu.js
+	source = patch-cli-register.js
 	sha256sums = c37fb46a966f604823337fb36ab23bd1baf8ce912ec35af59d62358a93357bee
-	sha256sums = 635b22d7deca6722c1fc9e6bec107f9ed10a9bae4e49e4d81353ae922e223c48
+	sha256sums = 6d8545b4d6b690efb939cec918ee4baea61c6bc4e4a6be530dacfd526bb6d492
 	sha256sums = 2d34e72032d0ffd1bb9a93e8cce80dfc2ff23c88ed2f95206e27c18c1cbdb5bd
 	sha256sums = 37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d
 	sha256sums = 0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40
 	sha256sums = 5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a
 	sha256sums = 019e90137432e215d09ac6c1edcf8be321a100ac4bae8f61dba66c61022803e7
+	sha256sums = 345c1d070b7eed0045eb2e8a477ed564f87ec69052c48f05a758435f12301007
 
 pkgname = obsidian

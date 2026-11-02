@@ -1,7 +1,7 @@
 # Obsidian (`obsidian`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.13.7--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-1.14.5--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://obsidian.md)
 
@@ -22,7 +22,7 @@ sudo pacman -S obsidian
 | Attribute | Value |
 |---|---|
 | **Package Name** | `obsidian` |
-| **Current Version** | `1.13.7-3` |
+| **Current Version** | `1.14.5-3` |
 | **Package Type** | **Modified** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Obsidian](https://obsidian.md) |
@@ -38,6 +38,7 @@ This package provides premier desktop environment enhancements:
 - **KDE Plasma Global Menu Integration**: Preloads the shared [`dbusmenu-shortcut-shim`](dbusmenu-shortcut-shim.md) library (restores punctuation shortcut tips) and applies JavaScript hooks (`patch-globalmenu.js`) that export Obsidian's menu bar directly to KDE Plasma's Global Menu / AppMenu widget over D-Bus.
 - **XDG Desktop Portal Theme Auto-Switching (`patch-portal-theme.js`)**: Automatically syncs Obsidian's internal theme between light and dark according to the desktop portal's system color scheme preference.
 - **Wayland Flags Loader**: Built-in support for Wayland flags via `~/.config/obsidian-flags.conf`.
+- **CLI Without Registration (`patch-cli-register.js`)**: `obsidian <command>` (e.g. `obsidian search query=foo`) is forwarded to the bundled `obsidian-cli`, and `obsidian` with no command opens the app. Settings → General → Register CLI no longer copies `obsidian-cli` over `~/.local/bin/obsidian`, and installing the package removes a copy left there by an earlier version.
 
 ---
 

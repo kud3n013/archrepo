@@ -5,12 +5,12 @@ export DESKTOPINTEGRATION=0
 # Enforce desktop file identity mapping
 export CHROME_DESKTOP="${CHROME_DESKTOP:-md.obsidian.Obsidian.desktop}"
 
-# If invoked with known Obsidian CLI subcommands, pass directly to the bundled obsidian-cli
-case "$1" in
-    version|vault|open|create|search|wordcount|workspace|workspaces|tabs|recents|devtools|dev:*|eval|help)
-        exec /opt/Obsidian/obsidian-cli "$@"
-        ;;
-esac
+# If invoked with an Obsidian CLI command (`read`, `base:query`, `vault=<name> ...`),
+# pass directly to the bundled obsidian-cli. Flags, obsidian:// URIs and existing
+# paths still open the app.
+if [[ "$1" =~ ^[a-z][a-z0-9-]*(:[a-z0-9-]+)*(=.*)?$ && ! -e "$1" ]]; then
+    exec /opt/Obsidian/obsidian-cli "$@"
+fi
 
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 USER_FLAGS_FILE="$XDG_CONFIG_HOME/obsidian-flags.conf"
