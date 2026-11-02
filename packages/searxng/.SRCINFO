@@ -1,6 +1,6 @@
 pkgbase = searxng
 	pkgdesc = A privacy-respecting, hackable metasearch engine
-	pkgver = r9856.ffa88e3
+	pkgver = r9859.10db664
 	pkgrel = 1
 	url = https://searxng.github.io/searxng/
 	install = searxng.install
