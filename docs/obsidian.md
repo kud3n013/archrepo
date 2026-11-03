@@ -1,7 +1,7 @@
 # Obsidian (`obsidian`)
 
 [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
-[![version](https://img.shields.io/badge/version-1.15.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
+[![version](https://img.shields.io/badge/version-1.15.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://obsidian.md)
 
@@ -22,7 +22,7 @@ sudo pacman -S obsidian
 | Attribute | Value |
 |---|---|
 | **Package Name** | `obsidian` |
-| **Current Version** | `1.15.0-1` |
+| **Current Version** | `1.15.0-2` |
 | **Package Type** | **Modified** |
 | **Build Status** | `passing` |
 | **Upstream Project** | [Obsidian](https://obsidian.md) |

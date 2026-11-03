@@ -1,7 +1,7 @@
 pkgbase = obsidian
 	pkgdesc = A powerful knowledge base that works on top of a local folder of plain text Markdown files (Official binary package with bundled Electron & CLI)
 	pkgver = 1.15.0
-	pkgrel = 1
+	pkgrel = 2
 	url = https://obsidian.md
 	install = obsidian.install
 	arch = x86_64
@@ -43,7 +43,7 @@ pkgbase = obsidian
 	sha256sums = 37603b321aab2d1dfaee79e70adb6aebceb4bf5c8a1e2fdc7c09109b2dbabc9d
 	sha256sums = 0ce0f10af877ff6f336ba13e3c23aa6fec51f672b8607d4aaf3f54ae9b15be40
 	sha256sums = 5c291c9dd6f487c7551ac31625f261b2947bc54eceaac38c9d3f08201e93d59a
-	sha256sums = 019e90137432e215d09ac6c1edcf8be321a100ac4bae8f61dba66c61022803e7
+	sha256sums = f31e582f3ad68239856cbeac543ca6eab551c0cd2e61f995c3a4b16df161c86e
 	sha256sums = 8129a7b12320b3c7ca400e4b51dbafa80465a1334e34603ae14bab6a5440345e
 
 pkgname = obsidian
