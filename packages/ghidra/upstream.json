@@ -1,0 +1,4 @@
+{
+  "check": "ghidra-release",
+  "repo": "NationalSecurityAgency/ghidra"
+}
