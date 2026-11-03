@@ -1,6 +1,6 @@
 # Ghidra (`ghidra`)
 
-[![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
 [![version](https://img.shields.io/badge/version-12.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-github-informational)](https://github.com/NationalSecurityAgency/ghidra)
@@ -27,7 +27,7 @@ Arch's `extra` repository also has a `ghidra`, built from source and usually a r
 | **Commands** | `ghidra` (GUI), `ghidra-analyzeHeadless`, `pyghidra` |
 | **Current Version** | `12.2-1` |
 | **Package Type** | **Modified** |
-| **Build Status** | `pending` |
+| **Build Status** | `passing` |
 | **Upstream Project** | [NationalSecurityAgency/ghidra](https://github.com/NationalSecurityAgency/ghidra) ([ghidra-sre.org](https://ghidra-sre.org)) |
 | **License** | Apache-2.0 (bundled components under their own licenses, see `/usr/share/licenses/ghidra/licenses`) |
 | **Category** | Development |
