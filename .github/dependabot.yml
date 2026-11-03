@@ -4,3 +4,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # v5+ extracts a single matched artifact directly into `path` instead of
+      # <path>/<name>/, which breaks the publish job's per-package layout (#20).
+      - dependency-name: actions/download-artifact
+        update-types: ["version-update:semver-major"]
