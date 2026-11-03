@@ -33,6 +33,7 @@ makedepends=(
   'git'
   'glslang'
   'gperf'
+  'lld'
   'nasm'
   'ninja'
   'python'
@@ -107,7 +108,9 @@ build() {
   # Distribution preset: static libraries, vcpkg distribution triplets.
   # ENABLE_CI_BASELINE_CPU targets x86-64-v2 instead of the build host's
   # -march=native. LTO and symbol files (debug info) stay off to keep the
-  # build within the runner's memory, disk and six hours.
+  # build within the runner's memory, disk and six hours. Upstream only
+  # links with lld when it finds one; GNU ld fails on the static Rust crates'
+  # calls back into LibGfx, which come after it on the link line.
   cmake \
     --preset Distribution \
     -S "${pkgname}" \
@@ -118,6 +121,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_INSTALL_LIBEXECDIR="lib/${pkgname}" \
     -DENABLE_CI_BASELINE_CPU=ON \
+    -DLAGOM_USE_LINKER=lld \
     -DENABLE_LTO_FOR_RELEASE=OFF \
     -DLADYBIRD_GENERATE_SYMBOL_FILES=OFF \
     -DENABLE_LAGOM_CCACHE=OFF \
