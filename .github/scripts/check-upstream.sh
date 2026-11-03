@@ -81,6 +81,33 @@ case "$CHECK" in
     fi
     ;;
 
+  ghidra-release)
+    # Tags are Ghidra_<ver>_build and the asset is ghidra_<ver>_PUBLIC_<YYYYMMDD>.zip.
+    # The date, kept in _build, is only known from the asset name, and a
+    # rebuilt release can keep the version with a new date. Without the zip
+    # the check fails instead of guessing.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASE_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases/latest" || true)
+      TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' 2>/dev/null || true)
+      if [[ "$TAG" =~ ^Ghidra_([0-9]+(\.[0-9]+)*)_build$ ]]; then
+        VER="${BASH_REMATCH[1]}"
+        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' 2>/dev/null \
+          | grep -E "^ghidra_${VER//./\\.}_PUBLIC_[0-9]{8}\.zip$" | sort | tail -1 || true)
+        if [ -z "$ASSET" ]; then
+          echo "::error::ghidra: release ${TAG} has no ghidra_${VER}_PUBLIC_<date>.zip" >&2
+          exit 1
+        fi
+        LATEST="$VER"
+        NEW_BUILD=$(echo "$ASSET" | grep -oP '_PUBLIC_\K[0-9]{8}(?=\.zip$)')
+        CURRENT_BUILD=$(grep -oP '^_build=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+        if [ "$NEW_BUILD" != "$CURRENT_BUILD" ]; then
+          UPDATE_NEEDED=true
+          EXTRA_INFO="build: ${CURRENT_BUILD} -> ${NEW_BUILD}"
+        fi
+      fi
+    fi
+    ;;
+
   beeper-redirect)
     HEADERS=$(curl -sI -A "curl/8" "https://api.beeper.com/desktop/download/linux/x64/stable/com.automattic.beeper.desktop" || true)
     VER=$(echo "$HEADERS" | grep -i '^location:' | grep -oP 'Beeper-\K[0-9.]+(?=-x86_64\.AppImage)' | head -1 || true)

@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-51%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-52%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -74,6 +74,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Unofficial Samsung Galaxy Buds manager with dynamic Wayland HiDPI auto-scaling detection and persistent tray menu hook. Upstream: [timschneeb/GalaxyBudsClient](https://github.com/timschneeb/GalaxyBudsClient)
 - [**`gdlauncher-carbon`**](docs/gdlauncher-carbon.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.0.40--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/gdlauncher-carbon.md) `sudo pacman -S gdlauncher-carbon`
   - Powerful Minecraft custom launcher with modern UI, Wayland support, and clean uninstallation scriptlet. Upstream: [GDLauncher](https://gdlauncher.com)
+- [**`ghidra`**](docs/ghidra.md) [![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-12.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/ghidra.md) `sudo pacman -S archrepo/ghidra`
+  - NSA's software reverse engineering framework (disassembler, decompiler, debugger) from the official release, with a JDK 25+ dependency, HiDPI scaling from the desktop and blank-window fixes for tiling window managers. Upstream: [NationalSecurityAgency/ghidra](https://github.com/NationalSecurityAgency/ghidra)
 - [**`gridcraft`**](docs/gridcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.11.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/gridcraft.md) `sudo pacman -S gridcraft`
   - GridCraft, ArtCraft's open-source spreadsheet app (Excel alternative). Upstream: [storytold/gridcraft](https://github.com/storytold/gridcraft)
 - [**`howdy-next`**](docs/howdy-next.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.4.1--3-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/howdy-next.md) `sudo pacman -S howdy-next`

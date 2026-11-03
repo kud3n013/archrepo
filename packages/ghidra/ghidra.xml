@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-ghidra-project">
+    <comment>Ghidra project</comment>
+    <glob pattern="*.gpr"/>
+  </mime-type>
+</mime-info>

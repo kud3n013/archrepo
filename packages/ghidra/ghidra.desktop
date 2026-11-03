@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Ghidra
+GenericName=Reverse Engineering Framework
+Comment=Disassemble, decompile and analyze compiled code
+Exec=ghidra %f
+Icon=ghidra
+Terminal=false
+Categories=Development;Debugger;
+MimeType=application/x-ghidra-project;
+StartupNotify=true
+StartupWMClass=ghidra-Ghidra
+Keywords=ghidra;reverse;engineering;decompiler;disassembler;debugger;binary;analysis;security;

@@ -1,0 +1,72 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/NationalSecurityAgency/ghidra
+# Arch Reference: https://gitlab.archlinux.org/archlinux/packaging/packages/ghidra (extra, built from source)
+# AUR Reference: https://aur.archlinux.org/packages/ghidra-bin
+
+pkgname=ghidra
+pkgver=12.2
+# Build date in upstream's release file name (ghidra_<ver>_PUBLIC_<date>.zip)
+_build=20261016
+pkgrel=1
+pkgdesc="Software reverse engineering framework from the NSA, with HiDPI and tiling window manager fixes"
+arch=('x86_64')
+url="https://github.com/NationalSecurityAgency/ghidra"
+license=('Apache-2.0')
+# Ghidra's launcher asks for a JDK (application.java.min=25), not only a JRE.
+# The native decompiler, sleigh and demangler link glibc and libstdc++.
+depends=('java-environment>=25' 'bash' 'glibc' 'gcc-libs' 'hicolor-icon-theme')
+optdepends=('python: PyGhidra (pyghidra) and Python 3 scripts'
+            'gdb: Linux debugger back end'
+            'lldb: LLDB debugger back end'
+            'xorg-xrdb: HiDPI detection from Xft.dpi')
+provides=('ghidra-bin')
+conflicts=('ghidra-bin' 'ghidra-git' 'ghidra-desktop')
+replaces=('ghidra-bin')
+backup=('etc/ghidra-flags.conf')
+options=(!strip !debug)
+source=("https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_${pkgver}_build/ghidra_${pkgver}_PUBLIC_${_build}.zip"
+        'ghidra.sh'
+        'ghidra-flags.conf'
+        'ghidra.desktop'
+        'ghidra.xml')
+sha256sums=('2c2cd776db3c1f6a097ba418922378ac3649cadd5e844a6f5f088ae628a7be67'
+            'd61bf96f9466759976f21d1697dd8328f24fdfe31e06995decf55ab6e46d0b51'
+            '145cec02c5312e8fc99a918b8cf079b675264c875d74f6d5c9ae9738842a4f27'
+            'fbb0c3affdefb0baafc2695cce77b0818be96b298954fa1058c0806f6563ee47'
+            '216579401b3f32605ba490f19641317f94a1f0a7ab0069ca9c452bbfbf6e99b4')
+
+prepare() {
+    # The icons ship inside Gui.jar
+    rm -rf "${srcdir}/icons"
+    mkdir -p "${srcdir}/icons"
+    bsdtar -xf "${srcdir}/ghidra_${pkgver}_PUBLIC/Ghidra/Framework/Gui/lib/Gui.jar" \
+        -C "${srcdir}/icons" 'images/GhidraIcon*.png'
+}
+
+package() {
+    local _root="${srcdir}/ghidra_${pkgver}_PUBLIC"
+
+    install -dm755 "${pkgdir}/opt"
+    cp -a --no-preserve=ownership "${_root}" "${pkgdir}/opt/ghidra"
+
+    # GUI launcher with the flags file; the command-line tools are linked as
+    # extra/ghidra names them
+    install -Dm755 "${srcdir}/ghidra.sh" "${pkgdir}/usr/bin/ghidra"
+    install -Dm644 "${srcdir}/ghidra-flags.conf" "${pkgdir}/etc/ghidra-flags.conf"
+    ln -s /opt/ghidra/support/analyzeHeadless "${pkgdir}/usr/bin/ghidra-analyzeHeadless"
+    ln -s /opt/ghidra/support/pyghidraRun "${pkgdir}/usr/bin/pyghidra"
+
+    install -Dm644 "${srcdir}/ghidra.desktop" "${pkgdir}/usr/share/applications/ghidra.desktop"
+    install -Dm644 "${srcdir}/ghidra.xml" "${pkgdir}/usr/share/mime/packages/ghidra.xml"
+    local _size
+    for _size in 16 24 32 40 48 64 128 256; do
+        install -Dm644 "${srcdir}/icons/images/GhidraIcon${_size}.png" \
+            "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/ghidra.png"
+    done
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    ln -s /opt/ghidra/LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    ln -s /opt/ghidra/licenses "${pkgdir}/usr/share/licenses/${pkgname}/licenses"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
