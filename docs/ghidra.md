@@ -52,7 +52,8 @@ Repackages upstream's official release zip, which already holds the Linux x86-64
 ### Packaging Details
 - **Source**: `ghidra_<version>_PUBLIC_<date>.zip` from the [GitHub release](https://github.com/NationalSecurityAgency/ghidra/releases). The date is kept in the PKGBUILD as `_build`.
 - **Java**: Ghidra 12.2 needs a JDK 25 or newer (`java-environment>=25`); a JRE isn't enough. It also runs on the current `jdk-openjdk` (27). If your default Java (`archlinux-java status`) is older, Ghidra's launcher finds a newer JDK in `/usr/lib/jvm` by itself and remembers it in `~/.config/ghidra/`.
-- **Optional dependencies**: `python` for PyGhidra (`pyghidra` sets up its own virtual environment under `~/.config/ghidra/` from the wheels Ghidra bundles, no download), `gdb` or `lldb` for the debugger, `xorg-xrdb` for HiDPI detection from `Xft.dpi`.
+- **GUI libraries**: Arch's JDK packages don't pull in the X11 libraries Java's AWT loads (`libXi`, `libXtst`, `libXrender`, `libXext`, `libX11`) or any font, so without them the GUI exits at once with `UnsatisfiedLinkError: libXi.so.6`. The package depends on them, `fontconfig` and a `ttf-font`.
+- **Optional dependencies**: `python` for PyGhidra (on first run `pyghidra` asks once, then sets up its own virtual environment in `~/.config/ghidra/ghidra_<version>_PUBLIC/venv` from the wheels Ghidra bundles, with no download), `gdb` or `lldb` for the debugger, `xorg-xrdb` for HiDPI detection from `Xft.dpi`.
 - **Updates**: the daily check follows the latest GitHub release of `NationalSecurityAgency/ghidra` and reads the build date from the release zip's name. A re-published zip with the same version but a new date bumps `pkgrel`.
 - **Replaces** the AUR package `ghidra-bin` and conflicts with `ghidra-git` and `ghidra-desktop`.
 

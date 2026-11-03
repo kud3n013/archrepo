@@ -13,8 +13,11 @@ arch=('x86_64')
 url="https://github.com/NationalSecurityAgency/ghidra"
 license=('Apache-2.0')
 # Ghidra's launcher asks for a JDK (application.java.min=25), not only a JRE.
+# Arch's JDKs don't pull in the X11 libraries Java's AWT (libawt_xawt.so)
+# loads, or a font, so the GUI fails to start without them.
 # The native decompiler, sleigh and demangler link glibc and libstdc++.
-depends=('java-environment>=25' 'bash' 'glibc' 'gcc-libs' 'hicolor-icon-theme')
+depends=('java-environment>=25' 'bash' 'glibc' 'gcc-libs' 'hicolor-icon-theme'
+         'libx11' 'libxext' 'libxi' 'libxrender' 'libxtst' 'fontconfig' 'ttf-font')
 optdepends=('python: PyGhidra (pyghidra) and Python 3 scripts'
             'gdb: Linux debugger back end'
             'lldb: LLDB debugger back end'
