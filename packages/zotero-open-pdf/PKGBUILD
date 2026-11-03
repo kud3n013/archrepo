@@ -1,0 +1,29 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+
+pkgname=zotero-open-pdf
+_pkgname=zotero-open-pdf
+_ext_id="zotero-open-pdf@iris-advies.com"
+pkgver=1.0.14
+pkgrel=1
+pkgdesc="Open PDF, EPUB and snapshot attachments in Zotero's internal viewer, the system viewer or custom external viewers"
+arch=('any')
+url="https://github.com/retorquere/zotero-open-pdf"
+# Upstream ships no license file and declares none
+license=('LicenseRef-zotero-open-pdf')
+depends=('zotero')
+options=('!strip' '!debug')
+source=("${pkgname}-${pkgver}.xpi::https://github.com/retorquere/${_pkgname}/releases/download/v${pkgver}/${_pkgname}-${pkgver}.xpi")
+sha256sums=('57c28fbef1cf8f510e8c96923939a36aea68adcc72b152ee5b0865de305ff5b1')
+
+package() {
+  # Install into Zotero distribution extensions directory for automatic profile deployment
+  install -Dm644 "${pkgname}-${pkgver}.xpi" "${pkgdir}/usr/lib/zotero/distribution/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for legacy extensions directory
+  mkdir -p "${pkgdir}/usr/lib/zotero/extensions"
+  ln -s "../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/extensions/${_ext_id}.xpi"
+
+  # Relative symlink for app/distribution path
+  mkdir -p "${pkgdir}/usr/lib/zotero/app/distribution/extensions"
+  ln -s "../../../distribution/extensions/${_ext_id}.xpi" "${pkgdir}/usr/lib/zotero/app/distribution/extensions/${_ext_id}.xpi"
+}

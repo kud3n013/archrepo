@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-49%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-50%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -143,6 +143,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Model Context Protocol (MCP) server & standalone CLI connecting AI assistants and LLMs to Zotero libraries. Upstream: [54yyyu/zotero-mcp](https://github.com/54yyyu/zotero-mcp)
 - [**`zotero-ocr`**](docs/zotero-ocr.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.9.6--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-ocr.md) `sudo pacman -S zotero-ocr`
   - PDF Optical Character Recognition plugin for Zotero configured with poppler and tesseract. Upstream: [UB-Mannheim/zotero-ocr](https://github.com/UB-Mannheim/zotero-ocr)
+- [**`zotero-open-pdf`**](docs/zotero-open-pdf.md) [![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.0.14--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-open-pdf.md) `sudo pacman -S zotero-open-pdf`
+  - Open PDF, EPUB and snapshot attachments in Zotero's internal viewer, the system viewer or custom external viewers. Upstream: [retorquere/zotero-open-pdf](https://github.com/retorquere/zotero-open-pdf)
 - [**`zotero-pdf-translate`**](docs/zotero-pdf-translate.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-2.4.7--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotero-pdf-translate.md) `sudo pacman -S zotero-pdf-translate`
   - In-app translation plugin for Zotero supporting PDFs, EPubs, metadata, and annotations via 20+ translation backends. Upstream: [windingwind/zotero-pdf-translate](https://github.com/windingwind/zotero-pdf-translate)
 - [**`zotmoov`**](docs/zotmoov.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.2.32--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/zotmoov.md) `sudo pacman -S zotmoov`
