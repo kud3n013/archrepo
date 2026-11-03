@@ -1,6 +1,6 @@
 # Open PDF for Zotero (`zotero-open-pdf`)
 
-[![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
 [![version](https://img.shields.io/badge/version-1.0.14--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-original-blue)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-website-informational)](https://github.com/retorquere/zotero-open-pdf)
@@ -24,7 +24,7 @@ sudo pacman -S zotero-open-pdf
 | **Package Name** | `zotero-open-pdf` |
 | **Current Version** | `1.0.14-1` |
 | **Package Type** | **Original** |
-| **Build Status** | `pending` |
+| **Build Status** | `passing` |
 | **Upstream Project** | [retorquere/zotero-open-pdf](https://github.com/retorquere/zotero-open-pdf) |
 | **Category** | Plugin / Add-on |
 
