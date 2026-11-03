@@ -116,7 +116,7 @@ case "$CHECK" in
     ;;
 
   codeberg-branch)
-    # Tracks a branch head rather than releases (kwin-scripts-krohnkite builds
+    # Tracks a branch head rather than releases (kwin-scripts-krohnkite-fork builds
     # kud3n's fork). The version is what the PKGBUILD's pkgver() derives from
     # `git describe --long --tags` (0.9.10.0-45-gfef8405 -> 0.9.10.0.r45.gfef8405),
     # so a blobless clone is described here the same way.
