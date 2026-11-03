@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-50%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-51%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -54,6 +54,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - CADCraft, ArtCraft's open-source 2D CAD and drafting app (AutoCAD alternative) with live light/dark switching through the XDG portal. Upstream: [storytold/cadcraft](https://github.com/storytold/cadcraft)
 - [**`claude-desktop`**](docs/claude-desktop.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.6556.2--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/claude-desktop.md) `sudo pacman -S claude-desktop`
   - Official Claude desktop app (Chat, Cowork and Claude Code) repackaged from Anthropic's Debian build, with a Wayland launcher, Cowork VM shims and the window manager's title bar in place of the app's frameless one. Upstream: [Anthropic](https://claude.ai/download)
+- [**`craft-anything`**](docs/craft-anything.md) [![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.3.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/craft-anything.md) `sudo pacman -S craft-anything`
+  - Craft Anything, ArtCraft's open-source tool that studies how a website, app or game works, then has a coding agent build your own version and checks it against the original. Upstream: [storytold/craft-anything](https://github.com/storytold/craft-anything)
 - [**`cursor`**](docs/cursor.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-3.22.7--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/cursor.md) `sudo pacman -S cursor`
   - AI-first code editor with KDE Plasma Global Menu export, DBusMenu punctuation normalization, GTK3 crash prevention & Wayland flags loader. Upstream: [Cursor](https://www.cursor.com)
 - [**`deckcraft`**](docs/deckcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.10.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/deckcraft.md) `sudo pacman -S deckcraft`

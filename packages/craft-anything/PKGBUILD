@@ -1,0 +1,45 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/storytold/craft-anything
+# AUR Reference: https://aur.archlinux.org/packages/craft-anything-bin
+
+pkgname=craft-anything
+pkgver=0.3.0
+pkgrel=1
+pkgdesc="Craft Anything, ArtCraft's open-source tool that studies how software works and has a coding agent build your own version"
+arch=('x86_64')
+url="https://github.com/storytold/craft-anything"
+license=('MIT OR Apache-2.0' 'OFL-1.1')
+# The binaries link only glibc and libgcc. The window system,
+# GPU and D-Bus libraries are opened at run time, so they are listed here by hand.
+depends=('glibc' 'gcc-libs' 'hicolor-icon-theme' 'dbus' 'libxkbcommon' 'libxkbcommon-x11' 'libx11' 'libxcb' 'libxcursor' 'libxi' 'wayland' 'libglvnd' 'vulkan-icd-loader')
+optdepends=('vulkan-driver: GPU rendering through Vulkan (falls back to OpenGL or the CPU)'
+            'xdg-desktop-portal: native file dialogs'
+            'zenity: file dialogs without a portal'
+            'xdg-utils: open links in the browser'
+            'claude-code: the coding agent that builds projects (AUR or Anthropic'\''s installer)'
+            'openai-codex: Codex as the coding agent'
+            'gemini-cli: Gemini CLI as the coding agent (through ACP)'
+            'opencode: opencode as the coding agent (through ACP)'
+            'chromium: study websites (Chrome, Edge and Brave work too)'
+            'ghidra: decompiler in Deep mode'
+            'android-tools: study apps on a connected phone (adb)'
+            'jadx: decompile Android apps')
+provides=('craft-anything-bin')
+conflicts=('craft-anything-bin' 'craft-anything-git')
+replaces=('craft-anything-bin')
+options=(!strip !debug)
+source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
+sha256sums=('674ec59ffbdaefbd577917e07c9d464562043b275a3889ba4f60239a12f03d53')
+
+package() {
+    local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
+
+    install -dm755 "${pkgdir}/usr"
+    cp -dr --no-preserve=ownership "${_root}/bin" "${_root}/share" "${pkgdir}/usr/"
+
+    install -dm755 "${pkgdir}/usr/share/licenses/${pkgname}"
+    find "${_root}/share/doc/${pkgname}" -maxdepth 1 -type f \( -name 'LICENSE-*' -o -name 'NOTICE' -o -name 'OFL-*' \) \
+        -exec install -m644 -t "${pkgdir}/usr/share/licenses/${pkgname}/" {} +
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
