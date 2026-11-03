@@ -10,6 +10,7 @@ pkgbase = ladybird
 	makedepends = git
 	makedepends = glslang
 	makedepends = gperf
+	makedepends = lld
 	makedepends = nasm
 	makedepends = ninja
 	makedepends = python

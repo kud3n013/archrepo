@@ -37,6 +37,7 @@ Ladybird publishes no releases, so this package compiles a snapshot of `master` 
 - **Portable CPU baseline:** built with `ENABLE_CI_BASELINE_CPU` (x86-64-v2, SSE4.2/POPCNT) instead of upstream's default `-march=native`, which would tie the binary to the build machine's CPU. The AUR `ladybird` package ships `-march=native`.
 - **Upstream's Distribution preset:** static libraries, with Skia, ANGLE, ICU, FFmpeg, curl and the other libraries built by vcpkg at the versions upstream pins in `vcpkg.json`. The vcpkg checkout follows that file's `builtin-baseline`.
 - **Pinned Rust toolchain:** the Rust code is built with the toolchain from upstream's `rust-toolchain.toml` (through `rustup`). Arch's newer `rust` fails the build on new deprecation warnings, as reported on the AUR.
+- **Always linked with `lld`.** Upstream uses lld only when it finds it installed, and GNU ld fails to link the Rust crates.
 - **No `-Werror`** in C++, so a new GCC warning cannot fail a snapshot build.
 - vcpkg's static harfbuzz and fontconfig are linked whole into the Qt UI, as in the AUR package.
 - `/usr/bin/ladybird` symlink next to upstream's `/usr/bin/Ladybird`.
