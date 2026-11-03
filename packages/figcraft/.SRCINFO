@@ -1,6 +1,6 @@
 pkgbase = figcraft
 	pkgdesc = FigCraft, an open-source interface design and prototyping tool (Figma alternative) from the ArtCraft suite
-	pkgver = 0.14.0
+	pkgver = 0.15.0
 	pkgrel = 1
 	url = https://github.com/storytold/figcraft
 	arch = x86_64
@@ -29,7 +29,7 @@ pkgbase = figcraft
 	replaces = figcraft-bin
 	options = !strip
 	options = !debug
-	source = figcraft-0.14.0-linux-x86_64.tar.gz::https://github.com/storytold/figcraft/releases/download/v0.14.0/figcraft-0.14.0-linux-x86_64.tar.gz
-	sha256sums = 0ea489ce299238af96106940cddb42091c3eba109c05fdf843b4e7f8eb970829
+	source = figcraft-0.15.0-linux-x86_64.tar.gz::https://github.com/storytold/figcraft/releases/download/v0.15.0/figcraft-0.15.0-linux-x86_64.tar.gz
+	sha256sums = 1e5e8e0b9b4a1811f31ce8204a9bc53c851f208b6fe45e0287302f70bc6a08d6
 
 pkgname = figcraft
