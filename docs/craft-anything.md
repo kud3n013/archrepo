@@ -1,6 +1,6 @@
 # Craft Anything (`craft-anything`)
 
-[![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
 [![version](https://img.shields.io/badge/version-0.3.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-original-blue)](#overview)
 [![upstream](https://img.shields.io/badge/upstream-github-informational)](https://github.com/storytold/craft-anything)
@@ -25,7 +25,7 @@ sudo pacman -S craft-anything
 | **Commands** | `craft-anything`, `craft-anything-cli` |
 | **Current Version** | `0.3.0-1` |
 | **Package Type** | **Original** |
-| **Build Status** | `pending` |
+| **Build Status** | `passing` |
 | **Upstream Project** | [storytold/craft-anything](https://github.com/storytold/craft-anything) ([getartcraft.com](https://getartcraft.com/apps/craft-anything)) |
 | **License** | MIT OR Apache-2.0 (bundled fonts OFL-1.1) |
 | **Category** | Development |
