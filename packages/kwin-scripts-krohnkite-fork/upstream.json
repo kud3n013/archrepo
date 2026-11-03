@@ -1,0 +1,5 @@
+{
+  "check": "codeberg-branch",
+  "repo": "kud3n/Krohnkite",
+  "branch": "local/pointer-combined"
+}
