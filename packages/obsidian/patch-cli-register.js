@@ -16,7 +16,8 @@ if (!appAsarMain || !obsidianAsarMain || !fs.existsSync(appAsarMain) || !fs.exis
 const MARKER = '/usr/bin/obsidian opens Obsidian and runs CLI commands';
 
 function patchCliRegister(code) {
-    const re = /if\(([\w$]+)\.existsSync\(([\w$]+)\)\)\{(\1\.existsSync\([\w$]+\)\|\|\1\.mkdirSync\([\w$]+,\{recursive:!0\}\);try\{\1\.unlinkSync\(([\w$]+)\)\}catch\([\w$]+\)\{\}return \1\.copyFileSync\(\2,\4\))/;
+    // The catch binding is optional: 1.15.0 started minifying to `catch{}`
+    const re = /if\(([\w$]+)\.existsSync\(([\w$]+)\)\)\{(\1\.existsSync\([\w$]+\)\|\|\1\.mkdirSync\([\w$]+,\{recursive:!0\}\);try\{\1\.unlinkSync\(([\w$]+)\)\}catch(?:\([\w$]+\))?\{\}return \1\.copyFileSync\(\2,\4\))/;
     return code.replace(re, 'if($1.existsSync($2)){if($1.existsSync("/usr/bin/obsidian"))return{success:!0,message:"Already registered in PATH: /usr/bin/obsidian opens Obsidian and runs CLI commands."};$3');
 }
 
