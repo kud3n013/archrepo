@@ -8,8 +8,8 @@
 # AppImage, which bundles its own copy of WebKitGTK and GTK.
 
 pkgname=triggers-client
-pkgver=4.7.0
-pkgrel=2
+pkgver=4.8.1
+pkgrel=1
 pkgdesc="Official launcher for the Triggers Minecraft server: installs and updates the game instances, signs in with Microsoft and starts the game"
 arch=('x86_64')
 url="https://saominecraft.com/us"
@@ -49,7 +49,7 @@ source=(
 )
 # makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
 noextract=("${_deb}")
-sha256sums=('d17f774a2834a12812f4ef97886aa88c0769d383b0c2ce03ff3c55e6fb19aec6'
+sha256sums=('51fed4122ce135de3bee80e415cc297d03773fe4e11f2ac74626ab49badedc58'
             'a047afbffd9753598dee00200a59609fb49fa075314d10d1f75e9b9a25473a89'
             '175e8ee0ffa2e40af4881f48649310e51c76e7f4c1016eebed6437c150eb14a3'
             '32a0f1eeae719da6be3f8c1708f27d0781506fddab6969b0d86a32913caa2c64')
