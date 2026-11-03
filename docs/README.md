@@ -64,6 +64,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`zotero-better-notes`**](zotero-better-notes.md) | `3.3.3-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Advanced note management, markdown tree, and linking for Zotero |
 | [**`zotero-mcp`**](zotero-mcp.md) | `0.13.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Model Context Protocol server and CLI connecting AI models to Zotero |
 | [**`zotero-ocr`**](zotero-ocr.md) | `0.9.6-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | OCR extraction for PDF research attachments in Zotero (tesseract/poppler) |
+| [**`zotero-open-pdf`**](zotero-open-pdf.md) | `1.0.14-1` | Original | ![pending](https://img.shields.io/badge/build-pending-lightgrey) | Open PDF, EPUB and snapshot attachments in internal, system or custom external viewers |
 | [**`zotero-pdf-translate`**](zotero-pdf-translate.md) | `2.4.7-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Inline PDF, annotation, and metadata translation in Zotero |
 | [**`zotmoov`**](zotmoov.md) | `1.2.32-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Automated attachment mover and directory organizer for Zotero |
 
