@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-48%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-49%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -78,7 +78,7 @@ Each package entry below provides direct links to its dedicated documentation in
   - C++ rewrite of Howdy facial-recognition authentication for Linux PAM, patched to eliminate OpenCV 5 DNN warning spam. Upstream: [nathawat/howdy-next](https://codeberg.org/nathawat/howdy-next)
 - [**`kast`**](docs/kast.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.6.2--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-original-blue)](docs/kast.md) `sudo pacman -S kast`
   - Arch/CachyOS setup TUI with an App Vault backup engine and Proton Drive backups. Upstream: [kud3n013/kast](https://github.com/kud3n013/kast)
-- [**`ladybird`**](docs/ladybird.md) [![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-20261103--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/ladybird.md) `sudo pacman -S ladybird`
+- [**`ladybird`**](docs/ladybird.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-20261103--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/ladybird.md) `sudo pacman -S ladybird`
   - Truly independent web browser with its own engine, compiled from a weekly snapshot of `master` for a portable x86-64-v2 baseline. Upstream: [LadybirdBrowser/ladybird](https://github.com/LadybirdBrowser/ladybird)
 - [**`lightcraft`**](docs/lightcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.12.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/lightcraft.md) `sudo pacman -S lightcraft`
   - LightCraft, ArtCraft's open-source photo library and raw developer (Lightroom alternative) with live light/dark switching through the XDG portal. Upstream: [storytold/lightcraft](https://github.com/storytold/lightcraft)

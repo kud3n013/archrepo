@@ -1,6 +1,6 @@
 # Ladybird Web Browser (`ladybird`)
 
-[![build](https://img.shields.io/badge/build-pending-lightgrey)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
+[![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml)
 [![version](https://img.shields.io/badge/version-20261103--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages)
 [![type](https://img.shields.io/badge/type-modified-orange)](#modifications-in-archrepo)
 [![upstream](https://img.shields.io/badge/upstream-github-informational)](https://github.com/LadybirdBrowser/ladybird)
@@ -24,7 +24,7 @@ sudo pacman -S ladybird
 | **Package Name** | `ladybird` |
 | **Current Version** | `20261103-1` |
 | **Package Type** | **Modified** |
-| **Build Status** | `pending` |
+| **Build Status** | `passing` |
 | **Upstream Project** | [LadybirdBrowser/ladybird](https://github.com/LadybirdBrowser/ladybird), branch `master` |
 | **Category** | Core Application (Web Browser) |
 
