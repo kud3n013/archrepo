@@ -1,0 +1,6 @@
+{
+  "check": "github-snapshot",
+  "repo": "LadybirdBrowser/ladybird",
+  "branch": "master",
+  "min_age_days": 7
+}

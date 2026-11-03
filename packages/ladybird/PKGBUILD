@@ -1,0 +1,152 @@
+# Maintainer: kud3n013 <kud3n013@gmail.com>
+# Contributor: Ali Mohammad Pur, Tim Schumacher (AUR ladybird)
+
+pkgname=ladybird
+pkgver=20261103
+pkgrel=1
+pkgdesc="Truly independent web browser, built from a weekly snapshot of master"
+arch=('x86_64')
+url="https://github.com/LadybirdBrowser/ladybird"
+license=('BSD-2-Clause')
+depends=(
+  'dbus'
+  'fontconfig'
+  'glib2'
+  'libdrm'
+  'libgl'
+  'libpulse'
+  'libxcb'
+  'libxkbcommon'
+  'ncurses'
+  'qt6-base'
+  'qt6-positioning'
+  'ttf-liberation'
+  'vulkan-icd-loader'
+  'wayland'
+  'xcb-util-wm'
+)
+# vcpkg builds the remaining libraries (Skia, ANGLE, ICU, FFmpeg, curl, ...)
+# from source and links them statically, pinned by upstream's vcpkg.json.
+makedepends=(
+  'autoconf-archive'
+  'cmake'
+  'git'
+  'glslang'
+  'gperf'
+  'nasm'
+  'ninja'
+  'python'
+  'qt6-tools'
+  'rustup'
+  'tar'
+  'unzip'
+  'vulkan-headers'
+  'wayland-protocols'
+  'zip'
+)
+conflicts=('ladybird-git')
+options=('!lto' '!debug' '!buildflags' '!staticlibs' '!emptydirs')
+
+# Upstream has no releases. check-upstream.sh (github-snapshot) moves
+# _commithash to the head of master once it is a week newer than pkgver,
+# the pinned commit's UTC date.
+_commithash=e45c3172e5a878a813acc7c61a808c39d6dd2eef
+source=(
+  "${pkgname}::git+${url}.git#commit=${_commithash}"
+  "vcpkg::git+https://github.com/microsoft/vcpkg.git"
+)
+sha256sums=('SKIP' 'SKIP')
+
+_env() {
+  export VCPKG_ROOT="${srcdir}/vcpkg"
+  export VCPKG_DISABLE_METRICS=1
+  # No binary cache: each build starts clean and the runner's disk is tight
+  export VCPKG_BINARY_SOURCES=clear
+  # Arch's rust is newer than the toolchain upstream pins, and its new
+  # deprecations fail the -D warnings Rust build, so use the pinned one.
+  export RUSTUP_TOOLCHAIN="$(sed -n 's/^channel = "\(.*\)"/\1/p' "${srcdir}/${pkgname}/rust-toolchain.toml")"
+  unset CARGO_TARGET_DIR
+}
+
+# _edit FILE SED: a sed that fails when it changes nothing, so a snapshot that
+# moved the line breaks the build instead of shipping unpatched.
+_edit() {
+  local before
+  before=$(sha256sum < "$1")
+  sed -i "$2" "$1"
+  if [ "$(sha256sum < "$1")" = "$before" ]; then
+    error "sed '$2' left $1 unchanged"
+    return 1
+  fi
+}
+
+prepare() {
+  cd "${srcdir}"
+  _env
+
+  # vcpkg.json names the vcpkg commit its port versions come from
+  local baseline
+  baseline=$(sed -n 's/.*"builtin-baseline": *"\([0-9a-f]*\)".*/\1/p' "${pkgname}/vcpkg.json")
+  git -C vcpkg checkout -q "$baseline"
+  "${VCPKG_ROOT}/bootstrap-vcpkg.sh" -disableMetrics
+
+  rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+
+  # New GCC warnings must not fail a snapshot build
+  _edit "${pkgname}/Meta/CMake/compile_options.cmake" '/^add_cxx_compile_options(-Werror)$/d'
+  # Carried from the AUR package: link vcpkg's static harfbuzz and fontconfig
+  # whole into the Qt UI
+  _edit "${pkgname}/UI/Qt/CMakeLists.txt" \
+    's/^target_link_libraries(ladybird PRIVATE Qt::Core Qt::Gui Qt::Widgets)$/target_link_libraries(ladybird PRIVATE Qt::Core Qt::Gui Qt::Widgets -Wl,--whole-archive harfbuzz fontconfig -Wl,--no-whole-archive)/'
+}
+
+build() {
+  cd "${srcdir}"
+  _env
+
+  # Distribution preset: static libraries, vcpkg distribution triplets.
+  # ENABLE_CI_BASELINE_CPU targets x86-64-v2 instead of the build host's
+  # -march=native. LTO and symbol files (debug info) stay off to keep the
+  # build within the runner's memory, disk and six hours.
+  cmake \
+    --preset Distribution \
+    -S "${pkgname}" \
+    -B build \
+    -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" \
+    -DVCPKG_OVERLAY_TRIPLETS="${srcdir}/${pkgname}/Meta/CMake/vcpkg/distribution-triplets" \
+    -DVCPKG_INSTALL_OPTIONS=--clean-after-build \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBEXECDIR="lib/${pkgname}" \
+    -DENABLE_CI_BASELINE_CPU=ON \
+    -DENABLE_LTO_FOR_RELEASE=OFF \
+    -DLADYBIRD_GENERATE_SYMBOL_FILES=OFF \
+    -DENABLE_LAGOM_CCACHE=OFF \
+    -DENABLE_INSTALL_HEADERS=OFF \
+    -Wno-dev
+
+  # One job per core: GCC needs several GB for some LibWeb units
+  cmake --build build --parallel "${CMAKE_BUILD_PARALLEL_LEVEL:-$(nproc)}"
+}
+
+package() {
+  cd "${srcdir}"
+
+  DESTDIR="${pkgdir}" cmake --install build
+
+  find "${pkgdir}" \( -name '*.a' -o -name '*.cmake' \) -delete
+
+  # The js and wasm REPLs install a commit stamp at the prefix root and take
+  # generic command names; drop the stamp and prefix the names.
+  rm -f "${pkgdir}/usr/COMMIT"
+  local tool
+  for tool in js wasm; do
+    mv "${pkgdir}/usr/bin/${tool}" "${pkgdir}/usr/bin/${pkgname}-${tool}"
+  done
+
+  [ -e "${pkgdir}/usr/bin/${pkgname}" ] || ln -s Ladybird "${pkgdir}/usr/bin/${pkgname}"
+
+  install -Dm644 "${pkgname}/LICENSE" -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+
+  # Ensure consistent directory and file permissions
+  chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

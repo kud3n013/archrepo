@@ -141,6 +141,35 @@ case "$CHECK" in
     fi
     ;;
 
+  github-snapshot)
+    # Tracks a branch with no releases (ladybird). pkgver is the pinned
+    # commit's UTC date (YYYYMMDD); the pin moves to the branch head only once
+    # the head is min_age_days newer, so a multi-hour source build runs at
+    # most that often.
+    BRANCH=""
+    MIN_AGE=0
+    if [ -f "$CONFIG_FILE" ]; then
+      BRANCH=$(jq -r '.branch // ""' "$CONFIG_FILE")
+      MIN_AGE=$(jq -r '.min_age_days // 0' "$CONFIG_FILE")
+    fi
+    if [ -n "$UPSTREAM" ] && [ -n "$BRANCH" ] && [[ "$MIN_AGE" =~ ^[0-9]+$ ]] && [[ "$CURRENT" =~ ^[0-9]{8}$ ]]; then
+      HEAD_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/commits/${BRANCH}" || true)
+      SHA=$(echo "$HEAD_JSON" | jq -r '.sha // empty' 2>/dev/null || true)
+      HEAD_DATE=$(echo "$HEAD_JSON" | jq -r '.commit.committer.date // empty' 2>/dev/null || true)
+      CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+      if [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] && [ -n "$HEAD_DATE" ] && [ "$SHA" != "$CURRENT_COMMIT" ]; then
+        HEAD_SECS=$(date -u -d "$HEAD_DATE" +%s)
+        PIN_SECS=$(date -u -d "$CURRENT" +%s)
+        if [ $(( (HEAD_SECS - PIN_SECS) / 86400 )) -ge "$MIN_AGE" ]; then
+          LATEST=$(date -u -d "@${HEAD_SECS}" +%Y%m%d)
+          NEW_COMMIT="$SHA"
+          UPDATE_NEEDED=true
+          EXTRA_INFO="commit: ${CURRENT_COMMIT:0:7} -> ${SHA:0:7}"
+        fi
+      fi
+    fi
+    ;;
+
   antigravity-download)
     DOWNLOAD_HTML=$(curl -sL --compressed -A "Mozilla/5.0" "https://antigravity.google/download" || true)
     MATCH=$(echo "$DOWNLOAD_HTML" | grep -oP 'https://storage\.googleapis\.com/antigravity-public/antigravity-hub/\K[0-9.]+\-[0-9]+(?=/linux-x64/Antigravity\.tar\.gz)' | head -1 || true)
