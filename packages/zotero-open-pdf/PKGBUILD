@@ -3,7 +3,7 @@
 pkgname=zotero-open-pdf
 _pkgname=zotero-open-pdf
 _ext_id="zotero-open-pdf@iris-advies.com"
-pkgver=1.0.14
+pkgver=1.0.15
 pkgrel=1
 pkgdesc="Open PDF, EPUB and snapshot attachments in Zotero's internal viewer, the system viewer or custom external viewers"
 arch=('any')
@@ -13,7 +13,7 @@ license=('LicenseRef-zotero-open-pdf')
 depends=('zotero')
 options=('!strip' '!debug')
 source=("${pkgname}-${pkgver}.xpi::https://github.com/retorquere/${_pkgname}/releases/download/v${pkgver}/${_pkgname}-${pkgver}.xpi")
-sha256sums=('57c28fbef1cf8f510e8c96923939a36aea68adcc72b152ee5b0865de305ff5b1')
+sha256sums=('bd9bec60c17a5a85c22ed1f2915b6f7c456a486303d1e2a4bd4ad79419fe863b')
 
 package() {
   # Install into Zotero distribution extensions directory for automatic profile deployment
