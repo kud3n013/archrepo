@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/soundcraft-bin
 
 pkgname=soundcraft
-pkgver=0.17.0
+pkgver=0.17.1
 pkgrel=1
 pkgdesc="SoundCraft, an open-source digital audio workstation (Pro Tools alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('soundcraft-bin' 'soundcraft-git')
 replaces=('soundcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('309bfecbb3044c16f0a200d64b58b341834089fa78211f722afb50eb05566d71')
+sha256sums=('e7ac140bb9fd69ade4dd02643af8e5d4c14a5c82cd670b2030e52688febb3cb4')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
