@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/craft-anything-bin
 
 pkgname=craft-anything
-pkgver=0.3.0
+pkgver=0.4.0
 pkgrel=1
 pkgdesc="Craft Anything, ArtCraft's open-source tool that studies how software works and has a coding agent build your own version"
 arch=('x86_64')
@@ -29,7 +29,7 @@ conflicts=('craft-anything-bin' 'craft-anything-git')
 replaces=('craft-anything-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('674ec59ffbdaefbd577917e07c9d464562043b275a3889ba4f60239a12f03d53')
+sha256sums=('28d9ebffb976ea4469fb54022742db59f4d9f623d18071369ff4d801c49b8bc0')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
