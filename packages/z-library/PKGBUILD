@@ -14,7 +14,7 @@
 # uses only when it is not packaged.
 
 pkgname=z-library
-pkgver=3.2.1
+pkgver=3.3.0
 pkgrel=1
 pkgdesc="Z-Library desktop app, with native title bar, KDE Global Menu and pacman-managed updates"
 arch=('x86_64')
@@ -82,7 +82,7 @@ source=(
     "patch-asar.js"
     "${pkgname}-bootstrap.js"
 )
-sha256sums=('303e1d6eb1e8e6604075da0c728e974de6ad76e480a30ea79cb8df157d9151f4'
+sha256sums=('1c16efac17e2f9b6bd3f46532854b28b9e4331dbc698236ecdae4f3280e3ac2a'
             'a2e3096bb814bde7d87d7e7be7fdf7a993291281ce5a055ef3830d76bc0e14ef'
             '284394077013b6acc2d249a493371de4088500b6ad0192dd643cee843cf1add0'
             'd3c24c679660aad8ead45b360ddd998e44356e958808bd782507040568d7b528'
