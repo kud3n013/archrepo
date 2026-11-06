@@ -1,14 +1,14 @@
 // Linux desktop integration for the Z-Library desktop app.
 //
 // Upstream's main window is frameless and draws Close, Maximize ("dock") and
-// Minimize ("remove") buttons at the end of its tab strip. Its main process is an
+// Minimize ("remove") buttons at the end of its header. Its main process is an
 // ES module (dist-electron/main.js). This file runs before it, from app.asar, and
 // on Linux:
 //
 //   1. turns off the in-app updater, so pacman owns updates,
 //   2. drops the remote debugging port upstream always opens on 127.0.0.1:9222,
 //   3. gives the main window the window manager's frame, and sends the frame's
-//      close button through the app's own close flow (the "keep tabs?" prompt),
+//      close button through the app's own close flow (the "exit the app?" prompt),
 //   4. adds Quit, View, Window and Help to upstream's application menu, so the
 //      KDE Global Menu (or the Alt menu bar elsewhere) has the usual entries,
 //   5. hides the in-page window buttons, which the frame now replaces.
@@ -29,22 +29,25 @@ const ORIGINAL_MAIN = "__ORIGINAL_MAIN__";
 // upstream's options.
 const MAIN_WINDOW_PRELOAD = "mainWindowPreload.cjs";
 
-// Upstream's window buttons are the first three entries of the tab strip's action
-// group; the rest of the group (tools, settings, notifications, profile, donate,
-// vertical tabs) is app UI and stays. Each button holds a single <img> whose alt
-// names the action.
-const WINDOW_BUTTONS = ["close", "dock", "remove"];
-const WINDOW_BUTTONS_CSS =
-  WINDOW_BUTTONS.map((alt) => `.top-bar__actions > .top-bar__actions-button:has(> img[alt="${alt}"])`).join(",\n") +
-  " { display: none !important; }";
+// Upstream's window buttons are the last three entries of the header, ending in
+// the close button; the rest of the header (tabs, donate, notifications, profile,
+// settings, downloads, navigation) is app UI and stays. Only the close button has
+// a class of its own, so Minimize and Maximize are found by their place before it.
+const CLOSE_BUTTON = "header.header > .header__button_danger";
+const WINDOW_BUTTONS = [
+  CLOSE_BUTTON,
+  "header.header > .header__button:has(+ .header__button_danger)",
+  "header.header > .header__button:has(+ .header__button + .header__button_danger)",
+].join(",\n");
+const WINDOW_BUTTONS_CSS = `${WINDOW_BUTTONS} { display: none !important; }`;
+const WINDOW_BUTTONS_COUNT = 3;
 
-// Runs in the app's own pages. Resolves to the window buttons that are missing
-// once the tab strip exists, so a renamed class or icon shows up in the log.
+// Runs in the app's own pages. Resolves to the number of window buttons found once
+// the header exists, so a renamed class shows up in the log.
 const CHECK_WINDOW_BUTTONS = `new Promise((resolve) => {
   const check = () => {
-    const bar = document.querySelector(".top-bar__actions");
-    if (!bar) return false;
-    resolve(${JSON.stringify(WINDOW_BUTTONS)}.filter((alt) => !bar.querySelector(':scope > .top-bar__actions-button > img[alt="' + alt + '"]')));
+    if (!document.querySelector("header.header")) return false;
+    resolve(document.querySelectorAll(${JSON.stringify(WINDOW_BUTTONS)}).length);
     return true;
   };
   if (check()) return;
@@ -52,12 +55,13 @@ const CHECK_WINDOW_BUTTONS = `new Promise((resolve) => {
   observer.observe(document.documentElement, { childList: true, subtree: true });
 })`;
 
-// The in-page close button calls this preload API: it asks whether to keep the
-// open tabs (unless the user turned the prompt off), saves them and quits.
+// The in-page close button asks whether to exit (unless the user turned the prompt
+// off) and quits; the open tabs are saved on quit. Its handler lives in the page,
+// and a click reaches it although the button is hidden.
 const CLOSE_LIKE_IN_PAGE = `(() => {
-  const api = window.homeOverlayViewAPI;
-  if (typeof api?.close !== "function") return false;
-  api.close();
+  const button = document.querySelector(${JSON.stringify(CLOSE_BUTTON)});
+  if (!button) return false;
+  button.click();
   return true;
 })()`;
 
@@ -223,7 +227,7 @@ function patchElectron(electron) {
       log("main window: native frame");
 
       // Closing the main window quits the app. Upstream's own close button first
-      // offers to keep the open tabs and saves them; the frame's button does the same.
+      // asks whether to exit; the frame's button does the same.
       let closeNow = false;
       this.on("close", (event) => {
         if (closeNow || quitting) {
@@ -281,9 +285,9 @@ function patchElectron(electron) {
       }
       contents
         .executeJavaScript(CHECK_WINDOW_BUTTONS)
-        .then((missing) => {
-          if (missing.length > 0) {
-            log(`in-page window buttons not found (${missing.join(", ")}); upstream may have changed its markup`);
+        .then((found) => {
+          if (found !== WINDOW_BUTTONS_COUNT) {
+            log(`found ${found} of ${WINDOW_BUTTONS_COUNT} in-page window buttons; upstream may have changed its markup`);
           } else {
             log("in-page window buttons hidden");
           }
