@@ -14,7 +14,7 @@
 # uses only when it is not packaged.
 
 pkgname=z-library
-pkgver=3.2.1
+pkgver=3.3.0
 pkgrel=1
 pkgdesc="Z-Library desktop app, with native title bar, KDE Global Menu and pacman-managed updates"
 arch=('x86_64')
@@ -82,12 +82,12 @@ source=(
     "patch-asar.js"
     "${pkgname}-bootstrap.js"
 )
-sha256sums=('303e1d6eb1e8e6604075da0c728e974de6ad76e480a30ea79cb8df157d9151f4'
+sha256sums=('1c16efac17e2f9b6bd3f46532854b28b9e4331dbc698236ecdae4f3280e3ac2a'
             'a2e3096bb814bde7d87d7e7be7fdf7a993291281ce5a055ef3830d76bc0e14ef'
             '284394077013b6acc2d249a493371de4088500b6ad0192dd643cee843cf1add0'
             'd3c24c679660aad8ead45b360ddd998e44356e958808bd782507040568d7b528'
             '508aca792de5666da77457db5710ae2df3eb30a78749be723d6142beedbc7802'
-            '40ac942f69960038779300f04fe9c2dd3eee9e1a7e1a196981ed4f22b3735631')
+            '3a7232deadfcb4fc207eb2e4c624ca02b2329b5a444ae30aa4b16cb48a2f2452')
 
 prepare() {
     cd "${srcdir}/Z-Library-${pkgver}"
@@ -124,12 +124,13 @@ prepare() {
         "${_proxies}/utils" \
         resources/apparmor-profile
 
-    # Add the bootstrap to app.asar. Upstream ships no app.asar.unpacked, and the
-    # repacked archive must not grow one.
-    if [[ -e resources/app.asar.unpacked ]]; then
-        echo "upstream now ships app.asar.unpacked; repack it with --unpack" >&2
-        return 1
-    fi
+    # Add the bootstrap to app.asar. Upstream unpacks zstd-napi, which holds a native
+    # binding, next to the archive, so the repack must come out with the same
+    # unpacked file list.
+    local _unpacked="resources/app.asar.unpacked"
+    (cd "${_unpacked}" && find . -type f | sort) > "${srcdir}/unpacked-before.txt"
+    local _executables
+    _executables=$(cd "${_unpacked}" && find . -type f -perm -u+x | sort)
 
     rm -rf "${srcdir}/app-src"
     asar extract resources/app.asar "${srcdir}/app-src"
@@ -148,11 +149,15 @@ prepare() {
     rm -rf "${srcdir}/icons"
     cp -r "${srcdir}/app-src/dist/icon.iconset" "${srcdir}/icons"
 
-    asar pack "${srcdir}/app-src" resources/app.asar
+    rm -rf "${_unpacked}"
+    asar pack "${srcdir}/app-src" resources/app.asar --unpack-dir 'node_modules/zstd-napi'
     rm -rf "${srcdir}/app-src"
 
-    if [[ -e resources/app.asar.unpacked ]]; then
-        echo "asar pack created app.asar.unpacked" >&2
+    # asar writes the unpacked files without their modes. Restore the execute bits.
+    (cd "${_unpacked}" && while read -r _file; do chmod u+x "${_file}"; done) <<< "${_executables}"
+
+    if ! (cd "${_unpacked}" && find . -type f | sort) | diff "${srcdir}/unpacked-before.txt" - ; then
+        echo "app.asar.unpacked differs from upstream" >&2
         return 1
     fi
 }
@@ -172,14 +177,13 @@ package() {
     # 4. Desktop entry.
     install -Dm644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
 
-    # 5. Icons. The iconset names files by point size; @2x files are double that.
+    # 5. Icons.
     local _size
     for _size in 16 32 128 256 512; do
-        install -Dm644 "${srcdir}/icons/icon_${_size}x${_size}.png" \
+        install -Dm644 "${srcdir}/icons/${_size}x${_size}.png" \
             "${pkgdir}/usr/share/icons/hicolor/${_size}x${_size}/apps/${pkgname}.png"
     done
-    install -Dm644 "${srcdir}/icons/icon_32x32@2x.png" "${pkgdir}/usr/share/icons/hicolor/64x64/apps/${pkgname}.png"
-    install -Dm644 "${srcdir}/icons/icon_512x512.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+    install -Dm644 "${srcdir}/icons/512x512.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
 
     # 6. Licenses shipped next to the binaries.
     install -Dm644 "${pkgdir}/opt/${pkgname}/LICENSE.electron.txt" -t "${pkgdir}/usr/share/licenses/${pkgname}/"

@@ -40,8 +40,8 @@ No upstream file is edited. `patch-asar.js` adds `z-library-bootstrap.js` to `ap
 On Linux the bootstrap:
 
 - **Title bar.** The main window gets the window manager's frame instead of upstream's frameless window. The loading window (a fixed-size splash) stays frameless, and the debug window already has a frame. Window titles stay "Z-Library" instead of the page's placeholder title.
-- **Close button.** The frame's close button does what the app's own close button does: it offers to keep the open tabs, saves them and quits.
-- **In-page window buttons.** Upstream's Close, Maximize and Minimize buttons at the right of the tab strip are hidden. Tools, settings, notifications, profile, Donate and the vertical tabs button stay.
+- **Close button.** The frame's close button does what the app's own close button does: it asks whether to exit (unless that prompt is turned off) and quits. The open tabs are saved on quit.
+- **In-page window buttons.** Upstream's Close, Maximize and Minimize buttons at the right of the header are hidden. Downloads, settings, notifications, profile, Donate, navigation and the vertical tabs button stay.
 - **Menu.** Upstream's menu (*Library*: Help; *Edit*: Copy, Paste, Cut, Select All; *Navigation*: Go back `Ctrl+Z`, Jump forward `Ctrl+Y`, Refresh `Ctrl+R`) is kept, with these added:
   - *Library*: Quit (`Ctrl+Q`, same as the close button)
   - *View*: Toggle Full Screen (`F11`)
