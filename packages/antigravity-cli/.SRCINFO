@@ -1,6 +1,6 @@
 pkgbase = antigravity-cli
 	pkgdesc = Google Antigravity CLI (agy), a terminal coding agent
-	pkgver = 1.5.2
+	pkgver = 1.5.3
 	pkgrel = 1
 	url = https://antigravity.google/product/antigravity-cli
 	arch = x86_64
@@ -14,9 +14,9 @@ pkgbase = antigravity-cli
 	options = !strip
 	options = !debug
 	options = !lto
-	source = cli_linux_x64-1.5.2-4951595792859136.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-cli/1.5.2-4951595792859136/linux-x64/cli_linux_x64.tar.gz
+	source = cli_linux_x64-1.5.3-6604829099950080.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-cli/1.5.3-6604829099950080/linux-x64/cli_linux_x64.tar.gz
 	source = agy.sh
-	sha512sums = aa876c0813572efaf85ed47983cc937414705d40490cbdb54f6e255656a4f8744ae38e457823e924fa8270b348124e0521d3cda3fec6824bb2d14b98a7a05baa
+	sha512sums = e363e1b17daaac2589f18e6973429c039fd5a5e5c15e9c0852fa349836f3992b10fe84732bc8d8c8208e149f0304f15aba9dec696d12efeed03917492c0580eb
 	sha512sums = 1157b9020098dde8eb2db14806efe78689bf562e563f8dad9d53da0ab5d4480d338d834f551a1e1b6a38f24eea4ad53c3bd00a718067f2ef1ec251d9313c7139
 
 pkgname = antigravity-cli
