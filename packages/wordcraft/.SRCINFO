@@ -1,6 +1,6 @@
 pkgbase = wordcraft
 	pkgdesc = WordCraft, an open-source word processor (Word alternative) from the ArtCraft suite
-	pkgver = 0.15.2
+	pkgver = 0.16.0
 	pkgrel = 1
 	url = https://github.com/storytold/wordcraft
 	arch = x86_64
@@ -29,7 +29,7 @@ pkgbase = wordcraft
 	replaces = wordcraft-bin
 	options = !strip
 	options = !debug
-	source = wordcraft-0.15.2-linux-x86_64.tar.gz::https://github.com/storytold/wordcraft/releases/download/v0.15.2/wordcraft-0.15.2-linux-x86_64.tar.gz
-	sha256sums = 366e54e235b4631779c0c78c0777a880de511163de9130ab78ce59583f7a0b9a
+	source = wordcraft-0.16.0-linux-x86_64.tar.gz::https://github.com/storytold/wordcraft/releases/download/v0.16.0/wordcraft-0.16.0-linux-x86_64.tar.gz
+	sha256sums = 325b97f15bbf532628a3176a9c17148a7175f3e4f19b9313de323ab513609752
 
 pkgname = wordcraft
