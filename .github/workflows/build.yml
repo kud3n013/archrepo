@@ -338,7 +338,15 @@ jobs:
           for bump_dir in ../bumps/*; do
             name=$(basename "$bump_dir")
             case "$name" in
-              *-bump-failed) PKG="${name%-bump-failed}"; BUILD_OK=false ;;
+              *-bump-failed)
+                PKG="${name%-bump-failed}"; BUILD_OK=false
+                # A re-run keeps the failed attempt's artifact next to the
+                # successful one; that stale copy would revert the update
+                if [ -d "../bumps/${PKG}-bump" ]; then
+                  echo "Skipping stale ${name}: a later attempt built ${PKG}"
+                  continue
+                fi
+                ;;
               *-bump)        PKG="${name%-bump}";        BUILD_OK=true ;;
               *) continue ;;
             esac
