@@ -346,6 +346,20 @@ case "$CHECK" in
     fi
     ;;
 
+  pypi)
+    # "repo" is the PyPI project name. info.version is the newest final release
+    # (pre-releases are left out unless nothing else exists), and it is taken
+    # only once a pure-Python wheel for it is on PyPI.
+    if [ -n "$UPSTREAM" ]; then
+      PYPI_JSON=$(curl -s -m 30 "https://pypi.org/pypi/${UPSTREAM}/json" || true)
+      VER=$(echo "$PYPI_JSON" | jq -r '.info.version // empty' 2>/dev/null || true)
+      if [ -n "$VER" ] && echo "$PYPI_JSON" | jq -e --arg v "$VER" \
+          '.releases[$v][]? | select(.packagetype == "bdist_wheel" and (.filename | endswith("-py3-none-any.whl")))' >/dev/null 2>&1; then
+        LATEST="$VER"
+      fi
+    fi
+    ;;
+
   none)
     ;;
 esac
