@@ -115,7 +115,13 @@ jobs:
           pacman-key --add src/keys/archrepo.asc
           pacman-key --lsign-key "$ARCHREPO_KEY_FPR"
           echo -e "\n[archrepo]\nSigLevel = Required\nServer = https://github.com/${{ github.repository }}/releases/download/packages" >> /etc/pacman.conf
-          pacman -Sy
+          # GitHub's release download stalls now and then; retry before failing
+          for attempt in 1 2 3; do
+            pacman -Sy && break
+            [ "$attempt" -eq 3 ] && exit 1
+            echo "pacman -Sy failed (attempt $attempt), retrying in 15s..."
+            sleep 15
+          done
 
       # ── Create unprivileged builder user ────────────────────────────
       - name: Create builder user
