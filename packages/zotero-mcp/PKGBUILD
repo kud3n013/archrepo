@@ -3,21 +3,24 @@
 pkgname=zotero-mcp
 _pkgname=zotero-mcp
 pkgver=0.15.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Model Context Protocol (MCP) server and standalone CLI for Zotero"
 arch=('x86_64')
 url="https://github.com/54yyyu/zotero-mcp"
-license=('MIT')
+license=('MIT' 'AGPL-3.0-or-later')
 depends=('python')
 optdepends=('zotero: local Zotero desktop library access')
 makedepends=('uv')
 provides=('zotero-mcp-server')
 conflicts=('zotero-mcp-server')
 options=('!strip' '!debug')
-source=(
-  "${pkgname}-${pkgver}.tar.gz::https://github.com/54yyyu/${_pkgname}/archive/refs/tags/v${pkgver}.tar.gz"
-)
-sha256sums=('9ccefdf5063efdf42fc4960d6fd3897f3df2642ba21bf46d518d72dedb7fb2b8')
+# The wheel published on PyPI (pure Python), pinned by checksum. Updates follow
+# PyPI too (upstream.json), so a GitHub tag that PyPI has not published yet
+# never triggers a build.
+_whl="zotero_mcp_server-${pkgver}-py3-none-any.whl"
+source=("https://files.pythonhosted.org/packages/py3/z/zotero-mcp-server/${_whl}")
+noextract=("${_whl}")
+sha256sums=('9155aaf422a04ea698f805281cbcac09c46a1c7509d3403b7faa4a5358254d24')
 
 package() {
   export UV_LINK_MODE=copy
@@ -25,13 +28,16 @@ package() {
 
   # Create an isolated, self-contained virtual environment in /opt/zotero-mcp/venv using system Python
   uv venv --python /usr/bin/python "${pkgdir}/opt/${pkgname}/venv"
-  uv pip install --python "${pkgdir}/opt/${pkgname}/venv/bin/python" "zotero-mcp-server==${pkgver}"
+  # Dependencies still resolve from PyPI; the package itself is the checked wheel
+  uv pip install --python "${pkgdir}/opt/${pkgname}/venv/bin/python" "${srcdir}/${_whl}"
 
   # Fix shebangs inside venv/bin to point to final /opt/zotero-mcp/venv/bin/python
   find "${pkgdir}/opt/${pkgname}/venv/bin" -type f -exec sed -i "s|${pkgdir}||g" {} + 2>/dev/null || true
 
   # Clean build-time caches
   rm -rf "${pkgdir}/opt/${pkgname}/venv/cache" "${srcdir}/.uv-cache" 2>/dev/null || true
+  # Installing from a local file records its $srcdir path here; it is metadata only
+  rm -f "${pkgdir}"/opt/${pkgname}/venv/lib/python*/site-packages/zotero_mcp_server-${pkgver}.dist-info/direct_url.json
   find "${pkgdir}/opt/${pkgname}/venv" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
   # Install launcher wrapper scripts in /usr/bin
@@ -44,8 +50,9 @@ BIN_EOF
     chmod 755 "${pkgdir}/usr/bin/${bin}"
   done
 
-  # License & Docs
-  cd "${_pkgname}-${pkgver}"
-  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-  install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  # Licenses ship in the wheel: MIT for the server, AGPL-3.0 for the bundled Zotero plugin
+  local _licdir
+  _licdir=$(echo "${pkgdir}"/opt/${pkgname}/venv/lib/python*/site-packages/zotero_mcp_server-${pkgver}.dist-info/licenses)
+  install -Dm644 "${_licdir}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 "${_licdir}/plugin/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE-plugin"
 }
