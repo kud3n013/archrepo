@@ -168,6 +168,34 @@ case "$CHECK" in
     fi
     ;;
 
+  github-branch)
+    # Tracks a branch head of a fork with no tags (sine-fork builds kud3n's fork
+    # of Sine). The version is what the PKGBUILD's pkgver() derives: the engine
+    # version in engine.json without cosine's "c" suffix, the commit count and
+    # the short hash (2.3.4.1.r1331.g79e4674).
+    BRANCH=""
+    [ -f "$CONFIG_FILE" ] && BRANCH=$(jq -r '.branch // ""' "$CONFIG_FILE")
+    if [ -n "$UPSTREAM" ] && [ -n "$BRANCH" ]; then
+      CLONE_DIR=$(mktemp -d)
+      if git clone -q --filter=blob:none --no-checkout --single-branch -b "$BRANCH" \
+          "https://github.com/${UPSTREAM}.git" "$CLONE_DIR" 2>/dev/null; then
+        ENGINE_VER=$(git -C "$CLONE_DIR" show HEAD:engine.json 2>/dev/null | jq -r '.updates[0].version // empty' 2>/dev/null || true)
+        ENGINE_VER="${ENGINE_VER%c}"
+        COUNT=$(git -C "$CLONE_DIR" rev-list --count HEAD 2>/dev/null || true)
+        SHA=$(git -C "$CLONE_DIR" rev-parse HEAD 2>/dev/null || true)
+        if [ -n "$ENGINE_VER" ] && [ -n "$COUNT" ] && [ -n "$SHA" ]; then
+          LATEST="${ENGINE_VER}.r${COUNT}.g${SHA:0:7}"
+          CURRENT_COMMIT=$(grep -oP '^_commithash=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+          if [ "$SHA" != "$CURRENT_COMMIT" ]; then
+            NEW_COMMIT="$SHA"
+            EXTRA_INFO="commit: ${CURRENT_COMMIT:0:7} -> ${SHA:0:7}"
+          fi
+        fi
+      fi
+      rm -rf "$CLONE_DIR"
+    fi
+    ;;
+
   github-snapshot)
     # Tracks a branch with no releases (ladybird). pkgver is the pinned
     # commit's UTC date (YYYYMMDD); the pin moves to the branch head only once
