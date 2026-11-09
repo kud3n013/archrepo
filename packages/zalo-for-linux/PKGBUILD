@@ -9,8 +9,8 @@
 pkgname=zalo-for-linux
 pkgver=26.11.10
 _zadarkver=26.3
-_commithash=d4452e1
-pkgrel=6
+_commithash=3680a0e
+pkgrel=7
 pkgdesc="Zalo for Linux (unofficial port with ZaDark), with KDE Global Menu, native title bar and live theme switching"
 arch=('x86_64')
 url="https://github.com/VN-Linux-Family/zalo-for-linux"
@@ -87,7 +87,7 @@ source=(
     "archrepo-theme.js"
     "archrepo-theme-preload.js"
 )
-sha256sums=('35c6e37adfdb96546cd0e003d644950945e1d880425c13cb09f8f23e42244d30'
+sha256sums=('1c5d02c22c83ea6d9684857da8683bc4154de911f1337e5ac0d06c874a4f23b9'
             '63442e64bebf91397e45ce9125241809fb1321ecc6b51c05f5b7cafcccc4c070'
             '8560335b446a2d41b02c4045bb1eeaecca9324d4ad151748ee63b561bc0a7cfe'
             '6003f1ded1519a8a9be21a91f231bd59f5341efc20858fcf84f4f401b12b0ec2'
