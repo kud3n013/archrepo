@@ -1,6 +1,6 @@
 pkgbase = deckcraft
 	pkgdesc = DeckCraft, an open-source presentation editor (PowerPoint alternative) from the ArtCraft suite
-	pkgver = 0.16.0
+	pkgver = 0.17.0
 	pkgrel = 1
 	url = https://github.com/storytold/deckcraft
 	arch = x86_64
@@ -30,7 +30,7 @@ pkgbase = deckcraft
 	replaces = deckcraft-bin
 	options = !strip
 	options = !debug
-	source = deckcraft-0.16.0-linux-x86_64.tar.gz::https://github.com/storytold/deckcraft/releases/download/v0.16.0/deckcraft-0.16.0-linux-x86_64.tar.gz
-	sha256sums = eed572b2f62395d0f5cfe246a728189651e95e4ecdf4c3e0ad87b77a3831e086
+	source = deckcraft-0.17.0-linux-x86_64.tar.gz::https://github.com/storytold/deckcraft/releases/download/v0.17.0/deckcraft-0.17.0-linux-x86_64.tar.gz
+	sha256sums = a61a05095a52a80990aa8990b447100553e99c8fa6edc8754aa52740a1a6f9b0
 
 pkgname = deckcraft
