@@ -2,7 +2,7 @@
 
 pkgname=sine-fork
 _pkgname=sine
-pkgver=2.3.4.1.r1331.g79e4674
+pkgver=2.3.4.1.r1336.gef719ba
 pkgrel=1
 pkgdesc="The ultimate mod and theme manager for Firefox-based browsers, built from kud3n's fork"
 arch=('x86_64')
@@ -31,7 +31,7 @@ install="${pkgname}.install"
 # head of main. The engine (engine.zip) is built from it and bundled; the
 # installer GUI is built from sineorg/installer and patched to install that
 # bundled engine instead of downloading CosmoCreeper's release.
-_commithash=79e4674c7833080ba488b4a9f00396a841eb068c
+_commithash=ef719ba31dafffe04f129883ed17237f4e353532
 _installercommit=94ecc00e4746a8c435d0fbcc5c42ada5e94d5891
 _imguicommit=69a501df6e6887a074b3c17a1c1bdd40a4c06dee
 source=(
@@ -45,11 +45,11 @@ source=(
     "${_pkgname}.desktop"
     "${_pkgname}.png"
 )
-sha256sums=('2a3a08190c7bdab83682d4ecd3f4df3afed180c436c038f576f45a91d677b701'
+sha256sums=('052932460f34b6914c742a4153b88d4fa5653656d12b66eef5129e764a628f46'
             'c17c7a3ae2339159d1964f2050e502537fd471f6128660bfcb28167acbaea01d'
             '6d56146d5c0777afb8d561f5900065acfc8d3bdb3243ea596fc1ab4a815dd9f3'
             'dd1a5921ae287aa8441bfecb9994200f6f947b14b5f7df31bcf4c9ae161a3566'
-            '869719c81e6d38b93f5e90277a47efb3f626ab1b23a3d5b61bf2c9364a1dfda9'
+            '0d325328242aba537dd710e878b939bf0e692c2725a28f4b68d61c66a0befa5b'
             '37147defd14cab7dd63ded34e410e830fd06251ba513d41039f1c3afc77d2b4e'
             '17643d90350d6a54ddcbc40f5b7c0c1d17bce10c112a12f24835e826fc57f567'
             '7ab5aeeb048c7f4b3bb439f6ee7345ee28cf524fe2034a4fd6555e8489ee2316'
