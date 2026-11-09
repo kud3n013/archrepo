@@ -1,0 +1,23 @@
+diff --git a/src/services/updates.mjs b/src/services/updates.mjs
+index c60fd75..8ab57cb 100644
+--- a/src/services/updates.mjs
++++ b/src/services/updates.mjs
+@@ -208,13 +208,11 @@ export default {
+    * @returns {object} Latest engine data.
+    */
+   async fetch() {
+-    return await ucAPI
+-      .fetch(
+-        "https://raw.githubusercontent.com/CosmoCreeper/Sine/" +
+-          (Services.prefs.getBoolPref("sine.is-cosine", false) ? "cosine" : "main") +
+-          "/engine.json"
+-      )
+-      .catch((err) => console.warn(err));
++    // sine-fork (archrepo): the engine comes from the pacman package, which
++    // rebuilds it from kud3n013/Sine. Upstream's engine.json would offer
++    // CosmoCreeper's release zips and replace the fork, so report no updates.
++    await this.init();
++    return { updates: [{ version: this.current, type: 0 }] };
+   },
+ 
+   /**

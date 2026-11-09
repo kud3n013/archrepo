@@ -1,0 +1,113 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+
+pkgname=sine-fork
+_pkgname=sine
+pkgver=2.3.4.1.r1331.g79e4674
+pkgrel=1
+pkgdesc="The ultimate mod and theme manager for Firefox-based browsers, built from kud3n's fork"
+arch=('x86_64')
+url="https://github.com/kud3n013/Sine"
+license=('MPL-2.0')
+depends=(
+    'curl'
+    'glfw'
+    'glibc'
+    'hicolor-icon-theme'
+    'libglvnd'
+    'unzip'
+    'xorg-xrdb'
+)
+makedepends=('cmake' 'git' 'libxrandr' 'ninja' 'python')
+optdepends=(
+    'polkit: Administrator privilege elevation (pkexec) for system-wide browser installations'
+)
+provides=("${_pkgname}")
+conflicts=("${_pkgname}" "${_pkgname}-bin")
+backup=("etc/${_pkgname}-flags.conf")
+options=('!debug')
+install="${pkgname}.install"
+
+# kud3n's fork of CosmoCreeper/Sine. check-upstream.sh moves _commithash to the
+# head of main. The engine (engine.zip) is built from it and bundled; the
+# installer GUI is built from sineorg/installer and patched to install that
+# bundled engine instead of downloading CosmoCreeper's release.
+_commithash=79e4674c7833080ba488b4a9f00396a841eb068c
+_installercommit=94ecc00e4746a8c435d0fbcc5c42ada5e94d5891
+_imguicommit=69a501df6e6887a074b3c17a1c1bdd40a4c06dee
+source=(
+    "Sine::git+${url}.git#commit=${_commithash}"
+    "installer::git+https://github.com/sineorg/installer.git#commit=${_installercommit}"
+    "imgui::git+https://github.com/ocornut/imgui.git#commit=${_imguicommit}"
+    "engine-no-self-update.patch"
+    "installer-local-engine.patch"
+    "${_pkgname}.sh"
+    "${_pkgname}-flags.conf"
+    "${_pkgname}.desktop"
+    "${_pkgname}.png"
+)
+sha256sums=('2a3a08190c7bdab83682d4ecd3f4df3afed180c436c038f576f45a91d677b701'
+            'c17c7a3ae2339159d1964f2050e502537fd471f6128660bfcb28167acbaea01d'
+            '6d56146d5c0777afb8d561f5900065acfc8d3bdb3243ea596fc1ab4a815dd9f3'
+            'dd1a5921ae287aa8441bfecb9994200f6f947b14b5f7df31bcf4c9ae161a3566'
+            '869719c81e6d38b93f5e90277a47efb3f626ab1b23a3d5b61bf2c9364a1dfda9'
+            '37147defd14cab7dd63ded34e410e830fd06251ba513d41039f1c3afc77d2b4e'
+            '17643d90350d6a54ddcbc40f5b7c0c1d17bce10c112a12f24835e826fc57f567'
+            '7ab5aeeb048c7f4b3bb439f6ee7345ee28cf524fe2034a4fd6555e8489ee2316'
+            '34be82334a44583b233739def8793aeb7d543757f6bb0b94280af0a8e8de2c0f')
+
+# The fork carries no tags: the version is the engine version in engine.json
+# (cosine's "c" suffix dropped), the commit count and the short hash, e.g.
+# 2.3.4.1.r1234.g79e4674. check-upstream.sh (github-branch) derives it the same way.
+pkgver() {
+    cd Sine
+    printf '%s.r%s.g%s' \
+        "$(python -c 'import json; print(json.load(open("engine.json"))["updates"][0]["version"].rstrip("c"))')" \
+        "$(git rev-list --count HEAD)" \
+        "$(git rev-parse --short=7 HEAD)"
+}
+
+prepare() {
+    cd "${srcdir}/Sine"
+    patch -Np1 -i "${srcdir}/engine-no-self-update.patch"
+
+    cd "${srcdir}/installer"
+    git submodule init
+    git config submodule.external/imgui.url "${srcdir}/imgui"
+    git -c protocol.file.allow=always submodule update
+    patch -Np1 -i "${srcdir}/installer-local-engine.patch"
+}
+
+build() {
+    cd "${srcdir}/Sine"
+    python scripts/package.py
+
+    local _enginever _bootver
+    _enginever=$(python -c 'import json; print(json.load(open("engine.json"))["updates"][0]["version"])')
+    _bootver=$(python -c 'import json; print(json.load(open("engine.json"))["bootloader"])')
+
+    cd "${srcdir}/installer"
+    cmake -S . -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DSINE_VERSION="${_enginever}" \
+        -DBOOT_VERSION="${_bootver}"
+    cmake --build build
+}
+
+package() {
+    # Installer GUI plus the engine and updater script it installs from
+    install -Dm755 "${srcdir}/installer/build/sine_installer" "${pkgdir}/opt/${_pkgname}/${_pkgname}"
+    install -Dm755 "${srcdir}/installer/updater.sh" "${pkgdir}/opt/${_pkgname}/updater.sh"
+    install -Dm644 "${srcdir}/Sine/engine.zip" "${pkgdir}/opt/${_pkgname}/engine.zip"
+
+    # Launcher wrapper and its flags file (shared with the sine package)
+    install -Dm755 "${srcdir}/${_pkgname}.sh" "${pkgdir}/usr/bin/${_pkgname}"
+    install -Dm644 "${srcdir}/${_pkgname}-flags.conf" "${pkgdir}/etc/${_pkgname}-flags.conf"
+
+    install -Dm644 "${srcdir}/${_pkgname}.desktop" "${pkgdir}/usr/share/applications/${_pkgname}.desktop"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${_pkgname}.png"
+    install -Dm644 "${srcdir}/${_pkgname}.png" "${pkgdir}/usr/share/pixmaps/${_pkgname}.png"
+
+    install -Dm644 "${srcdir}/Sine/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

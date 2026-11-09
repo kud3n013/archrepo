@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Sine
+GenericName=Firefox Theme & Mod Manager
+Comment=The ultimate mod and theme manager for Firefox-based browsers
+Exec=/usr/bin/sine %U
+Icon=sine
+Terminal=false
+StartupWMClass=Sine Installer
+Categories=Utility;Network;WebBrowser;Settings;
+Keywords=firefox;theme;mod;zen;floorp;librewolf;waterfox;sine;

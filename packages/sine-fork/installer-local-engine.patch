@@ -1,0 +1,62 @@
+diff --git a/src/main.cpp b/src/main.cpp
+index 9198670..592d2b1 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -284,7 +284,7 @@ void renderHeader(ImFont* &font, const float timeDiff)
+     const char* headerText = "Sine";
+     colorFade(timeDiff, {500, 0}, {300, 0});
+     ImGui::PushFont(font);
+-    ImGui::Text(headerText);
++    ImGui::TextUnformatted(headerText);
+     ImGui::PopFont();
+     ImGui::PopStyleColor();
+     ImGui::Separator();
+@@ -294,7 +294,7 @@ void renderStepHeader(const char* stepHeader, ImFont* &font, const float timeDif
+ {
+     colorFade(timeDiff, {500, 0}, {300, 0});
+     ImGui::PushFont(font);
+-    ImGui::Text(stepHeader);
++    ImGui::TextUnformatted(stepHeader);
+     ImGui::PopFont();
+     ImGui::PopStyleColor();
+ }
+@@ -671,7 +671,7 @@ void installSine(
+     }
+     else if (steps[installStep - 1] == "Launching manager...")
+     {
+-        downloadFile("https://github.com/CosmoCreeper/Sine/releases/download/v" + sineVersion + "/" + updaterName, filePath);
++        downloadFile("file:///opt/sine/" + updaterName, filePath);
+         processHandle = launchProcess(filePath, browserPathStr, profilePath, shouldSaveData, shouldUninstall, reinstallBoot);
+     }
+     else if (isFinalStep)
+@@ -840,7 +840,7 @@ int main(int argc, char* argv[])
+             colorFade(timeDiff, {500, 1500}, {300, 300});
+             ImGui::PushTextWrapPos(textPosX);
+             ImGui::PushFont(titleFont);
+-            ImGui::Text(transitionHeader);
++            ImGui::TextUnformatted(transitionHeader);
+             ImGui::PopFont();
+             ImGui::PopTextWrapPos();
+             ImGui::PopStyleColor();
+@@ -1099,7 +1099,7 @@ int main(int argc, char* argv[])
+             colorFade(timeDiff, { 500, 0 }, { 300, 0 });
+             ImGui::PushTextWrapPos(textPosX);
+             ImGui::PushFont(titleFont);
+-            ImGui::Text(transitionHeader);
++            ImGui::TextUnformatted(transitionHeader);
+             ImGui::PopFont();
+             ImGui::PopTextWrapPos();
+             ImGui::PopStyleColor();
+diff --git a/updater.sh b/updater.sh
+index 17f292c..5492b4c 100644
+--- a/updater.sh
++++ b/updater.sh
+@@ -53,7 +53,7 @@ done
+ # Versions / links
+ # --------------------
+ bootloaderLink="https://github.com/sineorg/bootloader/releases/download/v$bootloaderVersion"
+-sineLink="https://github.com/CosmoCreeper/Sine/releases/download/v$sineVersion"
++sineLink="file:///opt/sine"
+ 
+ download_file() {
+     local url=$1
