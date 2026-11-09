@@ -1,6 +1,6 @@
 pkgbase = vectorcraft
 	pkgdesc = VectorCraft, an open-source vector illustration editor (Illustrator alternative) from the ArtCraft suite
-	pkgver = 0.22.0
+	pkgver = 0.23.0
 	pkgrel = 1
 	url = https://github.com/storytold/vectorcraft
 	arch = x86_64
@@ -29,7 +29,7 @@ pkgbase = vectorcraft
 	replaces = vectorcraft-bin
 	options = !strip
 	options = !debug
-	source = vectorcraft-0.22.0-linux-x86_64.tar.gz::https://github.com/storytold/vectorcraft/releases/download/v0.22.0/vectorcraft-0.22.0-linux-x86_64.tar.gz
-	sha256sums = 6e812a92caec4dba23fd74734fa20a327886ef20427b55f2f887fe9334a0933f
+	source = vectorcraft-0.23.0-linux-x86_64.tar.gz::https://github.com/storytold/vectorcraft/releases/download/v0.23.0/vectorcraft-0.23.0-linux-x86_64.tar.gz
+	sha256sums = 07c24a6094fb457c665b95848d55bfbd05460354bc0eac9b4ec9f9467a8b1e31
 
 pkgname = vectorcraft
