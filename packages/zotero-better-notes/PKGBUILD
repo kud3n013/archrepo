@@ -3,7 +3,7 @@
 pkgname=zotero-better-notes
 _pkgname=zotero-better-notes
 _ext_id="Knowledge4Zotero@windingwind.com"
-pkgver=3.3.3
+pkgver=3.3.5
 pkgrel=1
 pkgdesc="Everything about note management. All in Zotero (Better Notes for Zotero)"
 arch=('any')
@@ -14,9 +14,7 @@ options=('!strip' '!debug')
 source=(
   "${pkgname}-${pkgver}.xpi::https://github.com/windingwind/${_pkgname}/releases/download/v${pkgver}/better-notes-for-zotero.xpi"
 )
-sha256sums=(
-  '48d426018338becd78c71f85159c36c03bbe3f6299ab5a564099e23790b01c1e'
-)
+sha256sums=('7dbe38c994608c5864ac76a33c500315db3361904b9f6f92bd5f78565c32c390')
 
 package() {
   # Install into Zotero distribution extensions directory for automatic profile deployment
