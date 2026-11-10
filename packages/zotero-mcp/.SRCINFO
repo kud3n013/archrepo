@@ -1,18 +1,20 @@
 pkgbase = zotero-mcp
 	pkgdesc = Model Context Protocol (MCP) server and standalone CLI for Zotero
-	pkgver = 0.15.2
+	pkgver = 0.16.0
 	pkgrel = 1
 	url = https://github.com/54yyyu/zotero-mcp
 	arch = x86_64
 	license = MIT
+	license = AGPL-3.0-or-later
 	makedepends = uv
 	depends = python
 	optdepends = zotero: local Zotero desktop library access
 	provides = zotero-mcp-server
 	conflicts = zotero-mcp-server
+	noextract = zotero_mcp_server-0.16.0-py3-none-any.whl
 	options = !strip
 	options = !debug
-	source = zotero-mcp-0.15.2.tar.gz::https://github.com/54yyyu/zotero-mcp/archive/refs/tags/v0.15.2.tar.gz
-	sha256sums = 9ccefdf5063efdf42fc4960d6fd3897f3df2642ba21bf46d518d72dedb7fb2b8
+	source = https://files.pythonhosted.org/packages/py3/z/zotero-mcp-server/zotero_mcp_server-0.16.0-py3-none-any.whl
+	sha256sums = 3ae32202590b3efe209b8a218b39788ea2bcfe09ed4cc9bc2fab3de200df0a70
 
 pkgname = zotero-mcp
