@@ -1,6 +1,6 @@
 pkgbase = craft-anything
 	pkgdesc = Craft Anything, ArtCraft's open-source tool that studies how software works and has a coding agent build your own version
-	pkgver = 0.5.0
+	pkgver = 0.6.0
 	pkgrel = 1
 	url = https://github.com/storytold/craft-anything
 	arch = x86_64
@@ -37,7 +37,7 @@ pkgbase = craft-anything
 	replaces = craft-anything-bin
 	options = !strip
 	options = !debug
-	source = craft-anything-0.5.0-linux-x86_64.tar.gz::https://github.com/storytold/craft-anything/releases/download/v0.5.0/craft-anything-0.5.0-linux-x86_64.tar.gz
-	sha256sums = d18c54ef05e5c7ef50f8c4959fee8983c0a4a1f141edc488d11f7029973c885b
+	source = craft-anything-0.6.0-linux-x86_64.tar.gz::https://github.com/storytold/craft-anything/releases/download/v0.6.0/craft-anything-0.6.0-linux-x86_64.tar.gz
+	sha256sums = cbc65972a8eb4c89ed74b99bcf14aa5ea0f7aa9da709def38da79ccacc5e07a0
 
 pkgname = craft-anything
