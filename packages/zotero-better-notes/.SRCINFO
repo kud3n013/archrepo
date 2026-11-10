@@ -1,6 +1,6 @@
 pkgbase = zotero-better-notes
 	pkgdesc = Everything about note management. All in Zotero (Better Notes for Zotero)
-	pkgver = 3.3.3
+	pkgver = 3.3.5
 	pkgrel = 1
 	url = https://github.com/windingwind/zotero-better-notes
 	arch = any
@@ -8,7 +8,7 @@ pkgbase = zotero-better-notes
 	depends = zotero
 	options = !strip
 	options = !debug
-	source = zotero-better-notes-3.3.3.xpi::https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.3/better-notes-for-zotero.xpi
-	sha256sums = 48d426018338becd78c71f85159c36c03bbe3f6299ab5a564099e23790b01c1e
+	source = zotero-better-notes-3.3.5.xpi::https://github.com/windingwind/zotero-better-notes/releases/download/v3.3.5/better-notes-for-zotero.xpi
+	sha256sums = 7dbe38c994608c5864ac76a33c500315db3361904b9f6f92bd5f78565c32c390
 
 pkgname = zotero-better-notes
