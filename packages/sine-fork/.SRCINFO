@@ -1,7 +1,7 @@
 pkgbase = sine-fork
 	pkgdesc = The ultimate mod and theme manager for Firefox-based browsers, built from kud3n's fork
 	pkgver = 2.3.4.1.r1336.gef719ba
-	pkgrel = 1
+	pkgrel = 2
 	url = https://github.com/kud3n013/Sine
 	install = sine-fork.install
 	arch = x86_64

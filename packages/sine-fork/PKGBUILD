@@ -3,7 +3,7 @@
 pkgname=sine-fork
 _pkgname=sine
 pkgver=2.3.4.1.r1336.gef719ba
-pkgrel=1
+pkgrel=2
 pkgdesc="The ultimate mod and theme manager for Firefox-based browsers, built from kud3n's fork"
 arch=('x86_64')
 url="https://github.com/kud3n013/Sine"
