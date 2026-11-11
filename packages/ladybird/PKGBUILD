@@ -2,7 +2,7 @@
 # Contributor: Ali Mohammad Pur, Tim Schumacher (AUR ladybird)
 
 pkgname=ladybird
-pkgver=20261103
+pkgver=20261111
 pkgrel=1
 pkgdesc="Truly independent web browser, built from a weekly snapshot of master"
 arch=('x86_64')
@@ -51,12 +51,13 @@ options=('!lto' '!debug' '!buildflags' '!staticlibs' '!emptydirs')
 # Upstream has no releases. check-upstream.sh (github-snapshot) moves
 # _commithash to the head of master once it is a week newer than pkgver,
 # the pinned commit's UTC date.
-_commithash=e45c3172e5a878a813acc7c61a808c39d6dd2eef
+_commithash=7aadc996ffe8973f741e89511e1d5d1086f2618f
 source=(
   "${pkgname}::git+${url}.git#commit=${_commithash}"
   "vcpkg::git+https://github.com/microsoft/vcpkg.git"
 )
-sha256sums=('SKIP' 'SKIP')
+sha256sums=('62b87b7cf835d62c06323a77648efd8b0973b70300c9ee4f73bdad243eafe183'
+            'SKIP')
 
 _env() {
   export VCPKG_ROOT="${srcdir}/vcpkg"
