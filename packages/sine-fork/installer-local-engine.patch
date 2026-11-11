@@ -1,5 +1,5 @@
 diff --git a/src/main.cpp b/src/main.cpp
-index 9198670..592d2b1 100644
+index 9198670..288ac27 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
 @@ -284,7 +284,7 @@ void renderHeader(ImFont* &font, const float timeDiff)
@@ -20,9 +20,12 @@ index 9198670..592d2b1 100644
      ImGui::PopFont();
      ImGui::PopStyleColor();
  }
-@@ -671,7 +671,7 @@ void installSine(
+@@ -669,9 +669,9 @@ void installSine(
+             removeDir(profilePath.replace(pos, 19, "Caches") + "/startupCache");
+         }
      }
-     else if (steps[installStep - 1] == "Launching manager...")
+-    else if (steps[installStep - 1] == "Launching manager...")
++    else if (installStep > 0 && steps[installStep - 1] == "Launching manager...")
      {
 -        downloadFile("https://github.com/CosmoCreeper/Sine/releases/download/v" + sineVersion + "/" + updaterName, filePath);
 +        downloadFile("file:///opt/sine/" + updaterName, filePath);
@@ -38,7 +41,32 @@ index 9198670..592d2b1 100644
              ImGui::PopFont();
              ImGui::PopTextWrapPos();
              ImGui::PopStyleColor();
-@@ -1099,7 +1099,7 @@ int main(int argc, char* argv[])
+@@ -999,9 +999,14 @@ int main(int argc, char* argv[])
+                 }
+             }
+ 
++            // The list can shrink (e.g. "Show unused profiles" unticked) or be empty.
++            if (selectedProfile >= static_cast<int>(profiles.size()))
++                selectedProfile = 0;
++
+             renderOptions(profiles, selectedProfile, bodyFont);
+ 
+-            profilePath = (std::filesystem::path(profileFolderPath) / profiles[selectedProfile]).string();
++            if (!profiles.empty())
++                profilePath = (std::filesystem::path(profileFolderPath) / profiles[selectedProfile]).string();
+ 
+             ImGui::Dummy(ImVec2(0.0f, 20.0f));
+ 
+@@ -1009,7 +1014,7 @@ int main(int argc, char* argv[])
+             ImGui::Checkbox("Show unused profiles", &showHiddenProfiles);
+             ImGui::PopFont();
+ 
+-            renderFooter(mediumFont, uiScale, io.DisplaySize);
++            renderFooter(mediumFont, uiScale, io.DisplaySize, profiles.empty());
+         }
+         else if (state == State::FIVE)
+         {
+@@ -1099,7 +1104,7 @@ int main(int argc, char* argv[])
              colorFade(timeDiff, { 500, 0 }, { 300, 0 });
              ImGui::PushTextWrapPos(textPosX);
              ImGui::PushFont(titleFont);
