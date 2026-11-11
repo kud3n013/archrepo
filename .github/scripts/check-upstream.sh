@@ -197,7 +197,7 @@ case "$CHECK" in
     ;;
 
   github-snapshot)
-    # Tracks a branch with no releases (ladybird). pkgver is the pinned
+    # Tracks a branch with no releases. pkgver is the pinned
     # commit's UTC date (YYYYMMDD); the pin moves to the branch head only once
     # the head is min_age_days newer, so a multi-hour source build runs at
     # most that often.
