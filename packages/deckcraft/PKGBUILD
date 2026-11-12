@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/deckcraft-bin
 
 pkgname=deckcraft
-pkgver=0.17.0
+pkgver=0.18.1
 pkgrel=1
 pkgdesc="DeckCraft, an open-source presentation editor (PowerPoint alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('deckcraft-bin' 'deckcraft-git')
 replaces=('deckcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('a61a05095a52a80990aa8990b447100553e99c8fa6edc8754aa52740a1a6f9b0')
+sha256sums=('5bae7d5566638624411ef968f2532ab3358dc280884144583e497c5631db8a26')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
