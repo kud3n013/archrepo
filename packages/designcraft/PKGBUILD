@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/designcraft-bin
 
 pkgname=designcraft
-pkgver=0.19.0
+pkgver=0.20.1
 pkgrel=1
 pkgdesc="DesignCraft, an open-source page layout and publishing app (InDesign alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('designcraft-bin' 'designcraft-git')
 replaces=('designcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('5055531fe9f60e4da6113770fecf27dfb03984f831fa4ed70730be156a316866')
+sha256sums=('e91630d4cdf578ccb1e2f39f88e24e8520f1482d51ae4714657ee471e2237f44')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
