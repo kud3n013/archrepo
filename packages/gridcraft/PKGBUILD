@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/gridcraft-bin
 
 pkgname=gridcraft
-pkgver=0.18.0
+pkgver=0.19.1
 pkgrel=1
 pkgdesc="GridCraft, an open-source spreadsheet app (Excel alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('gridcraft-bin' 'gridcraft-git')
 replaces=('gridcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('69205fd72e48e83e763c53c8f6ca3edc01d38ba8ba0d16e2b184a9c858a4cd5f')
+sha256sums=('8d97bba2d5bb00fd69ed55064852c1fd914de40d5ecd55ca01c8df81b828946d')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
