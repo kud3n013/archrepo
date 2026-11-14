@@ -7,8 +7,8 @@
 # antigravity-bootstrap.js); no upstream file is edited.
 
 pkgname=antigravity
-pkgver=2.31.2
-_build=6470801290035200
+pkgver=2.32.0
+_build=6141816156848128
 pkgrel=1
 pkgdesc="Google Antigravity agentic development platform, with native title bar, KDE Global Menu and system theme sync"
 arch=('x86_64')
@@ -71,7 +71,7 @@ source=(
     "patch-asar.js"
     "${pkgname}-bootstrap.js"
 )
-sha256sums=('20be3cab21a2aeba9dca3eee9a212f0308cf34b22fb4a8a98b0dedf18ee63413'
+sha256sums=('d98a1371f2bd4ca7dd2e7eee8f32ea070543a1e0e45c69761f700d67454f4275'
             '75f731468b234cc7458228eb7b61f61cd356caeb0e6d803d7da76185db5ff259'
             'e7d4c5037fc890f36d0f509082d9b37c23ee6d8736aee577916cd7b8db513dfe'
             '6d4700082dfdde9f3db79aae9b0f7f9c7143f92c2fb89a2f55ae3f82f9ce3684'
