@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/docs-package%20index-blue)](docs/README.md)
 [![GitHub Pages](https://img.shields.io/badge/site-GitHub%20Pages-informational)](https://kud3n013.github.io/archrepo/)
 [![GitHub Release](https://img.shields.io/github/v/release/kud3n013/archrepo?label=packages)](https://github.com/kud3n013/archrepo/releases/tag/packages)
-[![Active Packages](https://img.shields.io/badge/packages-52%20active-success)](docs/README.md)
+[![Active Packages](https://img.shields.io/badge/packages-53%20active-success)](docs/README.md)
 
 Automated, self-updating Arch Linux binary package repository. Packages are continuously built inside isolated `archlinux:base-devel` containers and published directly to pacman-compatible GitHub Release endpoints.
 
@@ -90,6 +90,8 @@ Each package entry below provides direct links to its dedicated documentation in
   - Steam Client modding framework for custom skins, themes, and community plugins. Upstream: [SteamClientHomebrew/Millennium](https://github.com/SteamClientHomebrew/Millennium)
 - [**`obsidian`**](docs/obsidian.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-1.15.0--2-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/obsidian.md) `sudo pacman -S obsidian`
   - Powerful Markdown knowledge base patched with KDE Global Menu / AppMenu support and XDG portal dark/light theme switching. Upstream: [Obsidian](https://obsidian.md)
+- [**`openheadphones`**](docs/openheadphones.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.3.1--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/openheadphones.md) `sudo pacman -S openheadphones`
+  - Unofficial open-source tray app for JBL earbuds and headphones (battery, noise cancelling, equalizer, touch gestures, settings), with its UI font found on Arch. Upstream: [edsuuu/OpenHeadphones](https://github.com/edsuuu/OpenHeadphones)
 - [**`pdfcraft`**](docs/pdfcraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.12.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/pdfcraft.md) `sudo pacman -S pdfcraft`
   - PdfCraft, ArtCraft's open-source PDF reader and editor (Acrobat alternative) with live light/dark switching through the XDG portal. Upstream: [storytold/pdfcraft](https://github.com/storytold/pdfcraft)
 - [**`photocraft`**](docs/photocraft.md) [![build](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/kud3n013/archrepo/actions/workflows/build.yml) [![version](https://img.shields.io/badge/version-0.13.0--1-blue)](https://github.com/kud3n013/archrepo/releases/tag/packages) [![type](https://img.shields.io/badge/type-modified-orange)](docs/photocraft.md) `sudo pacman -S photocraft`

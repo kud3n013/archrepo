@@ -1,0 +1,81 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/edsuuu/OpenHeadphones
+
+pkgname=openheadphones
+pkgver=0.3.1
+pkgrel=1
+pkgdesc="Tray app for JBL headphones: battery, noise cancelling, equalizer, touch gestures and settings (unofficial)"
+arch=('x86_64')
+url="https://github.com/edsuuu/OpenHeadphones"
+license=('MIT')
+# libdbus is linked; winit dlopens the X11, xkbcommon and Wayland libraries
+# (namcap cannot see those); BlueZ is the Bluetooth stack it talks to over D-Bus.
+depends=('glibc' 'libgcc' 'dbus' 'bluez' 'hicolor-icon-theme' 'ttf-dejavu'
+         'libx11' 'libxcursor' 'libxi' 'libxkbcommon' 'libxkbcommon-x11' 'wayland')
+optdepends=('gnome-shell-extension-appindicator: tray icon on GNOME'
+            'curl: notice of new upstream releases')
+# jbl-headphones is the name of upstream's .deb package and binary
+provides=('jbl-headphones')
+conflicts=('jbl-headphones')
+options=(!strip !debug)
+install=openheadphones.install
+source=("${pkgname}-${pkgver}.tar.gz::https://github.com/edsuuu/OpenHeadphones/releases/download/v${pkgver}/jbl-headphones-linux-x64.tar.gz"
+        "${pkgname}-${pkgver}.svg::https://raw.githubusercontent.com/edsuuu/OpenHeadphones/v${pkgver}/docs/logo.svg"
+        "LICENSE-${pkgver}::https://raw.githubusercontent.com/edsuuu/OpenHeadphones/v${pkgver}/LICENSE"
+        "openheadphones.desktop")
+noextract=("${pkgname}-${pkgver}.tar.gz")
+
+# The app reads its UI font from Debian/Ubuntu paths only
+# (/usr/share/fonts/truetype/{ubuntu,dejavu}/...) and panics with "No system
+# font found" on Arch, where ttf-dejavu lives in /usr/share/fonts/TTF/. The
+# DejaVu directory is rewritten in the binary to a same-length directory this
+# package owns, whose links point at Arch's DejaVu files.
+_debfonts=/usr/share/fonts/truetype/dejavu/
+_ourfonts=/usr/lib/openheadphones/fonts/dj/
+
+prepare() {
+    rm -rf "${srcdir}/app"
+    mkdir "${srcdir}/app"
+    bsdtar -xf "${srcdir}/${pkgname}-${pkgver}.tar.gz" -C "${srcdir}/app" --no-same-owner
+    [ "${#_debfonts}" -eq "${#_ourfonts}" ]
+    local _n
+    _n=$(grep -c --text -F "${_debfonts}" "${srcdir}/app/jbl-headphones" || true)
+    if [ "${_n}" -lt 1 ]; then
+        echo "jbl-headphones no longer has ${_debfonts}: check the font patch" >&2
+        return 1
+    fi
+    sed -i "s|${_debfonts}|${_ourfonts}|g" "${srcdir}/app/jbl-headphones"
+    if grep -q --text -F "${_debfonts}" "${srcdir}/app/jbl-headphones"; then
+        echo "font patch left ${_debfonts} in jbl-headphones" >&2
+        return 1
+    fi
+}
+sha256sums=('f4b0d87b07021ab84fce4dc6f7652bd3549b52d64e495d01ce1cec400422553e'
+            '31e8df1b27e77b0d72778f706c2c19ff39359fa3bbf3281b96909b699f534d24'
+            '5b3f278a4ce6ba5ebd497c6d6ab4e632511d930c882308f843655a3d8e88b52a'
+            '0536431a2be79dc40bd715f469e48c1b613935687206f5ceec6a645fdc224107')
+
+package() {
+    # The program finds devices/ and locales/ next to its real path
+    # (/proc/self/exe), so it lives with them and /usr/bin holds links.
+    # /usr/lib is not writable by the user, so the built-in updater only
+    # reports new versions and never replaces the pacman-managed files.
+    local _dir="${pkgdir}/usr/lib/${pkgname}"
+    install -d "${_dir}"
+    cp -r --no-preserve=ownership "${srcdir}/app/." "${_dir}/"
+    install -d "${pkgdir}${_ourfonts}"
+    ln -s /usr/share/fonts/TTF/DejaVuSans.ttf "${pkgdir}${_ourfonts}DejaVuSans.ttf"
+    ln -s /usr/share/fonts/TTF/DejaVuSans-Bold.ttf "${pkgdir}${_ourfonts}DejaVuSans-Bold.ttf"
+    install -d "${pkgdir}/usr/bin"
+    ln -s "../lib/${pkgname}/jbl-headphones" "${pkgdir}/usr/bin/jbl-headphones"
+    ln -s "../lib/${pkgname}/jbl-headphones" "${pkgdir}/usr/bin/openheadphones"
+
+    install -Dm644 "${srcdir}/openheadphones.desktop" "${pkgdir}/usr/share/applications/openheadphones.desktop"
+    install -Dm644 "${srcdir}/${pkgname}-${pkgver}.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/openheadphones.svg"
+    install -Dm644 "${srcdir}/LICENSE-${pkgver}" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    find "${_dir}" -type d -exec chmod 755 {} +
+    find "${_dir}" -type f -exec chmod 644 {} +  # links are not followed by -type f
+    chmod 755 "${_dir}/jbl-headphones"
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}

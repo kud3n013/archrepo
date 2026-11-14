@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=OpenHeadphones
+GenericName=Headphone Manager
+Comment=Battery, noise cancelling, equalizer and settings of JBL headphones
+Exec=/usr/bin/jbl-headphones --open
+Icon=openheadphones
+StartupNotify=false
+StartupWMClass=jbl-headphones
+Categories=AudioVideo;Audio;Settings;HardwareSettings;
+Keywords=jbl;headphones;earbuds;bluetooth;anc;equalizer;battery;
