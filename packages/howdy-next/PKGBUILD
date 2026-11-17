@@ -1,13 +1,13 @@
 # Maintainer: archrepo CI <ci@archrepo>
-# Contributor: nathawat <nathawat[at]noreply[dot]codeberg[dot]org>
+# Contributor: Scott <158021536+nathawatc@users.noreply.github.com>
 
 pkgname=howdy-next
 _pkgname=howdy-next
 pkgver=3.4.2
-pkgrel=1
+pkgrel=2
 pkgdesc="C++ rewrite of Howdy facial-recognition authentication on Linux (patched: no OpenCV WARN spam)"
 arch=('x86_64')
-url="https://codeberg.org/nathawat/howdy-next"
+url="https://github.com/nathawatc/howdy-next"
 license=('GPL-3.0-or-later')
 depends=(
 	'acl'
@@ -41,22 +41,30 @@ options=(!debug)
 
 _tag="v${pkgver}"
 source=(
-	"${_pkgname}-${pkgver}.tar.gz::${url}/archive/${_tag}.tar.gz"
+	"${_pkgname}-${pkgver}.tar.gz::${url}/archive/refs/tags/${_tag}.tar.gz"
 	"polkit-agent-helper-howdy.conf"
-	"0001-fix-opencv-suppress-noisy-dnn-warnings.patch"
+	# Upstream backports (from AUR howdy-next 3.4.2-4)
+	"0001-fix-build-fail-configure-on-unresolvable-pkg-config-.patch"
+	"0002-fix-vision-pin-DNN-engine-by-OpenCV-version-and-filt.patch"
+	# archrepo
+	"0003-fix-opencv-suppress-noisy-dnn-warnings.patch"
 )
-sha512sums=('91ea24436d2a769989cfe8931ada8974f10395ee752e07678f9f2f9a9815989435a75977076cf24883254a2c32a34550b1fefb27592f0ecd05880a90b7fcafaa'
-            '620bcf9d14c499e34245681218d91e64b12951b6fca1bd4288654d560530dc1a167e6de768152c3c34bb6de5af9970c9837ec88d4ed6b5602e195476e55a18fc'
-            'c5b340059b2d16d8c3e760d97f54eeec59ec4aa5b88529cbe8c033fb115a08888cbe9bf0401b40b3516f849b587e24b835f9ff498cfc0d349933a487de7499a6')
+sha256sums=('9620a67387e8bce7d8f01c84fb0beaea90e5dcad4f14f9fe50b94c67a72f2e18'
+            '3757c297b916b1fa3f9881781812c9fd8d574a8364fe5826ee38faa83cc7964e'
+            'b154f9375a9c2118c6b68c2c24974b32d5ae2da4c26eb1ac994b99fa58febd6c'
+            'c6c6aa0423b8826cf087e17c168d19100b7658d484d1570eef06dcf079e157a0'
+            '51e340c7f6636188bdd33dca496414fa220e6b1054f93daf759658b6f3226e29')
 
 prepare() {
-	cd "$srcdir/howdy-next"
-	patch -Np1 -i "$srcdir/0001-fix-opencv-suppress-noisy-dnn-warnings.patch"
+	cd "$srcdir/howdy-next-$pkgver"
+	patch -Np1 -i "$srcdir/0001-fix-build-fail-configure-on-unresolvable-pkg-config-.patch"
+	patch -Np1 -i "$srcdir/0002-fix-vision-pin-DNN-engine-by-OpenCV-version-and-filt.patch"
+	patch -Np1 -i "$srcdir/0003-fix-opencv-suppress-noisy-dnn-warnings.patch"
 }
 
 build() {
 	cmake \
-		-S "$srcdir/howdy-next" \
+		-S "$srcdir/howdy-next-$pkgver" \
 		-B "$srcdir/build" \
 		-DCMAKE_BUILD_TYPE=None \
 		-DCMAKE_INSTALL_PREFIX=/usr \

@@ -51,20 +51,20 @@
  #include <opencv2/core/types.hpp>
  #include <opencv2/imgproc.hpp>
  #include <opencv2/objdetect/face.hpp>
-@@ -50,11 +51,13 @@
- 	}  // namespace
- 
+@@ -136,11 +137,13 @@
+
  	auto ConfigureFaceModelEnvironment() -> bool {
+ 		InstallOpenCvLogFilter();
 +		cv::utils::logging::setLogLevel(cv::utils::logging::LOG_LEVEL_ERROR);
  		// Avoid environment mutation when compare has configured it before its worker starts.
  		const auto *engine = getenv("OPENCV_FORCE_DNN_ENGINE");
- 		if (engine != nullptr && std::string_view(engine) == "2") {
+ 		if (engine != nullptr && std::string_view(engine) == ForcedDnnEngine()) {
  			return true;
  		}
 +		setenv("OPENCV_LOG_LEVEL", "ERROR", 1);
- 		// Temporary OpenCV 5 workaround: forbid Classic-engine fallback for our ONNX models.
- 		return setenv("OPENCV_FORCE_DNN_ENGINE", "2", 1) == 0;
- 	}
+ 		// Pin the intended engine: OpenCV 5.0 would otherwise fall back to the Classic engine,
+ 		// and an inherited value could select another engine such as ONNX Runtime.
+ 		return setenv("OPENCV_FORCE_DNN_ENGINE", ForcedDnnEngine(), 1) == 0;
 @@ -69,10 +72,12 @@
  		backend_->create_detector = [](const std::string &path, const cv::Size &size,
  		                               float score_threshold, float nms_threshold,
