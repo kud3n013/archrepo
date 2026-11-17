@@ -1,0 +1,73 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://proton.me/lumo
+
+# Repackaging of Proton's official Linux .deb for Lumo, Proton's private AI
+# assistant. The app is a Tauri application: a single native binary that renders
+# through the system WebKitGTK, so unlike the Electron-based Proton apps there is
+# no bundled Chromium, no flags file and nothing in the .deb is modified.
+
+pkgname=lumo-desktop
+pkgver=0.5.9
+pkgrel=1
+pkgdesc="Proton official desktop application for Lumo, Proton's private AI assistant"
+arch=('x86_64')
+url="https://proton.me/lumo"
+# Proton ships no license text with the .deb and states no open-source license for this app.
+license=('custom:Commercial')
+depends=(
+    'cairo'
+    'dbus'
+    'gdk-pixbuf2'
+    'glib2'
+    'gtk3'
+    'hicolor-icon-theme'
+    'libayatana-appindicator'
+    'libsoup3'
+    'webkit2gtk-4.1'
+)
+optdepends=(
+    'gnome-shell-extension-appindicator: tray icon on GNOME Shell'
+    'org.freedesktop.secrets: sign-in storage via Secret Service (gnome-keyring or kwallet)'
+    'xdg-utils: open links in the default browser'
+)
+provides=('lumo')
+# The binary is already stripped by upstream.
+options=('!strip' '!debug')
+
+_deb="${pkgname}-${pkgver}.deb"
+source=(
+    "${_deb}::https://proton.me/download/lumo/linux/${pkgver}/Lumo_${pkgver}_amd64.deb"
+)
+# makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
+noextract=("${_deb}")
+sha512sums=('583cb312424c0874aae03c61afde5653c0104655592ea574a8ae2daef9f61bb750714eb25f37fc396f278519373017b3297c281aa16d273b35746bb561b35e26')
+
+prepare() {
+    cd "${srcdir}"
+
+    local _data
+    _data="$(bsdtar -tf "${_deb}" | grep -m1 '^data\.tar')"
+    bsdtar -xf "${_deb}" "${_data}"
+    rm -rf data
+    mkdir -p data
+    bsdtar -xf "${_data}" -C data
+}
+
+package() {
+    cd "${srcdir}/data"
+
+    install -Dm755 "usr/bin/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+
+    # Upstream's desktop entry registers the proton-lumo:// handler used by the
+    # browser sign-in flow, and names the window class lumo-desktop.
+    install -Dm644 usr/share/applications/lumo.desktop "${pkgdir}/usr/share/applications/lumo.desktop"
+
+    # Icons. The .deb files the 256 px image under "256x256@2", which is not a
+    # valid hicolor size directory, so it is installed as 256x256.
+    install -Dm644 "usr/share/icons/hicolor/32x32/apps/${pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/32x32/apps/${pkgname}.png"
+    install -Dm644 "usr/share/icons/hicolor/128x128/apps/${pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/128x128/apps/${pkgname}.png"
+    install -Dm644 "usr/share/icons/hicolor/256x256@2/apps/${pkgname}.png" \
+        "${pkgdir}/usr/share/icons/hicolor/256x256/apps/${pkgname}.png"
+}
