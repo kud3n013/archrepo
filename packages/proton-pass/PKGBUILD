@@ -8,7 +8,7 @@
 # theme by default.
 
 pkgname=proton-pass
-pkgver=1.43.1
+pkgver=1.44.0
 pkgrel=1
 pkgdesc="Proton official desktop application for Proton Pass, the end-to-end encrypted password manager"
 arch=('x86_64')
@@ -46,7 +46,7 @@ source=(
 )
 # makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
 noextract=("${_deb}")
-sha512sums=('0060237052fca72d74f985f6d93a0943c97a83592df368ee2516ebacc057de4f451fc8b8458f367f311bd5700da5849d815b3ccc8543718dbb22f80bd3cd949b'
+sha512sums=('70b9b3c05074a79cbc8efca92c3974d56ca34ad1d7d2ca80817116af3f0fb1a40220550f05af5a4dc91ff754c5aafb378b15dbd658d57241e711c923b94d4f30'
             'f553557f47c2f28b7659738ad7a760b8d1c799844fc4d827b93f94e3033592e93a45196156c5d2a1b5d4082d72d815504310b8392ed8106970b927ff98430525'
             '731dc22624bc42eb65c04b8bdd4c24cd5bfcd04fd62a7488bd5810204c9a806eb4c5cd12893e344e54f0cb88790f36c00f2ca180cd0283d9d8aed5e421126816'
             'a62f78cb7e4e90d981c6793e152cd5eef7793a6a604f6b372643813b172727197f986d60ea0f5a42ceb5a4b12c19a19d763956b444271efcf92faeac507c3419')
