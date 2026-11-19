@@ -362,6 +362,18 @@ case "$CHECK" in
     fi
     ;;
 
+  horizon-launcher-tag)
+    # Launcher releases are tagged launcher@X.Y.Z and never marked latest (the game's
+    # Nightlies fill /releases), so the tags are listed with git instead. The older
+    # launcher-vX.Y.Z series (up to launcher-v0.9.0) is left out: it sorts above 0.2.x.
+    # The release is created with its tag, so a tag implies the tarball is published.
+    if [ -n "$UPSTREAM" ]; then
+      TAG=$(git ls-remote --tags --refs "https://github.com/${UPSTREAM}.git" 'launcher@*' 2>/dev/null | \
+        grep -oP 'refs/tags/launcher@\K[0-9]+(\.[0-9]+)+$' | sort -V | tail -n 1 || true)
+      [ -n "$TAG" ] && LATEST="$TAG"
+    fi
+    ;;
+
   claude-desktop-apt)
     # The apt index lists every published version; take the newest claude-desktop stanza.
     VER=$(curl -s "https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages" | \
