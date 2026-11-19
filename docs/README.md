@@ -27,6 +27,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`gdlauncher-carbon`**](gdlauncher-carbon.md) | `2.0.40-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | GDLauncher Carbon Minecraft launcher with Wayland support |
 | [**`ghidra`**](ghidra.md) | `12.2-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | NSA's reverse engineering framework with HiDPI scaling & tiling window manager fixes |
 | [**`gridcraft`**](gridcraft.md) | `0.11.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | GridCraft, ArtCraft's open-source spreadsheet app (Excel alternative) |
+| [**`horizon-rust`**](horizon-rust.md) | `0.2.81-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Launcher for Horizon, Minecraft: Java Edition rewritten in Rust |
 | [**`howdy-next`**](howdy-next.md) | `3.4.1-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | C++ Howdy facial-recognition authentication (patched OpenCV 5 warnings) |
 | [**`kast`**](kast.md) | `0.6.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Arch/CachyOS setup TUI with App Vault backups to Proton Drive |
 | [**`lightcraft`**](lightcraft.md) | `0.12.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | LightCraft, ArtCraft's open-source photo library and raw developer (Lightroom alternative) with live light/dark switching through the XDG portal |

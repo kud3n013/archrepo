@@ -1,0 +1,11 @@
+# The launcher writes its own menu entry, ~/.local/share/applications/horizon-launcher.desktop,
+# pointing at /usr/bin/horizon-launcher. Remove the copies that start this package's
+# launcher once the package is gone, so no entry is left that starts nothing.
+post_remove() {
+    for user_home in /home/*; do
+        entry="$user_home/.local/share/applications/horizon-launcher.desktop"
+        if [ -f "$entry" ] && grep -Eq '^Exec="?/usr/(bin|lib/horizon-rust)/horizon-launcher' "$entry"; then
+            rm -f "$entry"
+        fi
+    done
+}

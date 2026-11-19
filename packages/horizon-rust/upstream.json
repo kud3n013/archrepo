@@ -1,0 +1,4 @@
+{
+  "check": "horizon-launcher-tag",
+  "repo": "horizon-rust/horizon"
+}

@@ -1,0 +1,99 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/horizon-rust/horizon
+
+# Horizon is Minecraft: Java Edition rewritten in Rust. This packages its launcher,
+# which signs in, prepares the game files from the player's own copy of Minecraft
+# and installs and updates the game builds per user. Upstream's prebuilt Linux
+# binary is installed unmodified. The release tarball holds only the binary, so
+# the desktop entries, icons and licenses come from the repository at the same tag.
+
+pkgname=horizon-rust
+pkgver=0.2.81
+pkgrel=1
+pkgdesc="Launcher for Horizon, Minecraft: Java Edition rewritten in Rust"
+arch=('x86_64')
+url="https://github.com/horizon-rust/horizon"
+license=('LGPL-3.0-or-later' 'MIT')
+depends=(
+    'glibc'
+    'hicolor-icon-theme'
+    'libglvnd'
+    'libxcb'
+    'libxkbcommon'
+    'libxkbcommon-x11'
+    'vulkan-icd-loader'
+    'wayland'
+    # Loaded by the game builds the launcher installs
+    'alsa-lib'
+    'libx11'
+    'libxcursor'
+    'libxi'
+    'libxrandr'
+    'systemd-libs'
+)
+optdepends=(
+    'vulkan-driver: GPU rendering (vulkan-radeon, vulkan-intel, nvidia-utils, ...)'
+    'gamemode: run the game with Feral GameMode'
+    'xdg-utils: open links in the default browser'
+    'xdg-desktop-portal: file pickers and the light/dark theme'
+    'base-devel: build native mods'
+    'libxtst: Mojang Java runtime for Java Edition instances'
+)
+provides=('horizon-launcher')
+conflicts=('horizon-launcher' 'horizon-launcher-bin')
+install="${pkgname}.install"
+# Upstream's binary is already stripped.
+options=('!strip' '!debug')
+
+_tag="launcher%40${pkgver}"
+_raw="https://raw.githubusercontent.com/horizon-rust/horizon/${_tag}"
+_sizes=(16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512)
+source=(
+    "${pkgname}-${pkgver}.tar.gz::https://github.com/horizon-rust/horizon/releases/download/${_tag}/horizon-launcher-linux-x86_64.tar.gz"
+    "${pkgname}-${pkgver}-horizon-launcher.desktop::${_raw}/packaging/linux/horizon-launcher.desktop"
+    "${pkgname}-${pkgver}-horizon.desktop::${_raw}/packaging/linux/horizon.desktop"
+    "${pkgname}-${pkgver}-LICENSE::${_raw}/LICENSE"
+    "${pkgname}-${pkgver}-MIT.txt::${_raw}/LICENSES/MIT.txt"
+    "${pkgname}-${pkgver}-horizon.svg::${_raw}/packaging/icons/hicolor/scalable/apps/horizon.svg"
+)
+for _s in "${_sizes[@]}"; do
+    source+=("${pkgname}-${pkgver}-horizon-${_s}.png::${_raw}/packaging/icons/hicolor/${_s}/apps/horizon.png")
+done
+source+=("horizon-launcher.sh")
+sha256sums=('8e19854a2bcf2a5370a97c937c57b8d2e42dcc1d55adb608c11ae32f87d250ad'
+            '436447e5ce86e144d744cf8f0e57aaeb2fe7f16e35cf62f4a3c7a56b0b0ddf31'
+            'f0121d7dbed19084e799d6628628115b4e7140f984e078c058ddc35c179b7518'
+            'e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118'
+            '0b60b28d153796544720e9d68df0997b6289ca2db67359102d2b8e61e57f455e'
+            '2a8c0871ae8a1fc4d3be47c8ce187ee5411d9553da241411ddd7e75c61373eb3'
+            '924f0dd525a41a0b6b57c7c9d75ba6ec94714e7b0ad3fd09e6082f647011d519'
+            'd262dd2c66e771a5a34bbaf2c47ce04ead024659cbe74dc750701603f643007a'
+            '8a1d8759b13c60ec5ab52db36d8fdc3977c784c5809125337be0394448cf4b83'
+            'be885ebce0640e87a48c6f0d5711f69463074edd3537c4f9a847769acb85b2f7'
+            '1017decdf41f0dba0113dcc02e65845456ae07ed6ce419b71723e7e50a1e3f67'
+            'cd904b580612cc00a8425c1850c7f9ef39bbe5c4322c676587b2af4d4410a1c7'
+            'a7621db90a417d8e3dc3ebae1e5bcfaa142fb0c1f09e1f646a8baef4eca06777'
+            'fefb808a16c99ce04bb77ffae561548603a6776db8d7d71e76becea3411285a1'
+            'fcb5df5126ee3baf4a509c52e0f3c26e63297493edbd372b9a7bdf6075fdfa7b')
+
+package() {
+    cd "${srcdir}"
+    local _p="${pkgname}-${pkgver}"
+
+    install -Dm755 horizon-launcher "${pkgdir}/usr/lib/${pkgname}/horizon-launcher"
+    install -Dm755 horizon-launcher.sh "${pkgdir}/usr/bin/horizon-launcher"
+
+    # horizon-launcher.desktop is the menu entry; horizon.desktop (hidden) gives the
+    # game's window its icon on Wayland.
+    install -Dm644 "${_p}-horizon-launcher.desktop" "${pkgdir}/usr/share/applications/horizon-launcher.desktop"
+    install -Dm644 "${_p}-horizon.desktop" "${pkgdir}/usr/share/applications/horizon.desktop"
+
+    local _s
+    for _s in "${_sizes[@]}"; do
+        install -Dm644 "${_p}-horizon-${_s}.png" "${pkgdir}/usr/share/icons/hicolor/${_s}/apps/horizon.png"
+    done
+    install -Dm644 "${_p}-horizon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/horizon.svg"
+
+    install -Dm644 "${_p}-LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -Dm644 "${_p}-MIT.txt" "${pkgdir}/usr/share/licenses/${pkgname}/MIT.txt"
+}
