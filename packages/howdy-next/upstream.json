@@ -1,4 +1,4 @@
 {
-  "check": "codeberg-release",
-  "repo": "nathawat/howdy-next"
+  "check": "github-release",
+  "repo": "nathawatc/howdy-next"
 }
