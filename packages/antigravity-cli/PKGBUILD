@@ -3,8 +3,8 @@
 # AUR Reference: https://aur.archlinux.org/packages/antigravity-cli
 
 pkgname=antigravity-cli
-pkgver=1.5.12
-_build=5281398513336320
+pkgver=1.5.13
+_build=5999302598852608
 pkgrel=1
 pkgdesc="Google Antigravity CLI (agy), a terminal coding agent"
 arch=('x86_64')
@@ -18,7 +18,7 @@ replaces=('antigravity-cli-bin')
 options=(!strip !debug !lto)
 source=("cli_linux_x64-${pkgver}-${_build}.tar.gz::https://storage.googleapis.com/antigravity-public/antigravity-cli/${pkgver}-${_build}/linux-x64/cli_linux_x64.tar.gz"
         "agy.sh")
-sha512sums=('26de25fccb3fbf0b093e090ce14a14ac1df1ec3e90ef4ea6106887d3a81b0cc9edb0dadea7b9101d07f9606eba159062a6fb7b78e91b73f7520684a24db73428'
+sha512sums=('014b37387703acab1f47cd532c8bb60167a6a3537b0f9891de03f1b1ffa9614307bc83c4b2f7551273b0877d722716b0cd9e26782f6b2a50705db4f05e18c68f'
             '1157b9020098dde8eb2db14806efe78689bf562e563f8dad9d53da0ab5d4480d338d834f551a1e1b6a38f24eea4ad53c3bd00a718067f2ef1ec251d9313c7139')
 
 package() {
