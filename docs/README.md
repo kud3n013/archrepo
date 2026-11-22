@@ -42,6 +42,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`proton-mail`**](proton-mail.md) | `1.15.1-2` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Mail & Calendar desktop app with system tray & close-to-tray |
 | [**`proton-pass`**](proton-pass.md) | `1.42.0-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Pass password manager desktop app, updated as soon as Proton releases |
 | [**`searxng`**](searxng.md) | `r9799.12f8b65-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Privacy metasearch engine with systemd service & automated secrets |
+| [**`serein`**](serein.md) | `1.0.0pre.nightly.20261121.100-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Unofficial native Discord client written in Rust (nightly) |
 | [**`sine`**](sine.md) | `2.3.3-2` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Mod and theme manager for Firefox-based browsers (Zen, Floorp, Firefox) |
 | [**`sine-fork`**](sine-fork.md) | `2.3.4.1.r1331.g79e4674-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Sine built from kud3n's fork, installing the fork's engine; replaces `sine` |
 | [**`soundcraft`**](soundcraft.md) | `0.12.1-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | SoundCraft, ArtCraft's open-source digital audio workstation (Pro Tools alternative) |

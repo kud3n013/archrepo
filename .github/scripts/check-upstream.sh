@@ -337,6 +337,34 @@ case "$CHECK" in
     fi
     ;;
 
+  serein-nightly)
+    # Serein only publishes nightly prereleases, so /releases/latest is empty.
+    # The newest release carrying upstream's own x86_64 Arch package wins. Its
+    # asset name holds the version in upstream's Arch form (1.0.0pre.nightly.<date>.<n>)
+    # and upstream's pkgrel, kept in _build; the tag is kept in _reltag.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASE_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases?per_page=20" | \
+        jq -c '[.[] | select(.draft == false and any(.assets[].name; test("-Linux-arch-serein-.+-x86_64\\.pkg\\.tar\\.zst$")))][0] // empty' 2>/dev/null || true)
+      if [ -n "$RELEASE_JSON" ]; then
+        NEW_RELTAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty')
+        ASSET=$(echo "$RELEASE_JSON" | jq -r '.assets[].name' | grep -E -- '-Linux-arch-serein-.+-x86_64\.pkg\.tar\.zst$' | head -1 || true)
+        if [[ "$ASSET" =~ -Linux-arch-serein-([0-9A-Za-z._+]+)-([0-9]+)-x86_64\.pkg\.tar\.zst$ ]]; then
+          LATEST="${BASH_REMATCH[1]}"
+          NEW_BUILD="${BASH_REMATCH[2]}"
+          CURRENT_RELTAG=$(grep -oP '^_reltag=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+          CURRENT_BUILD=$(grep -oP '^_build=\K.*' "${PKG_DIR}/PKGBUILD" || true)
+          if [ "$NEW_RELTAG" != "$CURRENT_RELTAG" ] || [ "$NEW_BUILD" != "$CURRENT_BUILD" ]; then
+            UPDATE_NEEDED=true
+            EXTRA_INFO="tag: ${CURRENT_RELTAG} -> ${NEW_RELTAG}; build: ${CURRENT_BUILD} -> ${NEW_BUILD}"
+          fi
+        else
+          echo "::error::serein: release ${NEW_RELTAG} has no parsable Arch package asset" >&2
+          exit 1
+        fi
+      fi
+    fi
+    ;;
+
   obsidian-desktop)
     # Obsidian releases include both mobile (e.g. Android apk only) and desktop builds.
     # Filter releases for the latest release containing the desktop debian package.
