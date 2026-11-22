@@ -1,0 +1,93 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/ViceVerse-cz/Serein
+
+# Repackaging of upstream's own Arch build of Serein, a native Discord client
+# written in Rust (egui UI, WebKitGTK 6 for embedded web content). Upstream only
+# publishes nightly prereleases; each one carries an x86_64 .pkg.tar.zst, which is
+# unpacked as is.
+#
+# pkgver follows upstream's Arch conversion of the tag: v1.0.0-nightly.<date>.<n>
+# becomes 1.0.0pre.nightly.<date>.<n>, which vercmp orders before a final 1.0.0.
+
+pkgname=serein
+pkgver=1.0.0pre.nightly.20261121.100
+pkgrel=1
+# Release tag and pkgrel of upstream's own Arch package, both kept by the upstream check.
+_reltag=v1.0.0-nightly.20261121.100
+_build=1
+pkgdesc="Unofficial native Discord client written in Rust (nightly)"
+arch=('x86_64')
+url="https://github.com/ViceVerse-cz/Serein"
+# The app is dual-licensed; the binary bundles fonts, icons, emoji and audio
+# codecs under the further licenses listed in THIRD_PARTY_NOTICES.md.
+license=('Apache-2.0 OR MIT' 'OFL-1.1' 'MPL-2.0' 'CC-BY-4.0')
+# Libraries the binary links (webkitgtk-6.0, gtk4, gstreamer, libpulse, ...) and
+# loads at runtime (EGL, Wayland, X11, D-Bus), plus the GStreamer plugins
+# and portal the voice and screen-share code needs.
+depends=(
+    'alsa-lib'
+    'dbus'
+    'fontconfig'
+    'glib2'
+    'glibc'
+    'gst-plugin-pipewire'
+    'gst-plugins-base'
+    'gst-plugins-base-libs'
+    'gst-plugins-good'
+    'gstreamer'
+    'gtk4'
+    'hicolor-icon-theme'
+    'libgcc'
+    'libglvnd'
+    'libpulse'
+    'libsoup3'
+    'libstdc++'
+    'libx11'
+    'libxcursor'
+    'libxi'
+    'libxkbcommon'
+    'libxkbcommon-x11'
+    'libxss'
+    'mesa'
+    'wayland'
+    'webkitgtk-6.0'
+    'xdg-desktop-portal'
+)
+optdepends=(
+    'org.freedesktop.secrets: saved logins via Secret Service (gnome-keyring or kwallet)'
+    'gst-plugins-bad: hardware screen encoding'
+    'gst-libav: inline video'
+)
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin" "${pkgname}-git")
+# The binary is already stripped by upstream.
+options=('!strip' '!debug')
+
+# Saved under a name that does not end in .pkg.tar.zst, so the CI artifact glob
+# never mistakes the upstream package for the one built here.
+source=(
+    "${pkgname}-${pkgver}-${_build}-upstream.tar.zst::${url}/releases/download/${_reltag}/${pkgname}-${_reltag}-Linux-arch-${pkgname}-${pkgver}-${_build}-x86_64.pkg.tar.zst"
+)
+sha256sums=('8c9e66586ac5125d1966fe809dff71b6ca4385cb93a64be594d72f300b3d78ab')
+
+package() {
+    cd "${srcdir}"
+
+    install -Dm755 "usr/bin/${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+
+    # Upstream's desktop entry; the file name matches the Wayland app id
+    # (StartupWMClass=cz.viceverse.serein).
+    install -Dm644 usr/share/applications/cz.viceverse.serein.desktop \
+        "${pkgdir}/usr/share/applications/cz.viceverse.serein.desktop"
+
+    # hicolor icons (PNG 16-1024 px, scalable and symbolic SVG), README and
+    # third-party notices with their license texts.
+    cp -a usr/share/icons usr/share/doc "${pkgdir}/usr/share/"
+
+    install -Dm644 "usr/share/doc/${pkgname}/LICENSE-MIT" \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE-MIT"
+    install -Dm644 "usr/share/doc/${pkgname}/LICENSE-APACHE" \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE-APACHE"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
