@@ -1,0 +1,19 @@
+pkgbase = whisperx
+	pkgdesc = Automatic speech recognition with word-level timestamps and speaker diarization (CPU)
+	pkgver = 3.8.6
+	pkgrel = 1
+	url = https://github.com/m-bain/whisperX
+	arch = x86_64
+	license = BSD-2-Clause
+	makedepends = uv
+	depends = ffmpeg
+	depends = glibc
+	conflicts = python-whisperx
+	conflicts = whisperx-git
+	noextract = whisperx-3.8.6-py3-none-any.whl
+	options = !strip
+	options = !debug
+	source = https://files.pythonhosted.org/packages/py3/w/whisperx/whisperx-3.8.6-py3-none-any.whl
+	sha256sums = cb6d4fcd3fb6c42305cb8b222a33a0b78f6b657e9db3b714345fe43dc0a69c1f
+
+pkgname = whisperx
