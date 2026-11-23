@@ -1,0 +1,87 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/m-bain/whisperX
+
+# WhisperX in a self-contained Python under /opt/whisperx, built from the wheel
+# published on PyPI.
+#
+# Upstream pins torch ~= 2.8.0 and Python < 3.14, while Arch ships newer torch
+# and Python 3.14, so neither comes from the system: uv installs a standalone
+# CPython 3.13 and resolves the rest from PyPI. torch is the CPU build. The
+# CUDA build plus NVIDIA's runtime wheels would push the package past GitHub's
+# 2 GiB release asset limit, and torch 2.8's CUDA 12.8 does not match Arch's.
+
+pkgname=whisperx
+pkgver=3.8.6
+pkgrel=1
+_pyver=3.13
+pkgdesc="Automatic speech recognition with word-level timestamps and speaker diarization (CPU)"
+arch=('x86_64')
+url="https://github.com/m-bain/whisperX"
+license=('BSD-2-Clause')
+# ffmpeg decodes input audio (whisperx.load_audio runs the ffmpeg CLI). The
+# standalone CPython and the manylinux wheels need only glibc from the system.
+depends=('ffmpeg' 'glibc')
+makedepends=('uv')
+conflicts=('python-whisperx' 'whisperx-git')
+options=('!strip' '!debug')
+# The wheel is pinned by checksum. Updates follow PyPI (upstream.json), so a
+# GitHub tag that PyPI has not published yet never triggers a build.
+_whl="${pkgname}-${pkgver}-py3-none-any.whl"
+source=("https://files.pythonhosted.org/packages/py3/${pkgname::1}/${pkgname}/${_whl}")
+noextract=("${_whl}")
+sha256sums=('cb6d4fcd3fb6c42305cb8b222a33a0b78f6b657e9db3b714345fe43dc0a69c1f')
+
+package() {
+  local _root="/opt/${pkgname}"
+  local _dest="${pkgdir}${_root}"
+  local _py="${_dest}/bin/python${_pyver}"
+
+  export UV_CACHE_DIR="${srcdir}/uv-cache"
+  export UV_LINK_MODE=copy
+  export UV_PYTHON_INSTALL_DIR="${srcdir}/python"
+  export UV_NO_CONFIG=1
+
+  # Standalone CPython, which is relocatable, copied in as the package's root.
+  # The minor-version symlink uv creates next to it is left behind.
+  uv python install --no-bin --no-registry "${_pyver}"
+  local _pydir
+  _pydir=$(find "${UV_PYTHON_INSTALL_DIR}" -mindepth 1 -maxdepth 1 -type d \
+    -name "cpython-${_pyver}.*-linux-x86_64-gnu" | sort -V | tail -1)
+  [ -n "${_pydir}" ] || { echo "uv installed no CPython ${_pyver}" >&2; return 1; }
+  install -dm755 "${pkgdir}/opt"
+  cp -a "${_pydir}" "${_dest}"
+  # uv writes its install path into sysconfig; point it at the final prefix
+  sed -i "s|${_pydir}|${_root}|g" "${_dest}"/lib/python${_pyver}/_sysconfigdata_*.py
+
+  # triton only serves torch.compile on CUDA; the CPU build never loads it.
+  printf 'triton\n' > "${srcdir}/excludes.txt"
+
+  # uv marks its Pythons EXTERNALLY-MANAGED, which keeps users' pip out of
+  # /opt/whisperx; installing the package's own contents overrides it here.
+  uv pip install \
+    --python "${_py}" \
+    --break-system-packages \
+    --torch-backend cpu \
+    --excludes "${srcdir}/excludes.txt" \
+    "${srcdir}/${_whl}"
+
+  # Console scripts were written with the $pkgdir interpreter path
+  grep -rlIF "${pkgdir}" "${_dest}/bin" | xargs -r sed -i "s|${pkgdir}||g"
+  # Installing from a local file records its $srcdir path; it is metadata only
+  rm -f "${_dest}"/lib/python${_pyver}/site-packages/${pkgname}-${pkgver}.dist-info/direct_url.json
+
+  # Precompile bytecode with the installed paths, so imports (torch, pandas,
+  # transformers) start fast and no __pycache__ is written into /opt at runtime.
+  find "${_dest}/lib/python${_pyver}/site-packages" -name '__pycache__' -type d -prune -exec rm -rf {} +
+  "${_py}" -m compileall -q -j0 -s "${pkgdir}" -p / \
+    "${_dest}/lib/python${_pyver}/site-packages" >/dev/null || true
+
+  install -dm755 "${pkgdir}/usr/bin"
+  ln -s "${_root}/bin/whisperx" "${pkgdir}/usr/bin/whisperx"
+
+  install -Dm644 \
+    "${_dest}/lib/python${_pyver}/site-packages/${pkgname}-${pkgver}.dist-info/licenses/LICENSE" \
+    "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+  chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
