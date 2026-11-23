@@ -337,6 +337,26 @@ case "$CHECK" in
     fi
     ;;
 
+  katlendar-prerelease)
+    # Katlendar is in beta and every release is a prerelease, so /releases/latest
+    # is empty. The newest release carrying the x86_64 Linux tarball wins; the tag
+    # (v0.1.0-beta.2) loses its "v" and hyphens (0.1.0beta.2) so vercmp orders
+    # the prerelease before the final 0.1.0. Without the tarball the check fails.
+    if [ -n "$UPSTREAM" ]; then
+      RELEASE_JSON=$(curl -s "${AUTH_HEADER[@]}" "https://api.github.com/repos/${UPSTREAM}/releases?per_page=20" | \
+        jq -c '[.[] | select(.draft == false)][0] // empty' 2>/dev/null || true)
+      if [ -n "$RELEASE_JSON" ]; then
+        TAG=$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty')
+        VER="${TAG#v}"
+        if ! echo "$RELEASE_JSON" | jq -e --arg a "katlendar-${VER}-linux-x86_64.tar.gz" 'any(.assets[].name; . == $a)' >/dev/null; then
+          echo "::error::katlendar: release ${TAG} has no katlendar-${VER}-linux-x86_64.tar.gz" >&2
+          exit 1
+        fi
+        LATEST="${VER//-/}"
+      fi
+    fi
+    ;;
+
   serein-nightly)
     # Serein only publishes nightly prereleases, so /releases/latest is empty.
     # The newest release carrying upstream's own x86_64 Arch package wins. Its

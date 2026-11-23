@@ -30,6 +30,7 @@ This directory contains individual documentation pages for all active packages a
 | [**`horizon-rust`**](horizon-rust.md) | `0.2.81-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Launcher for Horizon, Minecraft: Java Edition rewritten in Rust |
 | [**`howdy-next`**](howdy-next.md) | `3.4.1-3` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | C++ Howdy facial-recognition authentication (patched OpenCV 5 warnings) |
 | [**`kast`**](kast.md) | `0.6.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Arch/CachyOS setup TUI with App Vault backups to Proton Drive |
+| [**`katlendar`**](katlendar.md) | `0.1.0beta.2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Fast, local-first desktop calendar and task planner (beta) |
 | [**`lightcraft`**](lightcraft.md) | `0.12.0-1` | Modified | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | LightCraft, ArtCraft's open-source photo library and raw developer (Lightroom alternative) with live light/dark switching through the XDG portal |
 | [**`linux-enable-ir-emitter`**](linux-enable-ir-emitter.md) | `7.0.0beta2-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Enables the IR emitter of infrared cameras for Howdy (v7 beta) |
 | [**`lumo-desktop`**](lumo-desktop.md) | `0.5.9-1` | Original | ![passing](https://img.shields.io/badge/build-passing-brightgreen) | Proton Lumo private AI assistant desktop app |

@@ -1,0 +1,61 @@
+# Maintainer: kud3n013 <kud3n.013@proton.me>
+# Upstream: https://github.com/kud3n013/katlendar
+
+# Repackaging of upstream's prebuilt Linux tarball of Katlendar, a local-first
+# desktop calendar and task planner written in Rust (egui, OpenGL via glow).
+#
+# Prereleases are stored without the hyphen (0.1.0-beta.2 -> 0.1.0beta.2) so
+# vercmp orders them before the final 0.1.0; it is restored for the tag and asset.
+
+pkgname=katlendar
+pkgver=0.1.0beta.2
+pkgrel=1
+_ver="$pkgver"
+[[ "$pkgver" =~ ^([0-9.]+)([a-z].*)$ ]] && _ver="${BASH_REMATCH[1]}-${BASH_REMATCH[2]}"
+pkgdesc="Fast, local-first desktop calendar and task planner"
+arch=('x86_64')
+url="https://github.com/kud3n013/katlendar"
+license=('GPL-2.0-only')
+# The binary links only glibc and libgcc; winit and glutin dlopen the rest
+# (EGL/GL, Wayland, X11/xcb, xkbcommon, cursor and input extensions, fontconfig).
+depends=(
+    'fontconfig'
+    'glibc'
+    'hicolor-icon-theme'
+    'libgcc'
+    'libglvnd'
+    'libx11'
+    'libxcb'
+    'libxcursor'
+    'libxi'
+    'libxkbcommon'
+    'libxkbcommon-x11'
+    'libxrender'
+    'wayland'
+)
+optdepends=(
+    'org.freedesktop.secrets: keep account passwords and tokens in the Secret Service (gnome-keyring or kwallet)'
+    'xdg-utils: open links and account sign-in pages in the browser'
+)
+provides=("${pkgname}-bin")
+conflicts=("${pkgname}-bin" "${pkgname}-git")
+# The binary is already stripped by upstream.
+options=('!strip' '!debug')
+
+source=("${pkgname}-${pkgver}.tar.gz::${url}/releases/download/v${_ver}/${pkgname}-${_ver}-linux-x86_64.tar.gz")
+sha256sums=('2d306ccee73674949d05f586803c2e50eff2c0536b7293ddff56a9b75a007af1')
+
+package() {
+    cd "${srcdir}/${pkgname}-${_ver}-linux-x86_64"
+
+    install -Dm755 "${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+
+    # Upstream's desktop entry (Exec=katlendar, StartupWMClass=katlendar).
+    install -Dm644 "${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+    install -Dm644 "${pkgname}.png" "${pkgdir}/usr/share/icons/hicolor/512x512/apps/${pkgname}.png"
+
+    install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    chmod -R u+rwX,go+rX,go-w "${pkgdir}"
+}
