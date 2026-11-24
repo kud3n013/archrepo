@@ -8,7 +8,7 @@
 # the desktop entries, icons and licenses come from the repository at the same tag.
 
 pkgname=horizon-rust
-pkgver=0.2.107
+pkgver=0.2.108
 pkgrel=1
 pkgdesc="Launcher for Horizon, Minecraft: Java Edition rewritten in Rust"
 arch=('x86_64')
@@ -60,7 +60,7 @@ for _s in "${_sizes[@]}"; do
     source+=("${pkgname}-${pkgver}-horizon-${_s}.png::${_raw}/packaging/icons/hicolor/${_s}/apps/horizon.png")
 done
 source+=("horizon-launcher.sh")
-sha256sums=('e466ba53e654abf4d8a58bd9177c5fa212d9ddd6dc563f32ecfb8c4f337ae7aa'
+sha256sums=('a97f787bfbce69bf56f37a69bf449e0d9a7ef74dfbcb907865a913b22691a365'
             '436447e5ce86e144d744cf8f0e57aaeb2fe7f16e35cf62f4a3c7a56b0b0ddf31'
             'f0121d7dbed19084e799d6628628115b4e7140f984e078c058ddc35c179b7518'
             'e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118'
