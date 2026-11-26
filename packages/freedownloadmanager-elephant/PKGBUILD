@@ -2,7 +2,7 @@
 # Contributor: meowcateatrat <https://github.com/meowcateatrat>
 
 pkgname=freedownloadmanager-elephant
-pkgver=1.3.14
+pkgver=1.3.15
 pkgrel=1
 pkgdesc="Free Download Manager add-on for downloading videos from various sites (powered by yt-dlp)"
 arch=('any')
@@ -24,7 +24,7 @@ source=(
     "LICENSE-${pkgver}::https://raw.githubusercontent.com/meowcateatrat/elephant/${pkgver}/LICENSE"
 )
 noextract=("${pkgname}-${pkgver}.fda")
-sha512sums=('f5faad9a114af59dfce3486b023c7b32c8d7e32e616b7dc955e695fc14fed95aa6143fbffe284a8aed5bb9ebb30f9b24c481c14647d43712f1bac869a86b68d4'
+sha512sums=('c091293d82805fca020b369381e06573f12e4b7deda32f07417eef22ea2bac311557153c072e912d8f0dbdc8ce1d11e456a0f5936a1b835a6f48686b1cadbc30'
             '912e814f244d8016b8b476e9d9aa88efc6c0829383c3d6e7447ab5a597624debf55ae18925399228c8b5dfa3183914f605485748ce1cadf61a5c07c946bddec1')
 
 prepare() {
