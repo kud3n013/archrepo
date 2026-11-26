@@ -7,7 +7,7 @@
 # no bundled Chromium, no flags file and nothing in the .deb is modified.
 
 pkgname=lumo-desktop
-pkgver=0.5.9
+pkgver=0.5.10
 pkgrel=1
 pkgdesc="Proton official desktop application for Lumo, Proton's private AI assistant"
 arch=('x86_64')
@@ -40,7 +40,7 @@ source=(
 )
 # makepkg would unpack the .deb into $srcdir, but only the data archive is needed.
 noextract=("${_deb}")
-sha512sums=('583cb312424c0874aae03c61afde5653c0104655592ea574a8ae2daef9f61bb750714eb25f37fc396f278519373017b3297c281aa16d273b35746bb561b35e26')
+sha512sums=('5a3a959865f0f18940d4be251f12323b7d2b0c042628c7ce8066eb68918b54973d7e1baf00afc32dcb0e404c945422e31b01a509bee0d9c068187981cb956b85')
 
 prepare() {
     cd "${srcdir}"
