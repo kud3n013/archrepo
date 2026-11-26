@@ -1,6 +1,6 @@
 pkgbase = lumo-desktop
 	pkgdesc = Proton official desktop application for Lumo, Proton's private AI assistant
-	pkgver = 0.5.9
+	pkgver = 0.5.10
 	pkgrel = 1
 	url = https://proton.me/lumo
 	arch = x86_64
@@ -18,10 +18,10 @@ pkgbase = lumo-desktop
 	optdepends = org.freedesktop.secrets: sign-in storage via Secret Service (gnome-keyring or kwallet)
 	optdepends = xdg-utils: open links in the default browser
 	provides = lumo
-	noextract = lumo-desktop-0.5.9.deb
+	noextract = lumo-desktop-0.5.10.deb
 	options = !strip
 	options = !debug
-	source = lumo-desktop-0.5.9.deb::https://proton.me/download/lumo/linux/0.5.9/Lumo_0.5.9_amd64.deb
-	sha512sums = 583cb312424c0874aae03c61afde5653c0104655592ea574a8ae2daef9f61bb750714eb25f37fc396f278519373017b3297c281aa16d273b35746bb561b35e26
+	source = lumo-desktop-0.5.10.deb::https://proton.me/download/lumo/linux/0.5.10/Lumo_0.5.10_amd64.deb
+	sha512sums = 5a3a959865f0f18940d4be251f12323b7d2b0c042628c7ce8066eb68918b54973d7e1baf00afc32dcb0e404c945422e31b01a509bee0d9c068187981cb956b85
 
 pkgname = lumo-desktop
