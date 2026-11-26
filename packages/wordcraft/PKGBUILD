@@ -3,7 +3,7 @@
 # AUR Reference: https://aur.archlinux.org/packages/wordcraft-bin
 
 pkgname=wordcraft
-pkgver=0.18.1
+pkgver=0.19.1
 pkgrel=1
 pkgdesc="WordCraft, an open-source word processor (Word alternative) from the ArtCraft suite"
 arch=('x86_64')
@@ -21,7 +21,7 @@ conflicts=('wordcraft-bin' 'wordcraft-git')
 replaces=('wordcraft-bin')
 options=(!strip !debug)
 source=("${pkgname}-${pkgver}-linux-x86_64.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}-${pkgver}-linux-x86_64.tar.gz")
-sha256sums=('312a057d46dd80597c12dccfd1097ce25edea40baaaeb50bcb6f01ac1aebadb5')
+sha256sums=('ec8d8cc2b9204ac03d1380cec910defdf2e8850d93e9b87d6184eafef61968b4')
 
 package() {
     local _root="${srcdir}/${pkgname}-${pkgver}-linux-x86_64"
