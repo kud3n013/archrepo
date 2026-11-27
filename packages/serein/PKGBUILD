@@ -10,10 +10,10 @@
 # becomes 1.0.0pre.nightly.<date>.<n>, which vercmp orders before a final 1.0.0.
 
 pkgname=serein
-pkgver=1.0.0pre.nightly.20261125.104
+pkgver=1.0.0pre.nightly.20261126.105
 pkgrel=1
 # Release tag and pkgrel of upstream's own Arch package, both kept by the upstream check.
-_reltag=v1.0.0-nightly.20261125.104
+_reltag=v1.0.0-nightly.20261126.105
 _build=1
 pkgdesc="Unofficial native Discord client written in Rust (nightly)"
 arch=('x86_64')
@@ -68,7 +68,7 @@ options=('!strip' '!debug')
 source=(
     "${pkgname}-${pkgver}-${_build}-upstream.tar.zst::${url}/releases/download/${_reltag}/${pkgname}-${_reltag}-Linux-arch-${pkgname}-${pkgver}-${_build}-x86_64.pkg.tar.zst"
 )
-sha256sums=('4631b4e6af5505edd3c94009ecbfc6a1b20d45a338132ff363a93c60c97d484a')
+sha256sums=('cacb6034ffabe6b68238cb49d8253b7072bbdd04a974bbd977b2049b7640b223')
 
 package() {
     cd "${srcdir}"
