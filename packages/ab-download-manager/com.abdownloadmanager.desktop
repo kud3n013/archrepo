@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=AB Download Manager
+GenericName=Download Manager
+Comment=Manage and organize your download files better than before
+Exec=/usr/bin/ab-download-manager
+Icon=ab-download-manager
+Terminal=false
+Type=Application
+Categories=Network;FileTransfer;Utility;
+Keywords=download;downloader;accelerator;queue;
+StartupWMClass=com-abdownloadmanager-desktop-AppKt
